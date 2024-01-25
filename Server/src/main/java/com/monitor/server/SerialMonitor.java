@@ -1,9 +1,11 @@
 package com.monitor.server;
-
-import com.fazecast.jSerialComm.*;
 import java.net.MalformedURLException;
-import java.net.URL;
+import com.fazecast.jSerialComm.*;
+
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.net.URL;
+import java.sql.*;
 
 public class SerialMonitor {
     private boolean DEBUG=true;
@@ -12,7 +14,12 @@ public class SerialMonitor {
     private LocalTime nextHour;
     private SerialPort microbit;
 
-    public SerialMonitor() throws MalformedURLException {}
+    private static Connection connection;
+
+    public SerialMonitor(Connection connection) throws MalformedURLException {
+        this.connection = connection;
+    }
+
     public void start() throws Exception {
         /*
     *         IF YOU GET AN IMPORT ERROR
@@ -71,6 +78,26 @@ public class SerialMonitor {
                 nextHour = ServerApplication.nextHour;
                 byte[] delimitedMessage = event.getReceivedData();
                 String data = new String(delimitedMessage);
+
+                String[] sensorData = data.split(",");
+                String temperature = sensorData[0];
+                String noiseLevel = sensorData[1];
+                String ambientLight = sensorData[2];
+
+                try {
+                    // Insert data into the database
+                    PreparedStatement insertStatement = connection.prepareStatement(
+                        "INSERT INTO YourTableName (temp, noise, light, time) VALUES (?, ?, ?, ?)"
+                    );
+                    insertStatement.setString(1, temperature);
+                    insertStatement.setString(2, noiseLevel);
+                    insertStatement.setString(3, ambientLight);
+                    insertStatement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+                    insertStatement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
                 if (DEBUG) {
                     System.out.println(data);
                 }
@@ -78,6 +105,7 @@ public class SerialMonitor {
             }
         });
     }
+ 
     public void stop(){
         microbit.closePort();
     }
