@@ -16,12 +16,12 @@ def sendDataFromServer():
 
 def main():
     radio.on()
-    radio.config(channel=21, power=7, queue = 10)
+    radio.config(channel=21, power=7, queue = 10)#to receiver
     print("Starting")
     
     while True:
         message = radio.receive()
-        sendDataFromServer()
+        #sendDataFromServer()
         
         if message:
             print(message)
