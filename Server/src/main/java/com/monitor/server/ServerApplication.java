@@ -1,62 +1,63 @@
 package com.monitor.server;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.sql.*;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.boot.SpringApplication;
 import java.time.LocalTime;
+import java.sql.*;
 
 @EnableScheduling
 @SpringBootApplication
 @RestController
 public class ServerApplication {
-	private static final String PASSWORD = "";
-	private static String URL = ""; //jdbc:mysql://localhost:3306/?useSSL=FALSE&allowPublicKeyRetrieval=True";
-	private static final String USER = "";
+	private static final String PASSWORD = "35c4p335!";
+	private static String URL = "jdbc:mysql://localhost:3306/prisondb?useSSL=FALSE&allowPublicKeyRetrieval=True";
+	private static final String USER = "root";
 	private static Connection connection;
 	private static SerialMonitor monitor;
 	public static LocalTime nextHour = LocalTime.now().plusHours(1);;
-	private static boolean imAlive=false;
 
-	//private static final String[] tableNames = {"zone1", "zone2", "zone3", "cup", "motion", "realTime"};
-	/*private static final String[] tableQuery ={
-		"temp VARCHAR(100) NOT NULL, noise VARCHAR(100) NOT NULL, light VARCHAR(100) NOT NULL, time INT",
-			"temp VARCHAR(100) NOT NULL, noise VARCHAR(100) NOT NULL, light VARCHAR(100) NOT NULL, time INT",
-			"temp VARCHAR(100) NOT NULL, noise VARCHAR(100) NOT NULL, light VARCHAR(100) NOT NULL, time INT",
-			"timeOfUse timestamp",
-			"item text NOT NULL, timeOfUse timestamp",
-			"id INT, zone text NOT NULL, temp VARCHAR(100) NOT NULL, noise VARCHAR(100) NOT NULL, light VARCHAR(100) NOT NULL"
+	private static final String[] tableNames = {
+		"users",
+		"rooms",
+		"roomOccupants",
+		"roomEnvironment"
 	};
+	
+	private static final String[] tableQuery ={
+		"user_id INT PRIMARY KEY, username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, user_type VARCHAR(20) NOT NULL",
+		"room_id INT PRIMARY KEY, room_name VARCHAR(255) NOT NULL, battery_level DECIMAL(5, 2), last_update_timestamp TIMESTAMP",
+		"occupancy_id INT PRIMARY KEY, room_id INT NOT NULL, user_id INT NOT NULL, entry_timestamp TIMESTAMP, exit_timestamp TIMESTAMP, FOREIGN KEY (room_id) REFERENCES rooms(room_id), FOREIGN KEY (user_id) REFERENCES users(user_id)",
+		"data_id INT PRIMARY KEY, room_id INT NOT NULL, timestamp TIMESTAMP, temperature DECIMAL(5, 2), noise_level DECIMAL(5, 2), light_level DECIMAL(5, 2), FOREIGN KEY (room_id) REFERENCES rooms(room_id)"
+	};
+	
 	static {
 		try {
 			connection = DriverManager.getConnection(URL,USER,PASSWORD);
-			Statement stmt = connection.createStatement();
-			stmt.execute("CREATE DATABASE IF NOT EXISTS Microbits");
-			URL = "jdbc:mysql://localhost:3306/Microbits?useSSL=FALSE&allowPublicKeyRetrieval=True";
+			Statement createDBStmt = connection.createStatement();
+			createDBStmt.execute("CREATE DATABASE IF NOT EXISTS prisondb");
+			URL = "jdbc:mysql://localhost:3306/prisondb?useSSL=FALSE&allowPublicKeyRetrieval=True";
 			connection = DriverManager.getConnection(URL,USER,PASSWORD);
+
+			for (int i = 0; i < tableNames.length; i++) {
+				String make = "CREATE TABLE IF NOT EXISTS " + tableNames[i] + "(" + tableQuery[i] + ")";
+				PreparedStatement createTableStmt = connection.prepareStatement(make);
+				createTableStmt.executeUpdate();
+			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
-	}*/ //more database setup ^^
+	} //more database setup ^^
 	public static void main(String[] args) throws Exception {
-		/*
-		String reset = "DROP TABLE IF EXISTS Microbits.Realtime ";
-		PreparedStatement stmt2 = connection.prepareStatement(reset);
-		stmt2.executeUpdate();
-		for(int i=0;i<tableNames.length;i++){
-			String make = "CREATE TABLE IF NOT EXISTS "+tableNames[i]+"("+tableQuery[i]+")";
-			PreparedStatement stmt = connection.prepareStatement(make);
-			stmt.executeUpdate();
-		}
-		*/ //database setup ^^
 		SpringApplication.run(ServerApplication.class, args);
-		monitor = new SerialMonitor();
+
+		monitor = new SerialMonitor(connection);
 		Thread.sleep(1000);
+
 		try{
 			monitor.start();
-		}catch (Exception e) {
+		} catch (Exception e) {
 			System.out.println("no Microbit detected");
 		}
 	}
@@ -66,8 +67,10 @@ public class ServerApplication {
 		monitor.stop();
 		monitor=null;
 		try{
-			monitor= new SerialMonitor();
+			monitor= new SerialMonitor(connection);
 			monitor.start();
-		}catch (Exception e){e.printStackTrace();}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
