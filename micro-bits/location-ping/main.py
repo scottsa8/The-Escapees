@@ -1,18 +1,13 @@
 from microbit import *
 import radio
 import struct
+import machine
 
-#TODO:
-# - Channel needs changing
-# - Message type needs changing 
-# - Message formatting needs checking
-# - Keeps track of its location
-
-MESSAGE_ID = 50
+MESSAGE_ID = 1
 name = ""
 #for keeping track of users location
 
-nodeList = [[]] #Node name, Signal Strength, count
+nodeList = [] #Node name, Signal Strength, count
 lastLocation = ""
 
 STARTING_COUNT = 50
@@ -100,21 +95,29 @@ def decodeMessage(message):
 
     if message:
         currentNodeName = message[0][3:].decode()
+        print("node name: "+currentNodeName)
         signalStrength = str(message[1])
+        print("signal: "+signalStrength)
         nodeRegisterd = False
 
+        print("node list: "+str(nodeList))
         #search through list of connected nodes
         for i in range(len(nodeList)):
 
-            if (nodeList[i][0] == currentNodeName):
-                # update previous entry to array
-                nodeList[i][1] = signalStrength
-                nodeRegisterd = True
-                break
-
-         #if node isn't there, add its nam
+            try:
+                if (nodeList[i][0] == currentNodeName):
+                    print("found node")
+                    # update previous entry to array
+                    nodeList[i][1] = signalStrength
+                    nodeRegisterd = True
+                    break
+            except:
+                nodeRegisterd = False  
+        #if node isn't there, add its nam
         if (nodeRegisterd == False):
-            nodeList.append([currentNodeName, signalStrength, STARTING_COUNT])   
+            print("Didn't find node")
+            nodeList.append([currentNodeName, signalStrength, STARTING_COUNT])  
+            print("new node list: "+str(nodeList)) 
         
         hasLocation = True
 
@@ -131,21 +134,23 @@ def main():
     while(True):
 
         # receive message from nodes
-        radio.config(channel=11)
+        radio.config(channel=22)
         message = radio.receive_full()
 
-        #update the list for the user's location
-        hasLocation = decodeMessage(message)
-        if hasLocation:
-            updateCounts()
-            locationNodeName = findLocation()
+        if message:
+            print(message)
+            #update the list for the user's location
+            hasLocation = decodeMessage(message)
+            if hasLocation:
+                updateCounts()
+                locationNodeName = findLocation()
 
-            #send the user's name and location to the receiver
-            radio.config(channel=12)#send message to server
-            radio.send(str(MESSAGE_ID) +","+name+","+locationNodeName)
-            radio.config(channel=11)
+                #send the user's name and location to the receiver
+                radio.config(channel=21)#send message to server
+                radio.send(str(MESSAGE_ID) +","+name+","+locationNodeName)
+                radio.config(channel=22)#receive from node
 
-        sleep(100)
+        sleep(100) 
 
 
 main()

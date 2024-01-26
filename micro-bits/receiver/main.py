@@ -16,7 +16,7 @@ def sendDataFromServer():
 
 def main():
     radio.on()
-    radio.config(channel=11, power=7, queue = 10)
+    radio.config(channel=21, power=7, queue = 10)
     print("Starting")
     
     while True:

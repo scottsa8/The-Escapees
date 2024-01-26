@@ -1,6 +1,8 @@
 from microbit import *
 import radio
 import struct
+import machine
+
 
 #TODO:
 # - Change radio channel
@@ -38,14 +40,13 @@ def getName():
 #Set up around the room to track user
 def main():
     radio.on()
-    radio.config(channel=12)
+    radio.config(channel=22)#send to location-ping microbits
 
     name = getName()
 
-
     while True:
 
-        radio.send("99,"+ name)
+        radio.send(name)
         sleep(1000)
      
 
