@@ -3,12 +3,6 @@ import radio
 import struct
 import machine
 
-
-#TODO:
-# - Change radio channel
-# - Change the packet look
-# - Format for multiple users?
-
 def getName():
     
     length = 5
