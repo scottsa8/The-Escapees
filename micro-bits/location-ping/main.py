@@ -10,8 +10,8 @@ name = ""
 nodeList = [] #Node name, Signal Strength, count
 lastLocation = ""
 
-STARTING_COUNT = 50
-COUNT_WEIGHT = 1
+STARTING_COUNT = 0
+COUNT_WEIGHT = 10
 MAX_COUNT = 100
 MIN_COUNT = 0
 
@@ -52,7 +52,7 @@ def updateCounts():
     for i in range(len(nodeList)):
         strengthList.append(nodeList[i][1])
 
-    strongestSignal = max(strengthList)
+    strongestSignal = min(strengthList)
 
     #find what node the strongest signal is from
     closestNodePointer = None
@@ -143,11 +143,19 @@ def main():
             hasLocation = decodeMessage(message)
             if hasLocation:
                 updateCounts()
+
                 locationNodeName = findLocation()
 
                 #send the user's name and location to the receiver
+
                 radio.config(channel=21)#send message to server
+
                 radio.send(str(MESSAGE_ID) +","+name+","+locationNodeName)
+                # try:
+                #     radio.send(locationNodeName+"   "+str(nodeList[0][0])+": "+str(nodeList[0][2])+", "+str(nodeList[1][0])+": "+str(nodeList[1][2]))
+                # except:
+                #     radio.send("none")
+
                 radio.config(channel=22)#receive from node
 
         sleep(100) 
