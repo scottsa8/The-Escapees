@@ -1,7 +1,7 @@
 package com.monitor.server;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import com.fazecast.jSerialComm.*;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.net.URL;
@@ -10,11 +10,9 @@ import java.sql.*;
 public class SerialMonitor {
     private boolean DEBUG=true;
     private URL url = new URL("http://localhost:8080");
-    private LocalTime hour = LocalTime.now();
-    private LocalTime nextHour;
     private SerialPort microbit;
 
-    private Connection connection;
+    private static Connection connection;
 
     public SerialMonitor(Connection connection) throws MalformedURLException {
         this.connection = connection;
@@ -74,42 +72,37 @@ public class SerialMonitor {
 
             @Override
             public void serialEvent(SerialPortEvent event) {
-                hour = LocalTime.now();
-                nextHour = ServerApplication.nextHour;
                 byte[] delimitedMessage = event.getReceivedData();
                 String data = new String(delimitedMessage);
+
+                int packetType = Integer.parseInt(data.split(":")[0]);
+                if(packetType == 1){ //moving device
+                    String movDeviceName = data.split(",")[1];
+                    String locName = data.split(",")[2];
+                } else if (packetType ==2) { //env
+                    String locName = data.split(",")[1];
+                    String temp = data.split(",")[2];
+                    String light = data.split(",")[3];
+                    String noise = data.split(",")[4];
+
+                    try {
+                        // Insert data into the database
+                        PreparedStatement insertStatement = connection.prepareStatement(
+                                "INSERT INTO YourTableName (temp, noise, light, time) VALUES (?, ?, ?, ?)"
+                                );
+                        insertStatement.setString(1, temp);
+                        insertStatement.setString(2, noise);
+                        insertStatement.setString(3, light);
+                        insertStatement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+                        insertStatement.executeUpdate();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
                 if (DEBUG) {
                     System.out.println(data);
-                }
-                else {
-                    String[] sensorData = data.split(",");
-                    if (sensorData [0] == "1") {
-                        System.out.println("Location");
-                    }
-                    else if (sensorData[0] == "2") {
-                        System.out.println("Environment");
-                        String temperature = sensorData[0];
-                        String noiseLevel = sensorData[1];
-                        String ambientLight = sensorData[2];
-    
-                        try {
-                            // Insert data into the database
-                            PreparedStatement insertStatement = connection.prepareStatement(
-                                "INSERT INTO roomEnvironment (room_id, timestamp, temperature, noise_level, light_level) VALUES (?, ?, ?, ?, ?)"
-                            );
-                            insertStatement.setInt(1, roomID);
-                            insertStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
-                            insertStatement.setBigDecimal(3, new BigDecimal(temperature));
-                            insertStatement.setBigDecimal(4, new BigDecimal(noiseLevel));
-                            insertStatement.setBigDecimal(5, new BigDecimal(ambientLight));
-                            insertStatement.executeUpdate();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    else {
-                        System.out.println("Unknown message");
-                    }
                 }
             }
         });
