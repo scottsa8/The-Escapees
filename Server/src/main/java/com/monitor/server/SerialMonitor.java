@@ -36,7 +36,7 @@ public class SerialMonitor {
 
 
         // Get the appropriate port and open
-        microbit = SerialPort.getCommPort("COM12");
+        microbit = SerialPort.getCommPort("COM5");
         microbit.openPort();
         // Set the baud rate
         if(microbit.isOpen()) {
@@ -74,35 +74,37 @@ public class SerialMonitor {
             public void serialEvent(SerialPortEvent event) {
                 byte[] delimitedMessage = event.getReceivedData();
                 String data = new String(delimitedMessage);
+                System.out.println("DATA:"+data);
 
-                int packetType = Integer.parseInt(data.split(":")[0]);
-                if(packetType == 1){ //moving device
-                    String movDeviceName = data.split(",")[1];
-                    String locName = data.split(",")[2];
-                } else if (packetType ==2) { //env
-                    String locName = data.split(",")[1];
-                    String temp = data.split(",")[2];
-                    String light = data.split(",")[3];
-                    String noise = data.split(",")[4];
+                    int packetType = Integer.parseInt(data.split(",")[0]);
+                        System.out.println("1:" + data.split(",")[1]);
+                        if (packetType == 1) { //moving device
+                            String movDeviceName = data.split(",")[1];
+                            String locName = data.split(",")[2];
+                            System.out.println("OUTPUT:" + movDeviceName + "," + locName);
+                        } else if (packetType == 2) { //env
+                            String locName = data.split(",")[1];
+                            Integer temp = Integer.valueOf(data.split(",")[2]);
+                            Float light = Float.valueOf(data.split(",")[3]);
+                            Integer noise = Integer.valueOf(data.split(",")[4]);
+                            System.out.println(locName + "," + temp + "," + light + "," + noise);
+//                            try {
+//                                //Insert data into the database
+//                                PreparedStatement insertStatement = connection.prepareStatement(
+//                                        "INSERT INTO roomEnvironment (temp, noise, light, time) VALUES (?, ?, ?, ?)"
+//                                );
+//                                insertStatement.setString(1, temp);
+//                                insertStatement.setString(2, noise);
+//                                insertStatement.setString(3, light);
+//                                insertStatement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+//                                insertStatement.executeUpdate();
+//                            } catch (SQLException e) {
+//                                e.printStackTrace();
+//                            }
 
-                    try {
-                        // Insert data into the database
-                        PreparedStatement insertStatement = connection.prepareStatement(
-                                "INSERT INTO YourTableName (temp, noise, light, time) VALUES (?, ?, ?, ?)"
-                                );
-                        insertStatement.setString(1, temp);
-                        insertStatement.setString(2, noise);
-                        insertStatement.setString(3, light);
-                        insertStatement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
-                        insertStatement.executeUpdate();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
+                        }
                 if (DEBUG) {
-                    System.out.println(data);
+
                 }
             }
         });

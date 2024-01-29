@@ -12,8 +12,8 @@ import java.sql.*;
 @RestController
 public class ServerApplication {
 	private static final String PASSWORD = "35c4p335!";
-	private static String URL = "jdbc:mysql://localhost:3306/prisondb?useSSL=FALSE&allowPublicKeyRetrieval=True";
-	private static final String USER = "root";
+	private static String URL = "jdbc:mysql://localhost:3306/?useSSL=FALSE&allowPublicKeyRetrieval=True";
+	private static final String USER = "java";
 	private static Connection connection;
 	private static SerialMonitor monitor;
 	public static LocalTime nextHour = LocalTime.now().plusHours(1);;
