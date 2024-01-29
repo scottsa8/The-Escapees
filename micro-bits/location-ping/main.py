@@ -138,9 +138,10 @@ def main():
         message = radio.receive_full()
 
         if message:
-            print(message)
+            
             #update the list for the user's location
             hasLocation = decodeMessage(message)
+
             if hasLocation:
                 updateCounts()
 
@@ -150,13 +151,10 @@ def main():
 
                 radio.config(channel=21)#send message to server
 
-                radio.send(str(MESSAGE_ID) +","+name+","+locationNodeName)
-                # try:
-                #     radio.send(locationNodeName+"   "+str(nodeList[0][0])+": "+str(nodeList[0][2])+", "+str(nodeList[1][0])+": "+str(nodeList[1][2]))
-                # except:
-                #     radio.send("none")
+                radio.send(str(MESSAGE_ID)+","+name+","+locationNodeName)
 
                 radio.config(channel=22)#receive from node
+                hasLocation = False
 
         sleep(100) 
 
