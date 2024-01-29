@@ -102,6 +102,20 @@ public class ServerApplication {
 		return output;
 	}
 
+	@GetMapping("/createAcc")
+	private String createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
+		//INSERT INTO DB
+		return "created"; //else failed
+	}
+	@GetMapping("/checkLog")
+	private boolean checkLog(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
+		if(user.equals(user) && pass.equals(pass)){//FROM DB
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 //	-All location names used from enviroments (needed to generate dropdown selection).
 //	-Enviroment variables for a specific location
 //	-A number of people in a certain location
