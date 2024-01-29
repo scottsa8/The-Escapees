@@ -36,7 +36,7 @@ public class SerialMonitor {
 
 
         // Get the appropriate port and open
-        microbit = SerialPort.getCommPort("COM5");
+        microbit = SerialPort.getCommPort("COM6");
         microbit.openPort();
         // Set the baud rate
         if(microbit.isOpen()) {
@@ -74,20 +74,19 @@ public class SerialMonitor {
             public void serialEvent(SerialPortEvent event) {
                 byte[] delimitedMessage = event.getReceivedData();
                 String data = new String(delimitedMessage);
-                System.out.println("DATA:"+data);
-
-                    int packetType = Integer.parseInt(data.split(",")[0]);
-                        System.out.println("1:" + data.split(",")[1]);
-                        if (packetType == 1) { //moving device
-                            String movDeviceName = data.split(",")[1];
-                            String locName = data.split(",")[2];
-                            System.out.println("OUTPUT:" + movDeviceName + "," + locName);
-                        } else if (packetType == 2) { //env
-                            String locName = data.split(",")[1];
-                            Integer temp = Integer.valueOf(data.split(",")[2]);
-                            Float light = Float.valueOf(data.split(",")[3]);
-                            Integer noise = Integer.valueOf(data.split(",")[4]);
-                            System.out.println(locName + "," + temp + "," + light + "," + noise);
+                data =data.strip();
+                System.out.println("INPUT:"+data);
+                int packetType = Integer.parseInt(data.split(",")[0]);
+                if (packetType == 1) { //moving device
+                    String movDeviceName = data.split(",")[1];
+                    String locName = data.split(",")[2];
+                    System.out.println("OUTPUT:" + movDeviceName + "," + locName);
+                } else if (packetType == 2) { //env
+                    String locName = data.split(",")[1];
+                    int temp = Integer.parseInt(data.split(",")[2]);
+                    float light = Float.parseFloat(data.split(",")[3]);
+                    int noise = Integer.parseInt(data.split(",")[4]);
+                    System.out.println(locName + "," + temp + "," + light + "," + noise);
 //                            try {
 //                                //Insert data into the database
 //                                PreparedStatement insertStatement = connection.prepareStatement(
@@ -102,7 +101,7 @@ public class SerialMonitor {
 //                                e.printStackTrace();
 //                            }
 
-                        }
+                }
                 if (DEBUG) {
 
                 }
