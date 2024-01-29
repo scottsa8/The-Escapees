@@ -1,6 +1,8 @@
 package com.monitor.server;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
@@ -73,4 +75,35 @@ public class ServerApplication {
 			e.printStackTrace();
 		}
 	}
+
+	@GetMapping("/getAllNames")
+	private String getAllNames(){
+		String output="";
+		//GET FROM DB
+		return output;
+	}
+	@GetMapping("/getEnv")
+	private String getEnv(@RequestParam(value = "loc") String loc){
+		String output="";
+		//GET FROM DB AT LOC
+	return output;
+	}
+
+	@GetMapping("/getPeople")
+	private int getPeople(@RequestParam(value="loc")String loc){
+		int total=0;
+		return total;
+	}
+	@GetMapping("/listAll")
+	private String listAll(){
+		String output="";
+		//GET FROM DB
+		//ALL PEOPLE AND LATEST LOCATION
+		return output;
+	}
+
+//	-All location names used from enviroments (needed to generate dropdown selection).
+//	-Enviroment variables for a specific location
+//	-A number of people in a certain location
+//	-A list of all the people, type of person and their location
 }
