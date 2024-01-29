@@ -103,9 +103,9 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/createAcc")
-	private String createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
+	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
 		//INSERT INTO DB
-		return "created"; //else failed
+		return true; //else failed
 	}
 	@GetMapping("/checkLog")
 	private boolean checkLog(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
