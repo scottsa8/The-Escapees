@@ -115,9 +115,4 @@ public class ServerApplication {
 			return false;
 		}
 	}
-
-//	-All location names used from enviroments (needed to generate dropdown selection).
-//	-Enviroment variables for a specific location
-//	-A number of people in a certain location
-//	-A list of all the people, type of person and their location
 }
