@@ -1,4 +1,5 @@
 package com.monitor.server;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import com.fazecast.jSerialComm.*;
 
@@ -54,7 +55,6 @@ public class SerialMonitor {
 
         // Add data listener to the SerialPort
         microbit.addDataListener(new SerialPortMessageListener() {
-
             @Override
             public int getListeningEvents() {
                 return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
@@ -77,30 +77,45 @@ public class SerialMonitor {
                 data =data.strip();
                 System.out.println("INPUT:"+data);
                 int packetType = Integer.parseInt(data.split(",")[0]);
+                String[] sensorData = data.split(",");
                 if (packetType == 1) { //moving device
-                    String movDeviceName = data.split(",")[1];
-                    String locName = data.split(",")[2];
-                    System.out.println("OUTPUT:" + movDeviceName + "," + locName);
-                } else if (packetType == 2) { //env
-                    String locName = data.split(",")[1];
-                    int temp = Integer.parseInt(data.split(",")[2]);
-                    float light = Float.parseFloat(data.split(",")[3]);
-                    int noise = Integer.parseInt(data.split(",")[4]);
-                    System.out.println(locName + "," + temp + "," + light + "," + noise);
-//                            try {
-//                                //Insert data into the database
-//                                PreparedStatement insertStatement = connection.prepareStatement(
-//                                        "INSERT INTO roomEnvironment (temp, noise, light, time) VALUES (?, ?, ?, ?)"
-//                                );
-//                                insertStatement.setString(1, temp);
-//                                insertStatement.setString(2, noise);
-//                                insertStatement.setString(3, light);
-//                                insertStatement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
-//                                insertStatement.executeUpdate();
-//                            } catch (SQLException e) {
-//                                e.printStackTrace();
-//                            }
+                    String deviceName = sensorData[1];
+                    String roomName = sensorData[2];
+                    try {
+                        // Insert data into the database for moving devices
+                        PreparedStatement insertStatement = connection.prepareStatement(
+                            "INSERT INTO movement (occupancy_id, room_id, user_id, timestamp) VALUES (?, ?, ?, ?)"
+                        );
+                        insertStatement.setString(2, roomName);
+                        insertStatement.setString(3, deviceName);
+                        insertStatement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+                        insertStatement.executeUpdate();
 
+                    }
+                    catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                } 
+                else if (packetType == 2) { //env
+                    String roomID = sensorData[1];
+                    String temperature = sensorData[2];
+                    String noiseLevel = sensorData[3];
+                    String ambientLight = sensorData[4];
+                    try {
+                        //Insert data into the database
+                        PreparedStatement insertStatement = connection.prepareStatement(
+                            "INSERT INTO roomEnvironment (room_id, timestamp, temperature, noise_level, light_level) VALUES (?, ?, ?, ?, ?)"
+                        );
+                        insertStatement.setString(1, roomID);
+                        insertStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+                        insertStatement.setBigDecimal(3, new BigDecimal(temperature));
+                        insertStatement.setBigDecimal(4, new BigDecimal(noiseLevel));
+                        insertStatement.setBigDecimal(5, new BigDecimal(ambientLight));
+                        insertStatement.executeUpdate();
+                    } 
+                    catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
                 if (DEBUG) {
 
