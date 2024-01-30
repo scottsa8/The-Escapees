@@ -1,6 +1,8 @@
 from microbit import *
 import radio
 
+entriesLog = []
+count = 0
 
 #will check for any requests wanting to be sent from the server to other micro:bits
 def sendDataFromServer():
@@ -14,6 +16,35 @@ def sendDataFromServer():
         radio.send(message)
         radio.config(channel=11)
 
+def findEntries():
+    global entriesLog
+    global count
+
+
+    if(entriesLog[0] != entriesLog[1]):
+        #someone has entered room side entrieslog[1]
+        print("3,"+entriesLog[1])
+    
+    entriesLog = []
+    count = 0
+
+
+def logEntries(name):
+    global count
+    global entriesLog
+
+    if (count < 2):
+        print(str(entriesLog))
+        entriesLog.append(name)
+        count = count + 1
+
+        if(count == 2):
+            findEntries()
+    else:
+        print(str(entriesLog))
+        findEntries()
+
+
 def main():
     radio.on()
     radio.config(channel=21, power=7, queue = 10)#to receiver
@@ -24,7 +55,11 @@ def main():
         #sendDataFromServer()
         
         if message:
-            print(message)
+            messageArr = message.split(",")
+            if(messageArr[0] == "99"):
+                logEntries(messageArr[1])
+            else:
+                print(message)
 
 
 main()

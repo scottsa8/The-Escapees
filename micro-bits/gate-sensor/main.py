@@ -47,25 +47,9 @@ def addGateSensor():
 
         if(gateSensor.getCurrentGateStatus() == "Trigger"):
             #send radio to other gate
-            radio.config(channel=24, queue=1) 
-            radio.send(name)
-            
-
-        radio.config(channel=24, queue=1)
-        message = radio.receive()
-
-        if message and message != name:
-
-            while True:
-                if(gateSensor.getCurrentGateStatus() == "Trigger"):
-                    radio.config(channel=21)
-                    radio.send(name)
-                    radio.config(channel=24, queue=1)
-                    break
-
-            
-
-        #radio.send(gateSensor.getCurrentGateStatus())
+            radio.config(channel=21, queue=1) 
+            radio.send("99,"+name)
+            sleep(500)       
 
 def main():
     radio.on()
