@@ -5,7 +5,7 @@ class GateSensor:
 
     def __init__(self):
         
-        self.sensitivity = 100
+        self.sensitivity = 150
         pass
 
     def calibrateSensor(self):
@@ -13,7 +13,7 @@ class GateSensor:
         sleep(1000)
         distValues = []
         i=0
-        for i in range(100):
+        for i in range(10):
             distValues.append(self.getDistance())
             sleep(10)
             i = i + 1
