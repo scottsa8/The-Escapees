@@ -13,7 +13,7 @@ public class SerialMonitor {
     private URL url = new URL("http://localhost:8080");
     private SerialPort microbit;
 
-    private static Connection connection;
+    private Connection connection;
 
     public SerialMonitor(Connection connection) throws MalformedURLException {
         this.connection = connection;
@@ -29,16 +29,26 @@ public class SerialMonitor {
     *   This should add the required dependency  */
 
         // List all the ports available
-          if(DEBUG){
-              for(SerialPort s : SerialPort.getCommPorts()) {
-                  System.out.println("Serial Port: " + s.getDescriptivePortName());
-              }
-          }
+        if(DEBUG){
+            for(SerialPort s : SerialPort.getCommPorts()) {
+                System.out.println("Serial Port: " + s.getDescriptivePortName());
+            }
+        }
 
-
-        // Get the appropriate port and open
-        microbit = SerialPort.getCommPort("COM6");
+        //Set port
+        SerialPort[] ports = SerialPort.getCommPorts();
+        for (SerialPort port : ports) {
+            if (port.getDescriptivePortName().contains("USB Serial Device")) {
+                microbit = port;
+                break;
+            }
+        }
+        if (microbit == null) {
+            System.out.println("Microbit is not found");
+            throw new Exception("Microbit not found");
+        }
         microbit.openPort();
+
         // Set the baud rate
         if(microbit.isOpen()) {
             if(DEBUG){
