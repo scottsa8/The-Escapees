@@ -174,7 +174,6 @@ public class ServerApplication {
 		return output.toString();
 	}
 
-
 	@GetMapping("/createAcc")
 	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
 		try {
