@@ -82,7 +82,7 @@ public class SerialMonitor {
                     String deviceName = sensorData[1];
                     String roomName = sensorData[2];
                     try {
-                        // Insert data into the database for moving devices
+                        // Insert data into the database for movement
                         PreparedStatement insertStatement = connection.prepareStatement(
                             "INSERT INTO movement (occupancy_id, room_id, user_id, timestamp) VALUES (?, ?, ?, ?)"
                         );

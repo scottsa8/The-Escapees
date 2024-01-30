@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
 import java.time.LocalTime;
+import java.math.BigDecimal;
 import java.sql.*;
 
 @EnableScheduling
@@ -29,7 +30,7 @@ public class ServerApplication {
 	
 	private static final String[] tableQuery ={
 		"user_id INT PRIMARY KEY, username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, user_type VARCHAR(20) NOT NULL",
-		"room_id INT PRIMARY KEY, room_name VARCHAR(255) NOT NULL, battery_level DECIMAL(5, 2), last_update_timestamp TIMESTAMP",
+		"room_id INT PRIMARY KEY, room_name VARCHAR(255) NOT NULL",
 		"occupancy_id INT PRIMARY KEY, room_id INT NOT NULL, user_id INT NOT NULL, entry_timestamp TIMESTAMP, exit_timestamp TIMESTAMP, FOREIGN KEY (room_id) REFERENCES rooms(room_id), FOREIGN KEY (user_id) REFERENCES users(user_id)",
 		"data_id INT PRIMARY KEY, room_id INT NOT NULL, timestamp TIMESTAMP, temperature DECIMAL(5, 2), noise_level DECIMAL(5, 2), light_level DECIMAL(5, 2), FOREIGN KEY (room_id) REFERENCES rooms(room_id)"
 	};
@@ -78,41 +79,132 @@ public class ServerApplication {
 
 	@GetMapping("/getAllNames")
 	private String getAllNames(){
-		String output="";
-		//GET FROM DB
-		return output;
+		StringBuilder output = new StringBuilder();
+		try {
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT username FROM users");
+			while (rs.next()) {
+				output.append(rs.getString("username")).append("\n");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return output.toString();
 	}
+
 	@GetMapping("/getEnv")
 	private String getEnv(@RequestParam(value = "loc") String loc){
-		String output="";
-		//GET FROM DB AT LOC
-	return output;
+		StringBuilder output = new StringBuilder();
+		try {
+			// Assuming loc parameter is the room_id
+			PreparedStatement selectStatement = connection.prepareStatement(
+					"SELECT * FROM roomEnvironment WHERE room_id = ?"
+			);
+			selectStatement.setString(1, loc);
+			ResultSet rs = selectStatement.executeQuery();
+			
+			while (rs.next()) {
+				int dataId = rs.getInt("data_id");
+				Timestamp timestamp = rs.getTimestamp("timestamp");
+				BigDecimal temperature = rs.getBigDecimal("temperature");
+				BigDecimal noiseLevel = rs.getBigDecimal("noise_level");
+				BigDecimal lightLevel = rs.getBigDecimal("light_level");
+
+				// Customize the output format based on your needs
+				output.append(String.format("Data ID: %d, Timestamp: %s, Temperature: %s, Noise Level: %s, Light Level: %s\n", dataId, timestamp.toString(), temperature.toString(), noiseLevel.toString(), lightLevel.toString()));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return output.toString();
 	}
 
 	@GetMapping("/getPeople")
-	private int getPeople(@RequestParam(value="loc")String loc){
-		int total=0;
+	private int getPeople(@RequestParam(value="loc") String loc) {
+		int total = 0;
+
+		try {
+			// Fetch the total number of people in a specific location from the database
+			PreparedStatement selectStatement = connection.prepareStatement(
+					"SELECT COUNT(*) AS total_people " +
+							"FROM roomOccupants ro " +
+							"JOIN rooms r ON ro.room_id = r.room_id " +
+							"WHERE r.room_name = ?"
+			);
+			selectStatement.setString(1, loc);
+
+			ResultSet rs = selectStatement.executeQuery();
+
+			// Retrieve the total count
+			if (rs.next()) {
+				total = rs.getInt("total_people");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		return total;
 	}
+
 	@GetMapping("/listAll")
-	private String listAll(){
-		String output="";
-		//GET FROM DB
-		//ALL PEOPLE AND LATEST LOCATION
-		return output;
+	private String listAll() {
+		StringBuilder output = new StringBuilder();
+
+		try {
+			// Fetch all users and their latest location from the database
+			PreparedStatement selectStatement = connection.prepareStatement(
+					"SELECT u.username, r.room_name " +
+							"FROM users u " +
+							"JOIN roomOccupants ro ON u.user_id = ro.user_id " +
+							"JOIN rooms r ON ro.room_id = r.room_id"
+			);
+
+			ResultSet rs = selectStatement.executeQuery();
+
+			// Iterate over the result set and build the output string
+			while (rs.next()) {
+				String username = rs.getString("username");
+				String roomName = rs.getString("room_name");
+				output.append("User: ").append(username).append(", Location: ").append(roomName).append("\n");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return output.toString();
 	}
+
 
 	@GetMapping("/createAcc")
 	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
-		//INSERT INTO DB
-		return true; //else failed
+		try {
+			PreparedStatement insertStatement = connection.prepareStatement(
+					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)"
+			);
+			insertStatement.setString(1, user);
+			insertStatement.setString(2, pass);
+			insertStatement.setString(3, "user"); // Assuming default user_type is "user"
+			insertStatement.executeUpdate();
+			return true; // Success
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false; // Failed
+		}
 	}
+
 	@GetMapping("/checkLog")
 	private boolean checkLog(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
-		if(user.equals(user) && pass.equals(pass)){//FROM DB
-			return true;
-		}else{
-			return false;
+		try {
+			PreparedStatement selectStatement = connection.prepareStatement(
+					"SELECT * FROM users WHERE username = ? AND password = ?"
+			);
+			selectStatement.setString(1, user);
+			selectStatement.setString(2, pass);
+			ResultSet rs = selectStatement.executeQuery();
+			return rs.next(); // Returns true if a matching user is found
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false; // Failed
 		}
 	}
 }
