@@ -92,8 +92,8 @@ public class SerialMonitor {
                 if (DEBUG) {
 
                 }
-                if(sensorData.length<4) {
-                    if (packetType == 1) { //moving device
+                if (packetType == 1) { //moving device
+                    if(sensorData.length==2) {
                         String roomMicrobit = sensorData[1];
                         String deviceName = sensorData[2];
 
@@ -138,7 +138,10 @@ public class SerialMonitor {
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
-                    } else if (packetType == 2) { //env
+                    }
+                }
+                else if (packetType == 2) { //env
+                    if (sensorData.length == 4) {
                         String microbitName = sensorData[1];
                         String temperature = sensorData[2];
                         String noiseLevel = sensorData[3];
@@ -173,7 +176,10 @@ public class SerialMonitor {
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
-                    } else if (packetType == 3) {//gates
+                    }
+                }
+                else if(packetType == 3 ) {//gates
+                    if (sensorData.length == 1) {
                         String loc = sensorData[1];
                         //check if loc is in db?
                         if (true) {
