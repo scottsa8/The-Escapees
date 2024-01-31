@@ -12,7 +12,7 @@ public class SerialMonitor {
     private boolean DEBUG=true;
     private URL url = new URL("http://localhost:8080");
     private SerialPort microbit;
-    private int locCounter=0;
+    private int locCounter = 0;
 
     private Connection connection;
 
@@ -85,28 +85,59 @@ public class SerialMonitor {
             public void serialEvent(SerialPortEvent event) {
                 byte[] delimitedMessage = event.getReceivedData();
                 String data = new String(delimitedMessage);
-                data =data.strip();
-                System.out.println("INPUT:"+data);
-                int packetType = Integer.parseInt(data.split(",")[0]);
+                data = data.strip();
+                System.out.println("INPUT:" + data);
                 String[] sensorData = data.split(",");
-                if (packetType == 1) { //moving device
-                    String deviceName = sensorData[1];
-                    String roomName = sensorData[2];
-                    try {
-                        // Insert data into the database for movement
-                        PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO movement (occupancy_id, room_id, user_id, timestamp) VALUES (?, ?, ?, ?)"
-                        );
-                        insertStatement.setString(2, roomName);
-                        insertStatement.setString(3, deviceName);
-                        insertStatement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
-                        insertStatement.executeUpdate();
+                int packetType = Integer.parseInt(sensorData[0]);
+                if (DEBUG) {
 
-                    }
-                    catch (SQLException e) {
+                }
+                if (packetType == 1) { //moving device
+                    String roomMicrobit = sensorData[1];
+                    String deviceName = sensorData[2];
+                
+                    try {
+                        // Retrieve room_id based on room_microbit
+                        PreparedStatement selectRoomIdStatement = connection.prepareStatement(
+                                "SELECT room_id FROM rooms WHERE room_microbit = ?"
+                        );
+                        selectRoomIdStatement.setString(1, roomMicrobit);
+                        ResultSet roomResult = selectRoomIdStatement.executeQuery();
+                
+                        // Check if a room with the specified room_microbit exists
+                        if (roomResult.next()) {
+                            int roomID = roomResult.getInt("room_id");
+                
+                            PreparedStatement selectUserIdStatement = connection.prepareStatement(
+                                    "SELECT user_id FROM users WHERE user_microbit = ?"
+                            );
+                            selectUserIdStatement.setString(1, deviceName);
+                            ResultSet userResult = selectUserIdStatement.executeQuery();
+                
+                            // Check if a user with the specified user_microbit exists
+                            if (userResult.next()) {
+                                int userID = userResult.getInt("user_id");
+                
+                                // Insert data into the database for movement
+                                PreparedStatement insertStatement = connection.prepareStatement(
+                                        "INSERT INTO roomOccupants (room_id, user_id, entry_timestamp) VALUES (?, ?, ?)"
+                                );
+                                insertStatement.setInt(1, roomID);
+                                insertStatement.setInt(2, userID);
+                                insertStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+                                insertStatement.executeUpdate();
+                            } else {
+                                // Handle the case where the deviceName does not correspond to any user
+                                System.out.println("No user found for deviceName: " + deviceName);
+                            }
+                        } else {
+                            // Handle the case where the roomMicrobit does not correspond to any room
+                            System.out.println("No room found for roomMicrobit: " + roomMicrobit);
+                        }
+                    } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                } 
+                }                
                 else if (packetType == 2) { //env
                     String microbitName = sensorData[1];
                     String temperature = sensorData[2];
@@ -146,14 +177,11 @@ public class SerialMonitor {
                 else if(packetType == 3 ){//gates
                     String loc = sensorData[1];
                     //check if loc is in db?
-                    if(false){
+                    if(true) {
                         //add to DB
                     }
                     locCounter++;
                     //update DB counter
-                }
-                if (DEBUG) {
-
                 }
             }
         });
