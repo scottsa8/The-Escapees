@@ -108,26 +108,42 @@ public class SerialMonitor {
                     }
                 } 
                 else if (packetType == 2) { //env
-                    String roomID = sensorData[1];
+                    String microbitName = sensorData[1];
                     String temperature = sensorData[2];
                     String noiseLevel = sensorData[3];
                     String ambientLight = sensorData[4];
+                    
                     try {
-                        //Insert data into the database
-                        PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO roomEnvironment (room_id, timestamp, temperature, noise_level, light_level) VALUES (?, ?, ?, ?, ?)"
+                        // Retrieve room_id based on room_microbit
+                        PreparedStatement selectRoomIdStatement = connection.prepareStatement(
+                                "SELECT room_id FROM rooms WHERE room_microbit = ?"
                         );
-                        insertStatement.setString(1, roomID);
-                        insertStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
-                        insertStatement.setBigDecimal(3, new BigDecimal(temperature));
-                        insertStatement.setBigDecimal(4, new BigDecimal(noiseLevel));
-                        insertStatement.setBigDecimal(5, new BigDecimal(ambientLight));
-                        insertStatement.executeUpdate();
-                    } 
-                    catch (SQLException e) {
+                        selectRoomIdStatement.setString(1, microbitName);
+                        ResultSet roomResult = selectRoomIdStatement.executeQuery();
+                
+                        // Check if a room with the specified microbitName exists
+                        if (roomResult.next()) {
+                            int roomID = roomResult.getInt("room_id");
+                
+                            // Insert data into the database
+                            PreparedStatement insertStatement = connection.prepareStatement(
+                                    "INSERT INTO roomEnvironment (room_id, timestamp, temperature, noise_level, light_level) VALUES (?, ?, ?, ?, ?)"
+                            );
+                            insertStatement.setInt(1, roomID);
+                            insertStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+                            insertStatement.setBigDecimal(3, new BigDecimal(temperature));
+                            insertStatement.setBigDecimal(4, new BigDecimal(noiseLevel));
+                            insertStatement.setBigDecimal(5, new BigDecimal(ambientLight));
+                            insertStatement.executeUpdate();
+                        } else {
+                            // Handle the case where the microbitName does not correspond to any room
+                            System.out.println("No room found for microbitName: " + microbitName);
+                        }
+                    } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                }else if(packetType ==3 ){//gates
+                }
+                else if(packetType == 3 ){//gates
                     String loc = sensorData[1];
                     //check if loc is in db?
                     if(false){
