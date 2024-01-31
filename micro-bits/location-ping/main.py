@@ -137,6 +137,10 @@ def main():
         radio.config(channel=22)
         message = radio.receive_full()
 
+        if(button_a.is_pressed() and button_b.is_pressed()):
+            #scroll name of microbit
+            display.scroll(name)
+
         if message:
             
             #update the list for the user's location

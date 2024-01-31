@@ -42,6 +42,10 @@ def main():
 
         radio.send(name)
         sleep(1000)
+
+        if(button_a.is_pressed() and button_b.is_pressed()):
+            #scroll name of microbit
+            display.scroll(name)
      
 
 main()

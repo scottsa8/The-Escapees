@@ -37,8 +37,11 @@ def addGateSensor():
     calibrationComplete = False
 
     while(calibrationComplete == False):
-        
-        if(button_a.is_pressed()):
+        if(button_a.is_pressed() and button_b.is_pressed()):
+            #scroll name of microbit
+            display.scroll(name)
+
+        if(button_a.is_pressed() and button_b.is_pressed() == False):
             display.show(Image.CONFUSED)
             gateSensor.calibrateSensor()
             calibrationComplete = True

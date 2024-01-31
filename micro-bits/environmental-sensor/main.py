@@ -110,6 +110,10 @@ def main():
         radio.send(str(PACKET_ID)+","+name+ ","+ str(getAverageTemp()) + "," + str(getAverageLight()) + "," + str(getAverageNoise()))   
         sleep(1)
 
+        if(button_a.is_pressed() and button_b.is_pressed()):
+            #scroll name of microbit
+            display.scroll(name)
+
     #pendForRequests()
 
 
