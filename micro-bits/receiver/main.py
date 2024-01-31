@@ -38,14 +38,14 @@ def logEntries(name):
     global entriesLog
 
     if (count < 2):
-        print(str(entriesLog))
+        #print(str(entriesLog))
         entriesLog.append(name)
         count = count + 1
 
         if(count == 2):
             findEntries()
     else:
-        print(str(entriesLog))
+       # print(str(entriesLog))
         findEntries()
 
 
