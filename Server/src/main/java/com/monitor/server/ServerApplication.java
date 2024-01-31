@@ -86,7 +86,7 @@ public class ServerApplication {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT username FROM users");
 			while (rs.next()) {
-				output.append(rs.getString("username")).append("\n");
+				output.append(rs.getString("username")).append("!");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -102,7 +102,7 @@ public class ServerApplication {
 			PreparedStatement selectStatement = connection.prepareStatement(
 					"SELECT * FROM roomEnvironment WHERE room_id = ?"
 			);
-			selectStatement.setString(1, loc);
+				selectStatement.setString(1, loc);
 			ResultSet rs = selectStatement.executeQuery();
 			
 			while (rs.next()) {
@@ -113,7 +113,7 @@ public class ServerApplication {
 				BigDecimal lightLevel = rs.getBigDecimal("light_level");
 
 				// Customize the output format based on your needs
-				output.append(String.format("Data ID: %d, Timestamp: %s, Temperature: %s, Noise Level: %s, Light Level: %s\n", dataId, timestamp.toString(), temperature.toString(), noiseLevel.toString(), lightLevel.toString()));
+				output.append(String.format("Data ID: %d, Timestamp: %s, Temperature: %s, Noise Level: %s, Light Level: %s!", dataId, timestamp.toString(), temperature.toString(), noiseLevel.toString(), lightLevel.toString()));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -167,7 +167,7 @@ public class ServerApplication {
 			while (rs.next()) {
 				String username = rs.getString("username");
 				String roomName = rs.getString("room_name");
-				output.append("User: ").append(username).append(", Location: ").append(roomName).append("\n");
+				output.append("User: ").append(username).append(", Location: ").append(roomName).append("!");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
