@@ -12,6 +12,7 @@ public class SerialMonitor {
     private boolean DEBUG=true;
     private URL url = new URL("http://localhost:8080");
     private SerialPort microbit;
+    private int locCounter=0;
 
     private Connection connection;
 
@@ -141,7 +142,16 @@ public class SerialMonitor {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                }                
+                }
+                else if(packetType == 3 ){//gates
+                    String loc = sensorData[1];
+                    //check if loc is in db?
+                    if(false){
+                        //add to DB
+                    }
+                    locCounter++;
+                    //update DB counter
+                }
                 if (DEBUG) {
 
                 }

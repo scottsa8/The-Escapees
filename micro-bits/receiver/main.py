@@ -3,6 +3,10 @@ import radio
 
 entriesLog = []
 count = 0
+arrivedTime = 0
+
+
+TIMEOUT = 2000
 
 #will check for any requests wanting to be sent from the server to other micro:bits
 def sendDataFromServer():
@@ -46,18 +50,35 @@ def logEntries(name):
 
 
 def main():
+
+    global count
+    global entriesLog
+    global arrivedTime
+
     radio.on()
     radio.config(channel=21, power=7, queue = 10)#to receiver
     print("Starting")
     
+    arrivedTime = running_time()
+
     while True:
         message = radio.receive()
         #sendDataFromServer()
         
+        currentTime = running_time()
+
+        timePassed = currentTime - arrivedTime
+
+        if(timePassed > TIMEOUT):
+            count = 0
+            entriesLog = []
+
         if message:
             messageArr = message.split(",")
             if(messageArr[0] == "99"):
                 logEntries(messageArr[1])
+                arrivedTime = running_time()
+                
             else:
                 print(message)
 
