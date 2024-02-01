@@ -181,37 +181,46 @@ public class SerialMonitor {
                         e.printStackTrace();
                     }
                 }
-                else if (packetType == 3) { // head count
+                else if (packetType == 3) { // Increment head count for a room
                     String roomMicrobit = sensorData[1];
-                
+                    
                     try {
-                        // Retrieve room_id based on room_microbit
+                        // Retrieve room ID based on room_microbit
                         PreparedStatement selectRoomIdStatement = connection.prepareStatement(
                             "SELECT room_id FROM rooms WHERE room_microbit = ?"
                         );
                         selectRoomIdStatement.setString(1, roomMicrobit);
-                        ResultSet roomResult = selectRoomIdStatement.executeQuery();
+                        ResultSet roomIdResult = selectRoomIdStatement.executeQuery();
                 
-                        // Check if a room with the specified room_microbit exists
-                        if (roomResult.next()) {
-                            int roomID = roomResult.getInt("room_id");
+                        if (roomIdResult.next()) {
+                            int roomId = roomIdResult.getInt("room_id");
                 
-                            // Increment head_count for the matching room
-                            PreparedStatement updateHeadCountStatement = connection.prepareStatement(
-                                "UPDATE rooms SET head_count = head_count + 1 WHERE room_id = ?"
+                            // Retrieve the latest head count and timestamp for the room from headCountHistory
+                            PreparedStatement selectHeadCountStatement = connection.prepareStatement(
+                                "SELECT head_count, MAX(change_timestamp) AS latest_timestamp FROM headCountHistory WHERE room_id = ?"
                             );
-                            updateHeadCountStatement.setInt(1, roomID);
-                            updateHeadCountStatement.executeUpdate();
+                            selectHeadCountStatement.setInt(1, roomId);
+                            ResultSet headCountResult = selectHeadCountStatement.executeQuery();
                 
-                            System.out.println("Head count incremented for room with microbit: " + roomMicrobit);
-                        } else {
-                            // Handle the case where the roomMicrobit does not correspond to any room
-                            System.out.println("No room found for roomMicrobit: " + roomMicrobit);
+                            int previousHeadCount = 0;
+                            if (headCountResult.next()) {
+                                previousHeadCount = headCountResult.getInt("head_count");
+                            }
+                
+                            // Increment the head count and insert a new record into headCountHistory
+                            int newHeadCount = previousHeadCount + 1;
+                            PreparedStatement insertHeadCountStatement = connection.prepareStatement(
+                                "INSERT INTO headCountHistory (room_id, head_count, change_timestamp) VALUES (?, ?, ?)"
+                            );
+                            insertHeadCountStatement.setInt(1, roomId);
+                            insertHeadCountStatement.setInt(2, newHeadCount);
+                            insertHeadCountStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+                            insertHeadCountStatement.executeUpdate();
                         }
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                }
+                }                
             }
         });
     }
