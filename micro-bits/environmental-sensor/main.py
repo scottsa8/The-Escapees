@@ -89,7 +89,7 @@ def pendForRequests():
                 
                 if message is not None: # Replacement for exception handling to stop breaking the loop
                     radio.config(channel=11) #recieveing on
-                    radio.send("2,"+message)
+                    radio.send("2," + message)
                     radio.config(channel=13) #sending request to station
             
             sleep(1) # Avoid overloading

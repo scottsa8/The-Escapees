@@ -184,14 +184,36 @@ public class SerialMonitor {
                         e.printStackTrace();
                     }
                 }
-                else if(packetType == 3 ){//gates
-                    //String loc = sensorData[1];
-                    //check if loc is in db?
-                    //if(true) {
-                        //add to DB
-                    //}
-                    //locCounter++;
-                    //update DB counter
+                else if (packetType == 3) { // head count
+                    String roomMicrobit = sensorData[1];
+                
+                    try {
+                        // Retrieve room_id based on room_microbit
+                        PreparedStatement selectRoomIdStatement = connection.prepareStatement(
+                                "SELECT room_id FROM rooms WHERE room_microbit = ?"
+                        );
+                        selectRoomIdStatement.setString(1, roomMicrobit);
+                        ResultSet roomResult = selectRoomIdStatement.executeQuery();
+                
+                        // Check if a room with the specified room_microbit exists
+                        if (roomResult.next()) {
+                            int roomID = roomResult.getInt("room_id");
+                
+                            // Increment head_count for the matching room
+                            PreparedStatement updateHeadCountStatement = connection.prepareStatement(
+                                    "UPDATE rooms SET head_count = head_count + 1 WHERE room_id = ?"
+                            );
+                            updateHeadCountStatement.setInt(1, roomID);
+                            updateHeadCountStatement.executeUpdate();
+                
+                            System.out.println("Head count incremented for room with microbit: " + roomMicrobit);
+                        } else {
+                            // Handle the case where the roomMicrobit does not correspond to any room
+                            System.out.println("No room found for roomMicrobit: " + roomMicrobit);
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
