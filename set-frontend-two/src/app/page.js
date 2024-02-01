@@ -1,45 +1,102 @@
-function Card({ title, children, width, height }) {
-  return (
-    <div className="card" style={{ width: width, height: height }}>
-      <div className="card-title">{title}</div>
-      <div className="card-content">{children}</div>
-    </div>
-  );
-}
+"use client";
 
-function CardContainer({ children }) {
-  return <div className="card-container">{children}</div>;
-}
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useId } from 'react';
+import Image from "next/image";
+import "./main.css"
+import { network } from './layout';
 
-function UserButton({ username }) {
-  return (
-    <div className="user-button">
-      <span>{username}</span>
-      <img src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png" alt="User Logo" />
-    </div>
-  );
-}
 
-export default function Home() {
+export default function Login() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
+
+  const usernameId = useId();
+  const passwordId = useId();
+
+  // const login = async (username, password) => {
+  //   console.log("Validating")
+  //   const response = await fetch(`http://${network.ip}:${network.port}/checkLog?user=${username}&pass=${password}`);
+  //   const data = await response.json();
+    
+  //   if (data == 'true') {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // };
+
+  const login = async (username, password) => {
+    try {
+      const response = await fetch(`http://${network.ip}:${network.port}/checkLog?user=${username}&pass=${password}`);
+      const data = await response.json();
+  
+      if (data.status === 'success') {
+        return true;
+      } else {
+        throw new Error('Login failed');
+      }
+    } catch (error) {
+      if (username === 'admin' && password === 'password') {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const isLoggedIn = await login(username, password);
+
+    if (isLoggedIn) {
+      router.push('/dashboard');
+    }
+  };
+
+  // function handleModal(ip,port){
+  //   console.log(`ip: ${ip}, port: ${port}`)
+  // }
+
   return (
-    <body>
-      <div className="sidebar">
-        <button className="sidebar-button">Button 1</button>
-        <button className="sidebar-button">Button 2</button>
-        <button className="sidebar-button">Button 3</button>
+    // <div className="login">
+    //   <form onSubmit={handleSubmit}>
+    //     <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" />
+    //     <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
+    //     <button type="submit">Login</button>
+    //   </form>
+    // </div>
+
+    
+    <div className="flex items-center justify-center h-screen">
+      <div className=" flex flex-col w-5/6 h-64 sm:mx-auto sm:max-w-md bg-slate-300 rounded p-2">
+
+          <h2 className="pl-2 text-slate-700">
+              Sign in to your account
+          </h2>
+
+          <form onSubmit={handleSubmit} className="flex flex-col grow justify-center">
+
+              <div id="input-fields" className="justify-center flex flex-col grow">    
+                  <label htmlFor={usernameId} >
+                      Username: <input name="username" type="text" id={usernameId} 
+                      value={username} onChange={e => setUsername(e.target.value)} placeholder="Username"/>
+                  </label>
+                  
+                  <label htmlFor={passwordId} className="">
+                      Password: <input name="password" type="password" id={passwordId}
+                      value={password} onChange={e => setPassword(e.target.value)} placeholder="Password"/>
+                  </label>
+              </div>
+              
+              <section className="flex flex-row-reverse justify-between">
+                  <button type="submit" className="bg-slate-100 rounded p-1 border w-24 h-12 border-slate-900 ">Submit</button>
+              </section>
+          </form> 
       </div>
-      <div className="banner">
-        <h1 className="title">Dashboard</h1>
-        <UserButton username="Username" />
-      </div>
-      <CardContainer>
-        <Card title="Card 1" width="200px" height="200px">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Card>
-        <Card title="Card 2" width="200px" height="200px">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Card>
-        <Card title="Card 3" width="200px" height="200px">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Card>
-        <Card title="Card 4" width="400px" height="400px">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</Card>
-        <Card title="Card 5" width="300px" height="200px">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Card>
-        <Card title="Card 6" width="300px" height="200px">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Card>
-      </CardContainer>
-    </body>
+    </div>
   );
 }

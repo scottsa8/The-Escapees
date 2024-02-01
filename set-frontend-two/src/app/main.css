@@ -7,5 +7,5 @@ label{
 }
 
 input{
-    @apply border-black border border-solid rounded
+    @apply border-black border border-solid rounded h-10
 }
