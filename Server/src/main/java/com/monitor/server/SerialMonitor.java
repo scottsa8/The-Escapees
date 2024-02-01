@@ -3,6 +3,7 @@ import java.net.MalformedURLException;
 import com.fazecast.jSerialComm.*;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.*;
 
@@ -149,7 +150,7 @@ public class SerialMonitor {
                 else if (packetType == 2) { //env
                     String microbitName = sensorData[1];
                     String temperature = sensorData[2];
-                    String ambientLight = sensorData[3];
+                    BigDecimal lightLevel = new BigDecimal(sensorData[3]).setScale(2, RoundingMode.HALF_EVEN);
                     String noiseLevel = sensorData[4];
                     
                     try {
@@ -171,7 +172,7 @@ public class SerialMonitor {
                             insertStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
                             insertStatement.setBigDecimal(3, new BigDecimal(temperature));
                             insertStatement.setBigDecimal(4, new BigDecimal(noiseLevel));
-                            insertStatement.setBigDecimal(5, new BigDecimal(ambientLight));
+                            insertStatement.setBigDecimal(5, lightLevel);
                             insertStatement.executeUpdate();
                         } else {
                             // Handle the case where the microbitName does not correspond to any room
