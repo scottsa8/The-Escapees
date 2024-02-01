@@ -85,9 +85,6 @@ public class SerialMonitor {
                 System.out.println("INPUT:" + data);
                 String[] sensorData = data.split(",");
                 int packetType = Integer.parseInt(sensorData[0]);
-                if (DEBUG) {
-
-                }
                 if (packetType == 1) { //moving device
                     String deviceName = sensorData[1];
                     String roomMicrobit = sensorData[2];
@@ -95,7 +92,7 @@ public class SerialMonitor {
                     try {
                         // Retrieve room_id based on room_microbit
                         PreparedStatement selectRoomIdStatement = connection.prepareStatement(
-                                "SELECT room_id FROM rooms WHERE room_microbit = ?"
+                            "SELECT room_id FROM rooms WHERE room_microbit = ?"
                         );
                         selectRoomIdStatement.setString(1, roomMicrobit);
                         ResultSet roomResult = selectRoomIdStatement.executeQuery();
@@ -105,7 +102,7 @@ public class SerialMonitor {
                             int roomID = roomResult.getInt("room_id");                
                             // Retrieve user_id based on user_microbit
                             PreparedStatement selectUserIdStatement = connection.prepareStatement(
-                                    "SELECT user_id FROM users WHERE user_microbit = ?"
+                                "SELECT user_id FROM users WHERE user_microbit = ?"
                             );
                             selectUserIdStatement.setString(1, deviceName);
                             ResultSet userResult = selectUserIdStatement.executeQuery();
@@ -115,10 +112,10 @@ public class SerialMonitor {
                                 int userID = userResult.getInt("user_id");                
                                 // Retrieve the last recorded room for the user
                                 PreparedStatement selectLastRoomStatement = connection.prepareStatement(
-                                        "SELECT room_id FROM roomOccupants " +
-                                                "WHERE user_id = ? " +
-                                                "ORDER BY entry_timestamp DESC " +
-                                                "LIMIT 1"
+                                    "SELECT room_id FROM roomOccupants " +
+                                    "WHERE user_id = ? " +
+                                    "ORDER BY entry_timestamp DESC " +
+                                    "LIMIT 1"
                                 );
                                 selectLastRoomStatement.setInt(1, userID);
                                 ResultSet lastRoomResult = selectLastRoomStatement.executeQuery();
@@ -127,7 +124,7 @@ public class SerialMonitor {
                                 if (!lastRoomResult.next() || lastRoomResult.getInt("room_id") != roomID) {
                                     // Insert data into the database for movement
                                     PreparedStatement insertStatement = connection.prepareStatement(
-                                            "INSERT INTO roomOccupants (room_id, user_id, entry_timestamp) VALUES (?, ?, ?)"
+                                        "INSERT INTO roomOccupants (room_id, user_id, entry_timestamp) VALUES (?, ?, ?)"
                                     );
                                     insertStatement.setInt(1, roomID);
                                     insertStatement.setInt(2, userID);
@@ -158,7 +155,7 @@ public class SerialMonitor {
                     try {
                         // Retrieve room_id based on room_microbit
                         PreparedStatement selectRoomIdStatement = connection.prepareStatement(
-                                "SELECT room_id FROM rooms WHERE room_microbit = ?"
+                            "SELECT room_id FROM rooms WHERE room_microbit = ?"
                         );
                         selectRoomIdStatement.setString(1, microbitName);
                         ResultSet roomResult = selectRoomIdStatement.executeQuery();
@@ -168,7 +165,7 @@ public class SerialMonitor {
                             int roomID = roomResult.getInt("room_id");                
                             // Insert data into the database
                             PreparedStatement insertStatement = connection.prepareStatement(
-                                    "INSERT INTO roomEnvironment (room_id, timestamp, temperature, noise_level, light_level) VALUES (?, ?, ?, ?, ?)"
+                                "INSERT INTO roomEnvironment (room_id, timestamp, temperature, noise_level, light_level) VALUES (?, ?, ?, ?, ?)"
                             );
                             insertStatement.setInt(1, roomID);
                             insertStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
@@ -190,7 +187,7 @@ public class SerialMonitor {
                     try {
                         // Retrieve room_id based on room_microbit
                         PreparedStatement selectRoomIdStatement = connection.prepareStatement(
-                                "SELECT room_id FROM rooms WHERE room_microbit = ?"
+                            "SELECT room_id FROM rooms WHERE room_microbit = ?"
                         );
                         selectRoomIdStatement.setString(1, roomMicrobit);
                         ResultSet roomResult = selectRoomIdStatement.executeQuery();
@@ -201,7 +198,7 @@ public class SerialMonitor {
                 
                             // Increment head_count for the matching room
                             PreparedStatement updateHeadCountStatement = connection.prepareStatement(
-                                    "UPDATE rooms SET head_count = head_count + 1 WHERE room_id = ?"
+                                "UPDATE rooms SET head_count = head_count + 1 WHERE room_id = ?"
                             );
                             updateHeadCountStatement.setInt(1, roomID);
                             updateHeadCountStatement.executeUpdate();
