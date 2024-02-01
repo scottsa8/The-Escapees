@@ -1,3 +1,7 @@
+'use client';
+
+import {useState, useEffect} from 'react';
+
 function Card({ title, children, width, height }) {
   return (
     <div className="card" style={{ width: width, height: height }}>
@@ -21,6 +25,19 @@ function UserButton({ username }) {
 }
 
 export default function Dashboard() {
+  const [data, setData] = useState(null);
+  const [names, setNames] = useState(null);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/listAll')
+      .then(response => response.json())
+      .then(data => setData(data));
+
+    fetch('http://localhost:8080/getAllNames')
+      .then(response => response.json())
+      .then(names => setNames(names));
+  }, []);
+
   return (
     <body>
       <div className="sidebar">
@@ -33,8 +50,12 @@ export default function Dashboard() {
         <UserButton username="Username" />
       </div>
       <CardContainer>
-        <Card title="Card 1" width="200px" height="200px">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Card>
-        <Card title="Card 2" width="200px" height="200px">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Card>
+        <Card title="Card 1" width="200px" height="200px">
+          {data ? JSON.stringify(data, null, 2) : 'Loading...'}
+        </Card>
+        <Card title="Card 2" width="200px" height="200px">
+          {names ? JSON.stringify(names, null, 2) : 'Loading...'}
+        </Card>
         <Card title="Card 3" width="200px" height="200px">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Card>
         <Card title="Card 4" width="400px" height="400px">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</Card>
         <Card title="Card 5" width="300px" height="200px">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Card>

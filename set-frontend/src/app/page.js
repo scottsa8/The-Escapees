@@ -16,10 +16,10 @@ export default function Login() {
   const passwordId = useId();
 
   const login = async (username, password) => {
-    const hardcodedUsername = 'admin';
-    const hardcodedPassword = 'password';
-
-    if (username === hardcodedUsername && password === hardcodedPassword) {
+    const response = await fetch(`http://localhost:8080/checkLog?user=${username}&pass=${password}`);
+    const data = await response.json();
+  
+    if (data.status === 'success') {
       return true;
     } else {
       return false;
