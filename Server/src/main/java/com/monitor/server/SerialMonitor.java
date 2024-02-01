@@ -184,7 +184,7 @@ public class SerialMonitor {
                 }
                 else if (packetType == 3) { // Increment head count for a room
                     String roomMicrobit = sensorData[1];
-                    
+                
                     try {
                         // Retrieve room ID based on room_microbit
                         PreparedStatement selectRoomIdStatement = connection.prepareStatement(
@@ -198,7 +198,7 @@ public class SerialMonitor {
                 
                             // Retrieve the latest head count and timestamp for the room from headCountHistory
                             PreparedStatement selectHeadCountStatement = connection.prepareStatement(
-                                "SELECT head_count, MAX(change_timestamp) AS latest_timestamp FROM headCountHistory WHERE room_id = ?"
+                                "SELECT head_count FROM headCountHistory WHERE room_id = ? ORDER BY change_timestamp DESC LIMIT 1"
                             );
                             selectHeadCountStatement.setInt(1, roomId);
                             ResultSet headCountResult = selectHeadCountStatement.executeQuery();
@@ -221,7 +221,7 @@ public class SerialMonitor {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                }                
+                }                                
             }
         });
     }
