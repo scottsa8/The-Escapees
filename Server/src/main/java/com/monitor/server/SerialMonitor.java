@@ -1,10 +1,8 @@
 package com.monitor.server;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import com.fazecast.jSerialComm.*;
-
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
 
@@ -12,8 +10,6 @@ public class SerialMonitor {
     private boolean DEBUG=true;
     private URL url = new URL("http://localhost:8080");
     private SerialPort microbit;
-    private int locCounter = 0;
-
     private Connection connection;
 
     public SerialMonitor(Connection connection) throws MalformedURLException {
@@ -93,8 +89,8 @@ public class SerialMonitor {
 
                 }
                 if (packetType == 1) { //moving device
-                    String roomMicrobit = sensorData[1];
-                    String deviceName = sensorData[2];
+                    String deviceName = sensorData[1];
+                    String roomMicrobit = sensorData[2];
                 
                     try {
                         // Retrieve room_id based on room_microbit
@@ -106,8 +102,8 @@ public class SerialMonitor {
                 
                         // Check if a room with the specified room_microbit exists
                         if (roomResult.next()) {
-                            int roomID = roomResult.getInt("room_id");
-                
+                            int roomID = roomResult.getInt("room_id");                
+                            // Retrieve user_id based on user_microbit
                             PreparedStatement selectUserIdStatement = connection.prepareStatement(
                                     "SELECT user_id FROM users WHERE user_microbit = ?"
                             );
@@ -116,16 +112,31 @@ public class SerialMonitor {
                 
                             // Check if a user with the specified user_microbit exists
                             if (userResult.next()) {
-                                int userID = userResult.getInt("user_id");
-                
-                                // Insert data into the database for movement
-                                PreparedStatement insertStatement = connection.prepareStatement(
-                                        "INSERT INTO roomOccupants (room_id, user_id, entry_timestamp) VALUES (?, ?, ?)"
+                                int userID = userResult.getInt("user_id");                
+                                // Retrieve the last recorded room for the user
+                                PreparedStatement selectLastRoomStatement = connection.prepareStatement(
+                                        "SELECT room_id FROM roomOccupants " +
+                                                "WHERE user_id = ? " +
+                                                "ORDER BY entry_timestamp DESC " +
+                                                "LIMIT 1"
                                 );
-                                insertStatement.setInt(1, roomID);
-                                insertStatement.setInt(2, userID);
-                                insertStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
-                                insertStatement.executeUpdate();
+                                selectLastRoomStatement.setInt(1, userID);
+                                ResultSet lastRoomResult = selectLastRoomStatement.executeQuery();
+                
+                                // Check if there is a last recorded room
+                                if (!lastRoomResult.next() || lastRoomResult.getInt("room_id") != roomID) {
+                                    // Insert data into the database for movement
+                                    PreparedStatement insertStatement = connection.prepareStatement(
+                                            "INSERT INTO roomOccupants (room_id, user_id, entry_timestamp) VALUES (?, ?, ?)"
+                                    );
+                                    insertStatement.setInt(1, roomID);
+                                    insertStatement.setInt(2, userID);
+                                    insertStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+                                    insertStatement.executeUpdate();
+                                } else {
+                                    // Handle the case where the last recorded room is the same as the current room
+                                    System.out.println("User is already in the same room. No new record added.");
+                                }
                             } else {
                                 // Handle the case where the deviceName does not correspond to any user
                                 System.out.println("No user found for deviceName: " + deviceName);
@@ -137,12 +148,12 @@ public class SerialMonitor {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                }                
+                }                               
                 else if (packetType == 2) { //env
                     String microbitName = sensorData[1];
                     String temperature = sensorData[2];
-                    String noiseLevel = sensorData[3];
-                    String ambientLight = sensorData[4];
+                    String ambientLight = sensorData[3];
+                    String noiseLevel = sensorData[4];
                     
                     try {
                         // Retrieve room_id based on room_microbit
@@ -154,8 +165,7 @@ public class SerialMonitor {
                 
                         // Check if a room with the specified microbitName exists
                         if (roomResult.next()) {
-                            int roomID = roomResult.getInt("room_id");
-                
+                            int roomID = roomResult.getInt("room_id");                
                             // Insert data into the database
                             PreparedStatement insertStatement = connection.prepareStatement(
                                     "INSERT INTO roomEnvironment (room_id, timestamp, temperature, noise_level, light_level) VALUES (?, ?, ?, ?, ?)"
@@ -175,12 +185,12 @@ public class SerialMonitor {
                     }
                 }
                 else if(packetType == 3 ){//gates
-                    String loc = sensorData[1];
+                    //String loc = sensorData[1];
                     //check if loc is in db?
-                    if(true) {
+                    //if(true) {
                         //add to DB
-                    }
-                    locCounter++;
+                    //}
+                    //locCounter++;
                     //update DB counter
                 }
             }

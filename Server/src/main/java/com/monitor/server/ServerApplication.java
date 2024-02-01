@@ -1,13 +1,13 @@
 package com.monitor.server;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.boot.SpringApplication;
-import java.time.LocalTime;
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.sql.*;
 
 @EnableScheduling
