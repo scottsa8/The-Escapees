@@ -20,7 +20,7 @@ const inter = Inter({ subsets: ["latin"] });
 // console.log(list())
 
 export const network = {
-  ip: "192.000.000.1",
+  ip: "192.168.34.44",
   port: "8080"
 }
 

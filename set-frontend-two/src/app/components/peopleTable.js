@@ -19,39 +19,38 @@ import {
 
 const mantineTheme = getTheme(DEFAULT_OPTIONS);
 const theme = useTheme(mantineTheme);
-// const nodes = [
-//   {
-//     id: '420',
-//     name: 'Adam Strawbridge',
-//   },
-// ];
+const nodes = [
+  {name: "Adam", loc: "B80"},
+    {name: "Scott", loc: "B76"},
+    {name: "Hannah", loc: "B70"},
+];
 
 
 
 export default function PeopleTable() {
-  const dataTable = [];
+  const dataTable = {nodes}
 
   
     
     
   
 
-  useEffect(() => {
-    const getLocations = async () => {
-      const response = await fetch(`http://${network.ip}:${network.port}/getAll`)
-      const data = await response.json();
-      data.then((data) => {
-      for(value in data){
-        dataTable.push({"name":value["User"],"loc":value["Location"]})
-      }})
-    }
-      getLocations()
-    const interval=setInterval(()=>{
-        getLocations()
-      },10000)
+  // useEffect(() => {
+  //   const getLocations = async () => {
+  //     const response = await fetch(`http://${network.ip}:${network.port}/getAll`)
+  //     const data = await response.json();
+  //     data.then((data) => {
+  //     for(value in data){
+  //       dataTable.push({"name":value["User"],"loc":value["Location"]})
+  //     }})
+  //   }
+  //     getLocations()
+  //   const interval=setInterval(()=>{
+  //       getLocations()
+  //     },10000)
 
-      return()=>clearInterval(interval)
-  },[])
+  //     return()=>clearInterval(interval)
+  // },[])
 
   return (
     <div className="grow">
@@ -67,7 +66,7 @@ export default function PeopleTable() {
 
             <Body>
                 {tableList.map((item) => (
-                <Row key={item.id} item={item}>
+                <Row key={item.name} item={item}>
                     <Cell>{item.name}</Cell>
                     <Cell>{item.loc}</Cell>
                     

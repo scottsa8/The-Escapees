@@ -20,21 +20,21 @@ function LocationCount({location}){
     // };
 
     // useEgetPeople()
-    useEffect(()=>{
-        const getPeople = async () => {
-            const response = await fetch(`http://${network.ip}:${network.port}/getPeople?loc=${location}`)
-            const data = await response.json();
+    // useEffect(()=>{
+    //     const getPeople = async () => {
+    //         const response = await fetch(`http://${network.ip}:${network.port}/getPeople?loc=${location}`)
+    //         const data = await response.json();
             
-            data.then((data) => setCount(data));
-        };
-        getPeople()
-        const interval=setInterval(()=>{
-            getPeople()
-            },10000)
+    //         data.then((data) => setCount(data));
+    //     };
+    //     getPeople()
+    //     const interval=setInterval(()=>{
+    //         getPeople()
+    //         },10000)
        
        
-          return()=>clearInterval(interval)
-    },[])
+    //       return()=>clearInterval(interval)
+    // },[])
 
     return(
         <div className="flex flex-col w-12 min-h-49 border rounded border-neutral-900 m-0.5 grow">
@@ -47,13 +47,13 @@ function LocationCount({location}){
 
 export default function LocationCountBox(){
 
-    // const locations = [
-    //     { name:"Room1"},
-    //     { name:"Room2"},
-    //     { name:"Room3"},
+    const locations = [
+        { name:"Room1"},
+        { name:"Room2"},
+        { name:"Room3"},
         
-    // ]
-    const [locations,setLocation] = useState([])
+    ]
+    // const [locations,setLocation] = useState([])
 
     // useEffect(() => {
     //     fetch(`http://${network.ip}:${network.port}/getAllNames`)
@@ -63,15 +63,15 @@ export default function LocationCountBox(){
 
     
 
-    useEffect(() => {
-    const getLocations = async () => {
-        const response = await fetch(`http://${network.ip}:${network.port}/getAllNames`)
-        const data = await response.json();
-        data.then((data) => setLocation(data));
-    };
-        getLocations()
+    // useEffect(() => {
+    // const getLocations = async () => {
+    //     const response = await fetch(`http://${network.ip}:${network.port}/getAllNames`)
+    //     const data = await response.json();
+    //     data.then((data) => setLocation(data));
+    // };
+    //     getLocations()
 
-    },[])
+    // },[])
 
     return(
         
@@ -81,9 +81,9 @@ export default function LocationCountBox(){
             </div>
             
             <div id="content" className="flex">
-                {locations.forEach( (location) => (
+                {locations.map( (location) => (
                     <LocationCount
-                    location={location}/>
+                    location={location.name}/>
                 ) )}
             </div>
         </div>

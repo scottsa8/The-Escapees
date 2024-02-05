@@ -16,12 +16,14 @@ function EnviromentBox({measurement,value}){
 }
 
 export default function EnviromentContainer(){
-    
-    const [selectedLocation, setLocation] = useState([])
-
     const locations = [
-        
+        { name:"Room1"},
+        { name:"Room2"},
+        { name:"Room3"},
     ]
+    const [selectedLocation, setLocation] = useState(locations[0])
+
+    
 
     const values = {
         temp: "0",
@@ -29,27 +31,27 @@ export default function EnviromentContainer(){
         noise: "0"
     }
 
-    const getLocations = async () => {
-        const response = await fetch(`http://${network.ip}:${network.port}/getPeople?loc=${selectedLocation.name}`)
-        const data = await response.json();
-        for(value in data){
-            locations.push({"name":value})
-        }
-    };
+    // const getLocations = async () => {
+    //     const response = await fetch(`http://${network.ip}:${network.port}/getPeople?loc=${selectedLocation.name}`)
+    //     const data = await response.json();
+    //     for(value in data){
+    //         locations.push({"name":value})
+    //     }
+    // };
 
-    const getEnvData = async () => {
-        const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.name}`);
-        const data = await response.json();
-      
-        values.temp = data["Temperature"];
-        values.noise = data["Noise Level"];
-        values.light = data["Light Level"];
-    };
+    // const getEnvData = async () => {
+    //     const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.name}`);
+    //     const data = await response.json();
+        
+    //     values.temp = data["Temperature"];
+    //     values.noise = data["Noise Level"];
+    //     values.light = data["Light Level"];
+    // };
 
-    function handleLocationChange(value){
-        setLocation(value)
-        getEnvData()
-    }
+    // function handleLocationChange(value){
+    //     setLocation(value)
+    //     getEnvData()
+    // }
     
 
     // const splitString =  "Data ID: 1, Timestamp: 2023-01-31 16:00:00.0, Temperature: 25.00, Noise Level: 0.00, Light Level: 10.00!Data ID: 2, Timestamp: 2023-01-31 16:30:00.0, Temperature: 22.00, Noise Level: 1.00, Light Level: 5.00!".split("!");
@@ -66,22 +68,22 @@ export default function EnviromentContainer(){
     
     
 
-    useEffect(() => {
-        getLocations()
-        getEnvData()
-        const interval=setInterval(()=>{
-            getEnvData()
-            },10000)
+    // useEffect(() => {
+    //     getLocations()
+    //     getEnvData()
+    //     const interval=setInterval(()=>{
+    //         getEnvData()
+    //         },10000)
        
        
-          return()=>clearInterval(interval)
-    })
+    //       return()=>clearInterval(interval)
+    // })
 
     return(
         <div className="w-full flex flex-col items-center rounded border m-0.5 border-neutral-900 bg-neutral-200">
             <div className="w-full flex justify-center border border-neutral-950 bg-neutral-300 ">
-                <Listbox value={selectedLocation} onChange={handleLocationChange} >
-                <div classname=" flex justify-center w-24 border border-neutral-900">
+                <Listbox value={selectedLocation} onChange={setLocation} >
+                <div className=" flex flex-col justify-center w-24 border border-neutral-900">
                 <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900">Location:</Listbox.Label>
                     <Listbox.Button className="rounded hover:underline  text-xl w-24 h-11 grow text-center text-white bg-neutral-600">{selectedLocation.name}</Listbox.Button>
                     <Listbox.Options className="flex flex-col self-center" >
