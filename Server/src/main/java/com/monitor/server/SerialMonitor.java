@@ -241,6 +241,9 @@ public class SerialMonitor {
     }
  
     public void stop(){
-        microbit.closePort();
+        try{
+            microbit.closePort();
+        }catch (Exception e){}
+
     }
 }

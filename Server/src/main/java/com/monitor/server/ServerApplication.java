@@ -1,18 +1,23 @@
 package com.monitor.server;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.json.GsonJsonParser;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.boot.SpringApplication;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
+
 
 @EnableScheduling
 @SpringBootApplication
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class ServerApplication {
 	private static final String PASSWORD = "35c4p335!";
 	private static String URL = "jdbc:mysql://localhost:3306/?useSSL=FALSE&allowPublicKeyRetrieval=True";
@@ -77,49 +82,66 @@ public class ServerApplication {
 			monitor= new SerialMonitor(connection);
 			monitor.start();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
 	@GetMapping("/getAllNames")
 	private String getAllNames(){
 		StringBuilder output = new StringBuilder();
+		output.append("{\"names\":{"+
+				"\"data\":[");
 		try {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT username FROM users");
 			while (rs.next()) {
-				output.append(rs.getString("username")).append("!");
+				output.append("{\"username\": \""+rs.getString("username")+"\"}");
+				if(!rs.isLast()){
+					output.append(",");
+				}
 			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		output.append("]}}");
 		return output.toString();
 	}
 
-	@GetMapping("/getEnv")
+	@RequestMapping(value = "/getEnv", produces = MediaType.APPLICATION_JSON_VALUE)
 	private String getEnv(@RequestParam(value = "loc") String loc){
 		StringBuilder output = new StringBuilder();
+		output.append("{\"enviornment\":{"+
+				"\"data\":[");
+
 		try {
 			// Assuming loc parameter is the room_id
 			PreparedStatement selectStatement = connection.prepareStatement(
 					"SELECT * FROM roomEnvironment WHERE room_id = ?"
 			);
 				selectStatement.setString(1, loc);
+			//output.append("{\"DataID\": \""+1+"\", \"Timestamp\": \""+24+"\", \"Temperature\": \""+25.0+"\", \"NoiseLevel\": \""+10.0+"\", \"LightLevel\": \""+5.5+"\"}");
+
 			ResultSet rs = selectStatement.executeQuery();
-			
+
 			while (rs.next()) {
 				int dataId = rs.getInt("data_id");
 				Timestamp timestamp = rs.getTimestamp("timestamp");
 				BigDecimal temperature = rs.getBigDecimal("temperature");
 				BigDecimal noiseLevel = rs.getBigDecimal("noise_level");
 				BigDecimal lightLevel = rs.getBigDecimal("light_level");
-
 				// Customize the output format based on your needs
-				output.append(String.format("Data ID: %d, Timestamp: %s, Temperature: %s, Noise Level: %s, Light Level: %s!", dataId, timestamp.toString(), temperature.toString(), noiseLevel.toString(), lightLevel.toString()));
+
+				output.append("{\"DataID\": \""+dataId+"\", \"Timestamp\": \""+timestamp.toString()+"\", \"Temperature\": \""+temperature.toString()+"\", \"NoiseLevel\": \""+noiseLevel.toString()+"\", \"LightLevel\": \""+lightLevel.toString()+"\"}");
+				if(!rs.isLast()){
+					output.append(",");
+				}
 			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		output.append("]}}");
 		return output.toString();
 	}
 
@@ -153,7 +175,8 @@ public class ServerApplication {
 	@GetMapping("/listAll")
 	private String listAll() {
 		StringBuilder output = new StringBuilder();
-
+		output.append("{\"locations\":{"+
+				"\"data\":[");
 		try {
 			// Fetch all users and their latest location from the database
 			PreparedStatement selectStatement = connection.prepareStatement(
@@ -169,12 +192,17 @@ public class ServerApplication {
 			while (rs.next()) {
 				String username = rs.getString("username");
 				String roomName = rs.getString("room_name");
-				output.append("User: ").append(username).append(", Location: ").append(roomName).append("!");
+				//output.append("Location: ").append(roomName).append("!");
+				output.append("{\"user\": \""+username+"\", \"Location\": \""+roomName+"\"}");
+				if(!rs.isLast()){
+					output.append(",");
+				}
 			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		output.append("]}}");
 		return output.toString();
 	}
 
