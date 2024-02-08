@@ -4,6 +4,29 @@ import PeopleTable from "../components/peopleTable";
 import EnviromentContainer from "../components/enviroment";
 import LocationCountBox from "../components/locationNumber";
 
+export function sendNotification(title, options) {
+  // Check browser support
+  if (!("Notification" in window)) {
+    alert("This browser does not support desktop notification");
+  }
+
+  // Check for permission
+  else if (Notification.permission === "granted") {
+    new Notification(title, options);
+  }
+
+  // Request permission
+  else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(function (permission) {
+      if (permission === "granted") {
+        new Notification(title, options);
+      }
+    });
+  }
+
+}
+// sendNotification('Hello!', { body: 'You have a new message.'});
+
 function Card({ title, children, width, height }) {
   return (
     <div className="card" style={{ width: width, height: height }}>

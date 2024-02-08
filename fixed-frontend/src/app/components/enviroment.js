@@ -1,19 +1,20 @@
 import React, {useEffect, useState} from "react";
 import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
+import Dial from "./dial";
+import { sendNotification } from "../dashboard/page";
 
-function EnviromentBox({measurement,value}){
-    // const [value,setValue] = useState(0)
-
-    return(
-        <div className="flex flex-col w-12 min-h-49 border rounded border-neutral-900 grow ">
-            <label className="bg-neutral-600 text-center text-xl text-neutral-200">{measurement}</label>
-            <label className="text-center text-9xl">{value}</label>
+const EnviromentBox = ({ measurement, value }) => {
+    return (
+        <div className="flex flex-col items-center p-4">
+            <Dial value={value} min={0} max={40} onMaxValue={() => {
+                sendNotification('Max Value Reached', { body: `Measurement: ${measurement}, Value: ${value}`});
+            }}/>
+            <span className="text-lg font-medium mt-2">{measurement}</span>
         </div>
-        
+    );
+};
 
-    )
-}
 
 export default function EnviromentContainer(){
     const locations = [
@@ -93,11 +94,11 @@ export default function EnviromentContainer(){
            return()=>clearInterval(interval)
      })
 
-    return(
-        <div className="w-full flex flex-col items-center rounded border m-0.5 border-neutral-900 bg-neutral-200">
-            <div className="w-full flex justify-center border border-neutral-950 bg-neutral-300 ">
+     return(
+        <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-neutral-200">
+            <div className="w-full flex justify-center bg-neutral-300 p-3">
                 <Listbox value={selectedLocation} onChange={setLocation} >
-                <div className=" flex flex-col justify-center w-24 border border-neutral-900">
+                <div className=" flex flex-col justify-center w-24 ">
                 <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900">Location:</Listbox.Label>
                     <Listbox.Button className="rounded hover:underline  text-xl w-24 h-11 grow text-center text-white bg-neutral-600">{selectedLocation.name}</Listbox.Button>
                     <Listbox.Options className="flex flex-col self-center" >
@@ -122,4 +123,5 @@ export default function EnviromentContainer(){
         </div>
     )
 }
+
 
