@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
 import Dial from "./dial";
-import { sendNotification } from "../dashboard/page";
+import { sendNotification } from "./notifications";
 
 const EnviromentBox = ({ measurement, value }) => {
     return (
@@ -15,13 +15,8 @@ const EnviromentBox = ({ measurement, value }) => {
     );
 };
 
-
 export default function EnviromentContainer(){
-    const locations = [
-        { name:"Room1"},
-        { name:"Room2"},
-        { name:"Room3"},
-    ]
+    const [locations, setLocations] = useState([{name:""}]);
     const [selectedLocation, setLocation] = useState(locations[0])
 
     
@@ -32,18 +27,17 @@ export default function EnviromentContainer(){
         noise: "40"
     }
 
-     const getLocations = async () => { //not sure what this is for but updated it to call correct location
-        let id = getRoomID();
-         const response = await fetch(`http://${network.ip}:${network.port}/getPeople?loc=${id}`)
-         const data = await response.json();
-         for(value in data){
-             locations.push({"name":value})
-         }
-     };
+    const getLocations = async () => {
+        const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
+        const data = await response.json();
+        let data2 = data['rooms'];
+        let data3 = data2['data'];
+        return data3.map(item => item['room']);
+    };
+
 
      const getEnvData = async () => {
-        let id = getRoomID();
-        const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${id}`)
+        const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.name}`)
         const data = await response.json();
         //console.log(data)
         let data2 = data['enviornment'];
@@ -57,16 +51,14 @@ export default function EnviromentContainer(){
         // console.log(values.noise)
         // console.log(values.light)
      };
-     function getRoomID(){
-        let id = selectedLocation.name.split("m")[1];
-        return id;
-    }
-     
+        
 
      function handleLocationChange(value){
-         setLocation(value)
-         getEnvData()
-     }
+        getLocations().then(newLocations => {
+            setLocations(newLocations);
+            getEnvData();
+        }); // Added closing parenthesis here
+    }
     
 
     // const splitString =  "Data ID: 1, Timestamp: 2023-01-31 16:00:00.0, Temperature: 25.00, Noise Level: 0.00, Light Level: 10.00!Data ID: 2, Timestamp: 2023-01-31 16:30:00.0, Temperature: 22.00, Noise Level: 1.00, Light Level: 5.00!".split("!");
@@ -83,16 +75,13 @@ export default function EnviromentContainer(){
     
     
 
-     useEffect(() => {
-         getLocations()
-         getEnvData()
-         const interval=setInterval(()=>{
-             getEnvData()
-             },10000)
-       
-       
-           return()=>clearInterval(interval)
-     })
+    useEffect(() => {
+        getLocations().then(newLocations => {
+            console.log(newLocations)
+            setLocations(newLocations);
+            getEnvData();
+        });
+    }, []);
 
      return(
         <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-neutral-200">
