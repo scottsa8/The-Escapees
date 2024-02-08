@@ -1,6 +1,8 @@
 import React from "react";
+import { useState, useEffect } from "react";
 
-const Dial = ({ value, min, max }) => {
+function Dial({ value, min, max, onMaxValue }) {
+
     const size = 170; 
     const strokeWidth = 5; 
     const radius = (size-20 - strokeWidth) / 2;
@@ -9,6 +11,12 @@ const Dial = ({ value, min, max }) => {
     
     const offset = circumference - (value - min) / (max - min) * circumference;
 
+    useEffect(() => {
+        if (value >= max && typeof onMaxValue === 'function') {
+            onMaxValue();
+        }
+    }, [value, max, onMaxValue]);
+    
 
     return (
         <div className="dial-container">

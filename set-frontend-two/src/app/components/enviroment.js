@@ -2,10 +2,14 @@ import React, {useEffect, useState} from "react";
 import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
 import Dial from "./dial";
+import { sendNotification } from "../dashboard/page";
+
 const EnviromentBox = ({ measurement, value }) => {
     return (
         <div className="flex flex-col items-center p-4">
-            <Dial value={value} min={0} max={40} />
+            <Dial value={value} min={0} max={40} onMaxValue={() => {
+                sendNotification('Max Value Reached', { body: `Measurement: ${measurement}, Value: ${value}`});
+            }}/>
             <span className="text-lg font-medium mt-2">{measurement}</span>
         </div>
     );

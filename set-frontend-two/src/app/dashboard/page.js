@@ -13,7 +13,7 @@ function Card({ title, children, width, height }) {
   );
 }
 
-function sendNotification(title, options) {
+export function sendNotification(title, options) {
   // Check browser support
   if (!("Notification" in window)) {
     alert("This browser does not support desktop notification");
