@@ -38,11 +38,19 @@ export default function EnviromentContainer(){
         let data2 = data['rooms'];
         let data3 = data2['data'];
 
+<<<<<<< Updated upstream
        for (let i = 0; i < data3.length; i++) {
            let realData = data3[i];
            locations.push(realData['room']);
        }
     };
+=======
+        for (let i = 0; i < data3.length; i++) {
+            let realData = data3[i];
+            locations.push({name: realData['room']});
+        }
+     };
+>>>>>>> Stashed changes
 
      const getEnvData = async () => {
         let id = getRoomID();
