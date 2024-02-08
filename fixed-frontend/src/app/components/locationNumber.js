@@ -83,6 +83,7 @@ export default function LocationCountBox(){
             <div id="content" className="flex">
                 {locations.map( (location) => (
                     <LocationCount
+                    key={location}
                     location={location.name}/>
                 ) )}
             </div>
