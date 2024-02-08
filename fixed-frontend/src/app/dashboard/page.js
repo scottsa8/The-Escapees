@@ -3,11 +3,13 @@ import { useState } from "react";
 import LocationTable from "../components/LocationTable";
 import UserButton from "../components/UserButton";
 import HomePage from "./HomePage";
+import InteractiveMap from "../components/InteractiveMap";
 
 // Lists the pages for the navigation bar on the dashboard
 const views = {
   individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
-  homePage: { page: <HomePage/>, pageTitle: "Dashboard"}
+  homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
+  interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"}
 }
 
 //Used by the user to navigate through pages
@@ -23,6 +25,7 @@ const Dashboard = () => {
 
             <button className="sidebar-button" onClick={() => setView(views.homePage)}>{views.homePage.pageTitle}</button>
             <button className="sidebar-button" onClick={() => setView(views.individualLocations)}>{views.individualLocations.pageTitle}</button>
+            <button className="interactive-map" onClick={() => setView(views.interactiveMap)}>{views.interactiveMap.pageTitle}</button>
 
         </div>
 
