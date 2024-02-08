@@ -41,6 +41,7 @@ export default function EnviromentContainer(){
 <<<<<<< Updated upstream
        for (let i = 0; i < data3.length; i++) {
            let realData = data3[i];
+           console.log(realData['room'])
            locations.push(realData['room']);
        }
     };
@@ -53,8 +54,7 @@ export default function EnviromentContainer(){
 >>>>>>> Stashed changes
 
      const getEnvData = async () => {
-        let id = getRoomID();
-        const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${id}`)
+        const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.name}`)
         const data = await response.json();
         //console.log(data)
         let data2 = data['enviornment'];
@@ -68,11 +68,7 @@ export default function EnviromentContainer(){
         // console.log(values.noise)
         // console.log(values.light)
      };
-     function getRoomID(){
-        let id = selectedLocation.name.split("m")[1];
-        return id;
-    }
-     
+        
 
      function handleLocationChange(value){
          setLocation(value)
