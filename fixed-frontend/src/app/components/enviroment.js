@@ -16,7 +16,7 @@ const EnviromentBox = ({ measurement, value }) => {
 };
 
 export default function EnviromentContainer(){
-    const locations = [{name:""}]
+    const [locations, setLocations] = useState([{name:""}]);
     const [selectedLocation, setLocation] = useState(locations[0])
 
     
@@ -28,7 +28,6 @@ export default function EnviromentContainer(){
     }
 
     const getLocations = async () => {
-        
         const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
         const data = await response.json();
         let data2 = data['rooms'];
@@ -56,7 +55,7 @@ export default function EnviromentContainer(){
 
      function handleLocationChange(value){
         getLocations().then(newLocations => {
-            setLocations(newLocations);
+            setLocations(newLocation);
             getEnvData();
         }); // Added closing parenthesis here
     }
