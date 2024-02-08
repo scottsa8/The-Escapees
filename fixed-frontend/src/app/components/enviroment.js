@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
 import Dial from "./dial";
-import { sendNotification } from "../dashboard/page";
+import { sendNotification } from "../notification";
 
 const EnviromentBox = ({ measurement, value }) => {
     return (
