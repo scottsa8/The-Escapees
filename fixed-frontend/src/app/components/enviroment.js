@@ -16,11 +16,7 @@ const EnviromentBox = ({ measurement, value }) => {
 };
 
 export default function EnviromentContainer(){
-    const locations = [
-        { name:"Room1"},
-        { name:"Room2"},
-        { name:"Room3"},
-    ]
+    const locations = [{name:""}]
     const [selectedLocation, setLocation] = useState(locations[0])
 
     
@@ -39,6 +35,7 @@ export default function EnviromentContainer(){
         let data3 = data2['data'];
         return data3.map(item => item['room']);
         }
+
      };
 
      const getEnvData = async () => {
