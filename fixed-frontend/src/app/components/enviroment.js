@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
 import Dial from "./dial";
-import { sendNotification } from "../notification";
+import { sendNotification } from "./notifications";
 
 const EnviromentBox = ({ measurement, value }) => {
     return (
@@ -14,7 +14,6 @@ const EnviromentBox = ({ measurement, value }) => {
         </div>
     );
 };
-
 
 export default function EnviromentContainer(){
     const locations = [

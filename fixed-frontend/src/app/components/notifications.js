@@ -18,4 +18,4 @@ export function sendNotification(title, options) {
       });
     }
   
-  }
+}
