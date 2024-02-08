@@ -34,9 +34,8 @@ export default function EnviromentContainer(){
         let data2 = data['rooms'];
         let data3 = data2['data'];
         return data3.map(item => item['room']);
-        }
+    };
 
-     };
 
      const getEnvData = async () => {
         const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.name}`)
@@ -58,8 +57,9 @@ export default function EnviromentContainer(){
      function handleLocationChange(value){
         getLocations().then(newLocations => {
             setLocations(newLocations);
-         getEnvData()
-     }
+            getEnvData();
+        }); // Added closing parenthesis here
+    }
     
 
     // const splitString =  "Data ID: 1, Timestamp: 2023-01-31 16:00:00.0, Temperature: 25.00, Noise Level: 0.00, Light Level: 10.00!Data ID: 2, Timestamp: 2023-01-31 16:30:00.0, Temperature: 22.00, Noise Level: 1.00, Light Level: 5.00!".split("!");
@@ -76,18 +76,12 @@ export default function EnviromentContainer(){
     
     
 
-     useEffect(() => {
+    useEffect(() => {
         getLocations().then(newLocations => {
             setLocations(newLocations);
+            getEnvData();
         });
-         getEnvData()
-         const interval=setInterval(()=>{
-             getEnvData()
-             },10000)
-       
-       
-           return()=>clearInterval(interval)
-     })
+    }, []);
 
      return(
         <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-neutral-200">
