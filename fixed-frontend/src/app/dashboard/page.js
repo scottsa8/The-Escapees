@@ -3,7 +3,7 @@ import { useState } from "react";
 import LocationTable from "../components/LocationTable";
 import UserButton from "../components/UserButton";
 import HomePage from "./HomePage";
-import InteractiveMap from "../components/InteractiveMap";
+import InteractiveMap from "../components/map-components";
 
 // Lists the pages for the navigation bar on the dashboard
 const views = {
@@ -18,30 +18,31 @@ const Dashboard = () => {
 
   const [currentView,setView] = useState(views.homePage);
 
-  return ( 
+  return (
+
     <body>
         {/* Used to navigate pages */}
         <div className="sidebar">
 
-            <button className="sidebar-button" onClick={() => setView(views.homePage)}>{views.homePage.pageTitle}</button>
-            <button className="sidebar-button" onClick={() => setView(views.individualLocations)}>{views.individualLocations.pageTitle}</button>
-            <button className="interactive-map" onClick={() => setView(views.interactiveMap)}>{views.interactiveMap.pageTitle}</button>
+          <button className="sidebar-button" onClick={() => setView(views.homePage)}>{views.homePage.pageTitle}</button>
+          <button className="sidebar-button" onClick={() => setView(views.individualLocations)}>{views.individualLocations.pageTitle}</button>
+          <button className="sidebar-button" onClick={() => setView(views.interactiveMap)}>{views.interactiveMap.pageTitle}</button>
 
         </div>
 
         <div className="banner">
 
-            <h1 className="title">{currentView.pageTitle}</h1>
-            <UserButton username="Username" /> {/*UPDATE FOR ACTUAL USERNAME*/}
+          <h1 className="title">{currentView.pageTitle}</h1>
+          <UserButton username="Username" /> {/*UPDATE FOR ACTUAL USERNAME*/}
 
         </div>
 
         {/* Where the scree contents are shown */}
         <div className="card-container">
-            {currentView.page}
+          {currentView.page}
         </div>
-      
-        </body>
+
+      </body>
    );
 }
  

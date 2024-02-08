@@ -7,7 +7,6 @@ import Image from "next/image";
 import "./main.css"
 import { network } from './layout';
 
-
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -60,7 +59,7 @@ export default function Login() {
     const isLoggedIn = await login(username, password);
 
     if (isLoggedIn) {
-      router.push('/Dashboard');
+      router.push('/dashboard');
     }
   };
 
