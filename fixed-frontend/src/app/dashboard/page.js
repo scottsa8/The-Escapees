@@ -1,12 +1,12 @@
 'use client'
 import { useState } from "react";
-import PeopleTable from "../components/peopleTable";
+import LocationTable from "../components/LocationTable";
 import UserButton from "../components/UserButton";
 import HomePage from "./HomePage";
 
 // Lists the pages for the navigation bar on the dashboard
 const views = {
-  individualLocations: { page: <PeopleTable/>, pageTitle: "Individual Locations"},
+  individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
   homePage: { page: <HomePage/>, pageTitle: "Dashboard"}
 }
 
@@ -18,6 +18,7 @@ const Dashboard = () => {
 
   return ( 
     <body>
+        {/* Used to navigate pages */}
         <div className="sidebar">
 
             <button className="sidebar-button" onClick={() => setView(views.homePage)}>{views.homePage.pageTitle}</button>

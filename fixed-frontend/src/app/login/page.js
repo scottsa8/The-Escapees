@@ -3,8 +3,7 @@ import "../main.css";
 // import { useId } from "react";
 // import Image from "next/image";
 
-import PeopleTable from "../components/peopleTable";
-
+import LocationTable from "../components/LocationTable";
 
 export default function Login(){
     // const usernameId = useId();
@@ -20,7 +19,7 @@ export default function Login(){
 
     return(
         <div>
-            <PeopleTable/>
+            <LocationTable/>
         </div>
         
     )
