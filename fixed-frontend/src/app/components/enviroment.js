@@ -31,19 +31,18 @@ export default function EnviromentContainer(){
         noise: "40"
     }
 
-     const getLocations = async () => {
+    const getLocations = async () => {
         
-         const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
-         const data = await response.json();
-         let data2 = data['rooms'];
-         let data3 = data2['data'];
+        const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
+        const data = await response.json();
+        let data2 = data['rooms'];
+        let data3 = data2['data'];
 
-         //loop over real data - big array of all the rooms
-         let realData = data3['0']; //index of array 
-         locations.push(realData['room']); //get the string at the entry
-         //if the string = "gate1" or "gate2" then ignore it!!
-         console.log(realData['room']);
-     };
+       for (let i = 0; i < data3.length; i++) {
+           let realData = data3[i];
+           locations.push(realData['room']);
+       }
+    };
 
      const getEnvData = async () => {
         let id = getRoomID();
