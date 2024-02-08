@@ -55,7 +55,7 @@ export default function EnviromentContainer(){
 
      function handleLocationChange(value){
         getLocations().then(newLocations => {
-            setLocations(newLocation);
+            setLocations(newLocations);
             getEnvData();
         }); // Added closing parenthesis here
     }
@@ -77,6 +77,7 @@ export default function EnviromentContainer(){
 
     useEffect(() => {
         getLocations().then(newLocations => {
+            console.log(newLocations)
             setLocations(newLocations);
             getEnvData();
         });
