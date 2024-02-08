@@ -77,6 +77,7 @@ export default function EnviromentContainer(){
 
     useEffect(() => {
         getLocations().then(newLocations => {
+            console.log(newLocations)
             setLocations(newLocations);
             getEnvData();
         });

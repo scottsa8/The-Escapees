@@ -107,39 +107,55 @@ public class ServerApplication {
 	@RequestMapping(value = "/getEnv", produces = MediaType.APPLICATION_JSON_VALUE)
 	private String getEnv(@RequestParam(value = "loc") String loc){
 		StringBuilder output = new StringBuilder();
-		output.append("{\"enviornment\":{"+
-				"\"data\":[");
+		output.append("{\"environment\":{\"data\":[");
 
 		try {
-			// need to get roomid from loc, loc=room name now
-			// Assuming loc parameter is the room_id
-			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT * FROM roomEnvironment WHERE room_id = ?"
+			// Get room_id from rooms table using the room name (loc)
+			PreparedStatement roomIdStatement = connection.prepareStatement(
+					"SELECT room_id FROM rooms WHERE room_name = ?"
 			);
-			selectStatement.setString(1, loc);
+			roomIdStatement.setString(1, loc);
 
-			ResultSet rs = selectStatement.executeQuery();
+			ResultSet roomIdResultSet = roomIdStatement.executeQuery();
+			
+			if (roomIdResultSet.next()) {
+				int roomId = roomIdResultSet.getInt("room_id");
 
-			while (rs.next()) {
-				int dataId = rs.getInt("data_id");
-				Timestamp timestamp = rs.getTimestamp("timestamp");
-				BigDecimal temperature = rs.getBigDecimal("temperature");
-				BigDecimal noiseLevel = rs.getBigDecimal("noise_level");
-				BigDecimal lightLevel = rs.getBigDecimal("light_level");
-				// Customize the output format based on your needs
+				// Fetch records from roomEnvironment using the obtained room_id
+				PreparedStatement selectStatement = connection.prepareStatement(
+						"SELECT * FROM roomEnvironment WHERE room_id = ?"
+				);
+				selectStatement.setInt(1, roomId);
 
-				output.append("{\"DataID\": \""+dataId+"\", \"Timestamp\": \""+timestamp.toString()+"\", \"Temperature\": \""+temperature.toString()+"\", \"NoiseLevel\": \""+noiseLevel.toString()+"\", \"LightLevel\": \""+lightLevel.toString()+"\"}");
-				if(!rs.isLast()){
-					output.append(",");
+				ResultSet rs = selectStatement.executeQuery();
+
+				while (rs.next()) {
+					int dataId = rs.getInt("data_id");
+					Timestamp timestamp = rs.getTimestamp("timestamp");
+					BigDecimal temperature = rs.getBigDecimal("temperature");
+					BigDecimal noiseLevel = rs.getBigDecimal("noise_level");
+					BigDecimal lightLevel = rs.getBigDecimal("light_level");
+
+					// Customize the output format based on your needs
+					output.append("{\"DataID\": \""+dataId+"\", \"Timestamp\": \""+timestamp.toString()+"\", \"Temperature\": \""+temperature.toString()+"\", \"NoiseLevel\": \""+noiseLevel.toString()+"\", \"LightLevel\": \""+lightLevel.toString()+"\"}");
+					if (!rs.isLast()) {
+						output.append(",");
+					}
 				}
+			} else {
+				// Handle the case when the room name (loc) is not found
+				output.append("{\"error\": \"Room not found\"}");
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			// Handle the SQL exception
+			output.append("{\"error\": \"An error occurred\"}");
 		}
 		output.append("]}}");
 		return output.toString();
 	}
+
 
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value="loc") String loc) {
@@ -230,7 +246,7 @@ public class ServerApplication {
 					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)"
 			);
 			insertStatement.setString(1, user);
-			insertStatement.setString(2, pass);
+			insertStatement.setString(2, hashPassword(pass));
 			insertStatement.setString(3, "user"); // Assuming default user_type is "user"
 			insertStatement.executeUpdate();
 			return true; // Success
@@ -244,17 +260,31 @@ public class ServerApplication {
 	private boolean checkLog(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
 		try {
 			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT * FROM users WHERE username = ? AND password = ?"
+					"SELECT * FROM users WHERE username = ?"
 			);
 			selectStatement.setString(1, user);
-			selectStatement.setString(2, pass);
 			ResultSet rs = selectStatement.executeQuery();
-			return rs.next(); // Returns true if a matching user is found
+			if (rs.next()) {
+				String storedHashedPassword = rs.getString("password");
+				
+				// Use the verifyPassword function to check if the provided password is correct
+				if (verifyPassword(pass, storedHashedPassword)) {
+					System.out.println("Password verification successful.");
+					return true; // Password is correct
+				} else {
+					System.out.println("Incorrect password.");
+					return false; // Password is incorrect
+				}
+			} else {
+				System.out.println("User not found.");
+				return false; // User not found
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false; // Failed
 		}
 	}
+
 
 	public static String hashPassword(String plainPassword) {
         // Adjust the log rounds to change security (larger number takes longer but more secure)
