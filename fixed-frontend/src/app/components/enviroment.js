@@ -19,7 +19,7 @@ export default function EnviromentContainer(){
     const [locations, setLocations] = useState([{name:""}]);
     const [selectedLocation, setLocation] = useState(locations[0])
 
-    
+
 
     const values = {
         temp: "20",
@@ -32,7 +32,7 @@ export default function EnviromentContainer(){
         const data = await response.json();
         let data2 = data['rooms'];
         let data3 = data2['data'];
-        return data3.map(item => item['room']);
+        return data3;
     };
 
 
@@ -55,7 +55,7 @@ export default function EnviromentContainer(){
 
      function handleLocationChange(value){
         getLocations().then(newLocations => {
-            setLocations(newLocation);
+            setLocations(newLocations);
             getEnvData();
         }); // Added closing parenthesis here
     }
@@ -80,28 +80,28 @@ export default function EnviromentContainer(){
             setLocations(newLocations);
             getEnvData();
         });
-    }, []);
+    }, );
 
-     return(
+    return (
         <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-neutral-200">
             <div className="w-full flex justify-center bg-neutral-300 p-3">
-                <Listbox value={selectedLocation} onChange={setLocation} >
-                <div className=" flex flex-col justify-center w-24 ">
-                <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900">Location:</Listbox.Label>
-                    <Listbox.Button className="rounded hover:underline  text-xl w-24 h-11 grow text-center text-white bg-neutral-600">{selectedLocation.name}</Listbox.Button>
-                    <Listbox.Options className="flex flex-col self-center" >
-                       {locations.map( (location) => (
-                            <Listbox.Option
-                                key={location.name}
-                                value={location}
-                                className="hover:underline text-xl rounded text-center hover:bg-neutral-400 hover:cursor-pointer h-11 w-24"
-                            >{location.name}
-                            </Listbox.Option>
-                        ))} 
-                    </Listbox.Options>
+                <Listbox value={selectedLocation} onChange={setLocation}>
+                    <div className="flex flex-col justify-center w-24">
+                        <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900">Location:</Listbox.Label>
+                        <Listbox.Button className="rounded hover:underline text-xl w-24 h-11 grow text-center text-white bg-neutral-600">{selectedLocation.name}</Listbox.Button>
+                        <Listbox.Options className="flex flex-col self-center">
+                            {locations.map((location, index) => (
+                                <Listbox.Option
+                                    key={index}
+                                    value={location}
+                                    className="hover:underline text-xl rounded text-center hover:bg-neutral-400 hover:cursor-pointer h-11 w-24"
+                                >
+                                    {location.room}
+                                </Listbox.Option>
+                            ))}
+                        </Listbox.Options>
                     </div>
                 </Listbox>
-                
             </div>
             <div className="w-full flex justify-between">
                 <EnviromentBox measurement="Temp" value={values["temp"]}/>
