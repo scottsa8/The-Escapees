@@ -111,6 +111,7 @@ public class ServerApplication {
 				"\"data\":[");
 
 		try {
+			// need to get roomid from loc, loc=room name now
 			// Assuming loc parameter is the room_id
 			PreparedStatement selectStatement = connection.prepareStatement(
 					"SELECT * FROM roomEnvironment WHERE room_id = ?"
