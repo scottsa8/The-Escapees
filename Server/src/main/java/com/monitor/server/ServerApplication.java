@@ -172,13 +172,11 @@ public class ServerApplication {
 				"\"data\":[");
 		try {
 			// Fetch all rooms from the database
-			PreparedStatement selectStatement = connection.prepareStatement("");
-			//SQL FOR ROOM NAMES PLS
+			PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM rooms");
 			ResultSet rs = selectStatement.executeQuery();
-
 			// Iterate over the result set and build the output string
 			while (rs.next()) {
-				output.append("{\"room\": \""+rs.getString("room_name"));
+				output.append("{\"room\": \""+rs.getString("room_name")+"\"}");
 				if(!rs.isLast()){
 					output.append(",");
 				}
