@@ -231,7 +231,7 @@ public class ServerApplication {
 					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)"
 			);
 			insertStatement.setString(1, user);
-			insertStatement.setString(2, pass);
+			insertStatement.setString(2, hashPassword(pass));
 			insertStatement.setString(3, "user"); // Assuming default user_type is "user"
 			insertStatement.executeUpdate();
 			return true; // Success
@@ -245,17 +245,31 @@ public class ServerApplication {
 	private boolean checkLog(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
 		try {
 			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT * FROM users WHERE username = ? AND password = ?"
+					"SELECT * FROM users WHERE username = ?"
 			);
 			selectStatement.setString(1, user);
-			selectStatement.setString(2, pass);
 			ResultSet rs = selectStatement.executeQuery();
-			return rs.next(); // Returns true if a matching user is found
+			if (rs.next()) {
+				String storedHashedPassword = rs.getString("password");
+				
+				// Use the verifyPassword function to check if the provided password is correct
+				if (verifyPassword(pass, storedHashedPassword)) {
+					System.out.println("Password verification successful.");
+					return true; // Password is correct
+				} else {
+					System.out.println("Incorrect password.");
+					return false; // Password is incorrect
+				}
+			} else {
+				System.out.println("User not found.");
+				return false; // User not found
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false; // Failed
 		}
 	}
+
 
 	public static String hashPassword(String plainPassword) {
         // Adjust the log rounds to change security (larger number takes longer but more secure)
