@@ -165,7 +165,30 @@ public class ServerApplication {
 
 		return total;
 	}
+	@GetMapping("/getRooms")
+	private String getRooms(){
+		StringBuilder output = new StringBuilder();
+		output.append("{\"rooms\":{"+
+				"\"data\":[");
+		try {
+			// Fetch all rooms from the database
+			PreparedStatement selectStatement = connection.prepareStatement("");
+			//SQL FOR ROOM NAMES PLS
+			ResultSet rs = selectStatement.executeQuery();
 
+			// Iterate over the result set and build the output string
+			while (rs.next()) {
+				output.append("{\"room\": \""+rs.getString("room_name"));
+				if(!rs.isLast()){
+					output.append(",");
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		output.append("]}}");
+		return output.toString();
+	}
 	@GetMapping("/listAll")
 	private String listAll() {
 		StringBuilder output = new StringBuilder();
