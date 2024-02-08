@@ -1,10 +1,11 @@
 package com.monitor.server;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
+import org.mindrot.jbcrypt.BCrypt;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.sql.*;
@@ -255,4 +256,13 @@ public class ServerApplication {
 			return false; // Failed
 		}
 	}
+
+	public static String hashPassword(String plainPassword) {
+        // Adjust the log rounds to change security (larger number takes longer but more secure)
+        return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
+    }
+
+    public static boolean verifyPassword(String plainPassword, String hashedPassword) {
+        return BCrypt.checkpw(plainPassword, hashedPassword);
+    }
 }
