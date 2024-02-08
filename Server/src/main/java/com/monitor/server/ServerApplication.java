@@ -1,7 +1,5 @@
 package com.monitor.server;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.*;
@@ -10,8 +8,6 @@ import org.springframework.boot.SpringApplication;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @EnableScheduling
@@ -24,7 +20,6 @@ public class ServerApplication {
 	private static final String USER = "java";
 	private static Connection connection;
 	private static SerialMonitor monitor;
-	public static LocalTime nextHour = LocalTime.now().plusHours(1);;
 
 	private static final String[] tableNames = {
 		"users",
@@ -119,8 +114,7 @@ public class ServerApplication {
 			PreparedStatement selectStatement = connection.prepareStatement(
 					"SELECT * FROM roomEnvironment WHERE room_id = ?"
 			);
-				selectStatement.setString(1, loc);
-			//output.append("{\"DataID\": \""+1+"\", \"Timestamp\": \""+24+"\", \"Temperature\": \""+25.0+"\", \"NoiseLevel\": \""+10.0+"\", \"LightLevel\": \""+5.5+"\"}");
+			selectStatement.setString(1, loc);
 
 			ResultSet rs = selectStatement.executeQuery();
 
