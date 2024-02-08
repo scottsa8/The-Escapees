@@ -60,7 +60,7 @@ export default function Login() {
     const isLoggedIn = await login(username, password);
 
     if (isLoggedIn) {
-      router.push('/dashboard');
+      router.push('/Dashboard');
     }
   };
 
