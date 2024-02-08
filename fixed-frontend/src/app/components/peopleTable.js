@@ -17,8 +17,7 @@ import {
   } from '@table-library/react-table-library/mantine';
 
 
-const mantineTheme = getTheme(DEFAULT_OPTIONS);
-const theme = useTheme(mantineTheme);
+
  const nodes = [
 //    {name: "Adam", loc: "B80"},
 //   //   {name: "Scott", loc: "B76"},
@@ -28,6 +27,9 @@ const theme = useTheme(mantineTheme);
 
 export default function PeopleTable() {
   const dataTable = {nodes} 
+
+  const mantineTheme = getTheme(DEFAULT_OPTIONS);
+  const theme = useTheme(mantineTheme);
   
   useEffect(() => {
     const getLocations = async () => {
