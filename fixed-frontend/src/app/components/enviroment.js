@@ -37,10 +37,7 @@ export default function EnviromentContainer(){
         const data = await response.json();
         let data2 = data['rooms'];
         let data3 = data2['data'];
-
-        for (let i = 0; i < data3.length; i++) {
-            let realData = data3[i];
-            locations.push({name: realData['room']});
+        return data3.map(item => item['room']);
         }
      };
 
@@ -62,7 +59,8 @@ export default function EnviromentContainer(){
         
 
      function handleLocationChange(value){
-         setLocation(value)
+        getLocations().then(newLocations => {
+            setLocations(newLocations);
          getEnvData()
      }
     
@@ -82,7 +80,9 @@ export default function EnviromentContainer(){
     
 
      useEffect(() => {
-         getLocations()
+        getLocations().then(newLocations => {
+            setLocations(newLocations);
+        });
          getEnvData()
          const interval=setInterval(()=>{
              getEnvData()
