@@ -107,39 +107,55 @@ public class ServerApplication {
 	@RequestMapping(value = "/getEnv", produces = MediaType.APPLICATION_JSON_VALUE)
 	private String getEnv(@RequestParam(value = "loc") String loc){
 		StringBuilder output = new StringBuilder();
-		output.append("{\"enviornment\":{"+
-				"\"data\":[");
+		output.append("{\"environment\":{\"data\":[");
 
 		try {
-			// need to get roomid from loc, loc=room name now
-			// Assuming loc parameter is the room_id
-			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT * FROM roomEnvironment WHERE room_id = ?"
+			// Get room_id from rooms table using the room name (loc)
+			PreparedStatement roomIdStatement = connection.prepareStatement(
+					"SELECT room_id FROM rooms WHERE room_name = ?"
 			);
-			selectStatement.setString(1, loc);
+			roomIdStatement.setString(1, loc);
 
-			ResultSet rs = selectStatement.executeQuery();
+			ResultSet roomIdResultSet = roomIdStatement.executeQuery();
+			
+			if (roomIdResultSet.next()) {
+				int roomId = roomIdResultSet.getInt("room_id");
 
-			while (rs.next()) {
-				int dataId = rs.getInt("data_id");
-				Timestamp timestamp = rs.getTimestamp("timestamp");
-				BigDecimal temperature = rs.getBigDecimal("temperature");
-				BigDecimal noiseLevel = rs.getBigDecimal("noise_level");
-				BigDecimal lightLevel = rs.getBigDecimal("light_level");
-				// Customize the output format based on your needs
+				// Fetch records from roomEnvironment using the obtained room_id
+				PreparedStatement selectStatement = connection.prepareStatement(
+						"SELECT * FROM roomEnvironment WHERE room_id = ?"
+				);
+				selectStatement.setInt(1, roomId);
 
-				output.append("{\"DataID\": \""+dataId+"\", \"Timestamp\": \""+timestamp.toString()+"\", \"Temperature\": \""+temperature.toString()+"\", \"NoiseLevel\": \""+noiseLevel.toString()+"\", \"LightLevel\": \""+lightLevel.toString()+"\"}");
-				if(!rs.isLast()){
-					output.append(",");
+				ResultSet rs = selectStatement.executeQuery();
+
+				while (rs.next()) {
+					int dataId = rs.getInt("data_id");
+					Timestamp timestamp = rs.getTimestamp("timestamp");
+					BigDecimal temperature = rs.getBigDecimal("temperature");
+					BigDecimal noiseLevel = rs.getBigDecimal("noise_level");
+					BigDecimal lightLevel = rs.getBigDecimal("light_level");
+
+					// Customize the output format based on your needs
+					output.append("{\"DataID\": \""+dataId+"\", \"Timestamp\": \""+timestamp.toString()+"\", \"Temperature\": \""+temperature.toString()+"\", \"NoiseLevel\": \""+noiseLevel.toString()+"\", \"LightLevel\": \""+lightLevel.toString()+"\"}");
+					if (!rs.isLast()) {
+						output.append(",");
+					}
 				}
+			} else {
+				// Handle the case when the room name (loc) is not found
+				output.append("{\"error\": \"Room not found\"}");
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			// Handle the SQL exception
+			output.append("{\"error\": \"An error occurred\"}");
 		}
 		output.append("]}}");
 		return output.toString();
 	}
+
 
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value="loc") String loc) {
