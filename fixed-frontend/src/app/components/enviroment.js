@@ -16,11 +16,7 @@ const EnviromentBox = ({ measurement, value }) => {
 };
 
 export default function EnviromentContainer(){
-    const locations = [
-        { name:"Room1"},
-        { name:"Room2"},
-        { name:"Room3"},
-    ]
+    const locations = [{name:""}]
     const [selectedLocation, setLocation] = useState(locations[0])
 
     
@@ -40,8 +36,13 @@ export default function EnviromentContainer(){
 
         for (let i = 0; i < data3.length; i++) {
             let realData = data3[i];
+            if(realData['room']=="gate1" || realData['room']=="gate2"){
+                continue;
+            }
             locations.push({name: realData['room']});
+            console.log(locations.at(i))
         }
+
      };
 
      const getEnvData = async () => {
