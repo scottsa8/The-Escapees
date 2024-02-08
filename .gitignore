@@ -12,6 +12,7 @@ target/
 *.iml
 *.ipr
 *.class
+*.bin
 ### VS Code ###
 .idea
 .mvn/wrapper
