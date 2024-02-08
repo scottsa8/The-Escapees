@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { network } from "../layout";
-
+import Dial from "./dial";
 
 
 function LocationCount({location}){

@@ -1,56 +1,7 @@
 import React, {useEffect, useState} from "react";
 import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
-
-
-const Dial = ({ value, min, max }) => {
-    const size = 170; 
-    const strokeWidth = 5; 
-    const radius = (size-20 - strokeWidth) / 2;
-    const circumference = 2 * Math.PI * radius;
-
-    
-    const offset = circumference - (value - min) / (max - min) * circumference;
-
-    return (
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block">
-            {/* circle */}
-            <circle
-                cx={size / 2}
-                cy={size / 2}
-                r={radius}
-                fill="white"
-                stroke="#e6e6e6"
-                strokeWidth={strokeWidth}
-            />
-            {/* border circle */}
-            <circle
-                cx={size / 2}
-                cy={size / 2}
-                r={radius}
-                fill="transparent"
-                stroke="blue"
-                strokeWidth={strokeWidth}
-                strokeDasharray={circumference}
-                strokeDashoffset={offset}
-                transform={`rotate(-90 ${size / 2} ${size / 2})`}
-            />
-            {/* value */}
-            <text
-                x="50%"
-                y="50%"
-                dy=".3em"
-                textAnchor="middle"
-                fontSize="1.7em"
-                fontWeight="bold"
-            >
-                {value}
-            </text>
-        </svg>
-    );
-};
-
-
+import Dial from "./dial";
 const EnviromentBox = ({ measurement, value }) => {
     return (
         <div className="flex flex-col items-center p-4">
@@ -125,10 +76,10 @@ export default function EnviromentContainer(){
     // })
 
     return(
-        <div className="w-full flex flex-col items-center rounded border m-0.5 border-neutral-900 bg-neutral-200">
-            <div className="w-full flex justify-center border border-neutral-950 bg-neutral-300 p-3">
+        <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-neutral-200">
+            <div className="w-full flex justify-center bg-neutral-300 p-3">
                 <Listbox value={selectedLocation} onChange={setLocation} >
-                <div className=" flex flex-col justify-center w-24 border-neutral-900">
+                <div className=" flex flex-col justify-center w-24 ">
                 <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900">Location:</Listbox.Label>
                     <Listbox.Button className="rounded hover:underline  text-xl w-24 h-11 grow text-center text-white bg-neutral-600">{selectedLocation.name}</Listbox.Button>
                     <Listbox.Options className="flex flex-col self-center" >
