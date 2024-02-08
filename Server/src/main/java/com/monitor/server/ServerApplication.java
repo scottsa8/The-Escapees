@@ -156,7 +156,6 @@ public class ServerApplication {
 		return output.toString();
 	}
 
-
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value="loc") String loc) {
 		int total = 0;

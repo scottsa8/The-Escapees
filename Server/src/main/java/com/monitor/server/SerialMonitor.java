@@ -61,6 +61,11 @@ public class SerialMonitor {
             throw new Exception("no port");
         }
 
+        byte[] helloWorldBytes = "hello world".getBytes();
+
+        // Write the bytes to the microbit
+        microbit.writeBytes(helloWorldBytes, helloWorldBytes.length);
+        
         // Add data listener to the SerialPort
         microbit.addDataListener(new SerialPortMessageListener() {
             @Override
