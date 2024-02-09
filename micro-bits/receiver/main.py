@@ -5,20 +5,19 @@ entriesLog = []
 count = 0
 arrivedTime = 0
 
-
 TIMEOUT = 2000
 
 #will check for any requests wanting to be sent from the server to other micro:bits
 def sendDataFromServer():
-
     if uart.any():
         data = uart.readline()
         decodedMessage = data.decode('utf-8').strip()
+        display.scroll(decodedMessage)
         message = str(decodedMessage)
 
         radio.config(channel=13)
         radio.send(message)
-        radio.config(channel=11)
+        radio.config(channel=21)
 
 def findEntries():
     global entriesLog
@@ -63,7 +62,7 @@ def main():
 
     while True:
         message = radio.receive()
-        #sendDataFromServer()
+        sendDataFromServer()
         
         currentTime = running_time()
 
@@ -81,6 +80,4 @@ def main():
                 
             else:
                 print(message)
-
-
 main()
