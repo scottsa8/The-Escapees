@@ -3,6 +3,7 @@ import { useState } from "react";
 import PeopleTable from "../components/peopleTable";
 import EnviromentContainer from "../components/enviroment";
 import LocationCountBox from "../components/locationNumber";
+import Settings from "../components/settings";
 
 export function sendNotification(title, options) {
   // Check browser support
@@ -56,7 +57,8 @@ export default function Dashboard() {
   const views = {
 
     "table": <PeopleTable/>,
-    "test": <InteractivePage/>
+    "test": <InteractivePage/>,
+    "settings": <Settings/>
   }
 
   const[currentView,setView] = useState("test")
@@ -64,13 +66,13 @@ export default function Dashboard() {
 
   return (
     <body>
-      <div className="sidebar">
+      <div className="sidebar dark:bg-gray-700 dark:text-blue-100">
         <button className="sidebar-button" onClick={() => setView("test")}>FrontPage</button>
         <button className="sidebar-button" onClick={() => setView("table")}>Individuals</button>
-        {/* <button className="sidebar-button" onClick={() => setView("test")}>Button 3</button> */}
+        <button className="sidebar-button" onClick={() => setView("settings")}>Settings</button>
       </div>
-      <div className="banner">
-        <h1 className="title">Dashboard</h1>
+      <div className="banner dark:bg-gray-700 dark:text-neutral-50">
+        <h1 className="title dark:text-neutral-50">Dashboard</h1>
         <UserButton username="Username" />
       </div>
       <CardContainer>
