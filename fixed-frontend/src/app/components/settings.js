@@ -28,7 +28,7 @@ export default function Settings() {
       }, [theme]);
 
     return (
-        <div className="card-container p-4 dark:bg-gray-500 dark:text-neutral-50">
+        <div className="card-container p-4 dark:text-neutral-50">
             <h1 className="text-2xl font-bold mb-4">Settings</h1>
             {/* x slider */}
             <div className="card p-4">
