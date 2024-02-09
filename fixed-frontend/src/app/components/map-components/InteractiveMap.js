@@ -23,14 +23,68 @@ function getBounds(centerPoint){
 
 const InteractiveMap = () => {
 
-    const created = (e) => console.log(e);
+    const [mapLayers, setMapLayers] = useState([]);
+
+    //callback functions to create shapes on the map
+
+    //when an object is created, store it
+    const onCreate = (e) => {
+        console.log(e)
+
+        
+        const {layerType, layer} = e;
+
+        //if the user has drawn a polygon
+        if(layerType === "polygon"){
+            const {leafletID} = layer;//used to id which polygon to edit or delete
+
+            setMapLayers( (layers) => [...layers, {id: leafletID, latlngs: layer.getLatLngs()[0]}]);
+        }
+
+    };
+
+    //When you edit a polygon it saves the updated polygon values
+    const onEdit = (e) => {
+        console.log(e)
+
+        const {layers: {_layers}} = e;
+
+        Object.values(_layers).map(({leafletID, editing}) => {
+            //find current layer id and update with new coordinates
+            setMapLayers(
+                (layers) => layers.map((l) => l.id === leafletID
+                ? { ...l, latlngs: {...editing.latlngs[0]}} 
+                : l//if not matching, return same object
+                )
+            );
+        });
+    };
+
+    //remove the selected polygon
+    const onDelete = (e) => {
+        console.log(e)
+        const {layers: {_layers}} = e;
+
+        Object.values(_layers).map((leafletID) => {
+            setMapLayers((layers) => layers.filter( (l) => l.id !== leafletID));
+        });
+    };
 
     return ( 
         <div>
             <MapContainer className="interactive-map" style={{height: "100vh", width: "100vw"}} center={lancasterPrisonLongLat} zoom = {zoom} scrollWheelZoom={true}>
 
+                {/* The sidepannel with shape drawing options */}
                 <FeatureGroup>
-                    <EditControl position="topright" created={created} />
+                    <EditControl position="topright" onCreated={onCreate} onEdited={onEdit} onDeleted = {onDelete} draw={{
+                        // Disabling the other draw features so there is onlt a polygon option
+                      rectangle: false,
+                      circle: false,
+                      square: false,
+                      polyline: false,
+                      marker: false,  
+                      circlemarker: false
+                    }}/>
                 </FeatureGroup>
 
                 {/* Get data from OSM */}
