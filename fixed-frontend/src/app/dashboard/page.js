@@ -71,8 +71,8 @@ export default function Dashboard() {
         <button className="sidebar-button" onClick={() => setView("table")}>Individuals</button>
         <button className="sidebar-button" onClick={() => setView("settings")}>Settings</button>
       </div>
-      <div className="banner dark:bg-gray-700 dark:text-neutral-50">
-        <h1 className="title dark:text-neutral-50">Dashboard</h1>
+      <div className="banner dark:bg-gray-700">
+        <h1 className="title">Dashboard</h1>
         <UserButton username="Username" />
       </div>
       <CardContainer>

@@ -4,7 +4,9 @@
 
 body {
   background-color: #EAEAEB;
-
+}
+.dark body{
+  background-color: #6B7280;
 }
 
 .banner {
