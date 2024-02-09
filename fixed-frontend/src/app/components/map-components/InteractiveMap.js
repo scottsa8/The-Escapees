@@ -7,19 +7,13 @@ import { useRef } from 'react';
 import { EditControl } from 'react-leaflet-draw';
 import { useState } from 'react';
 
-
 const lancasterPrisonLongLat = [54.05287592589365, -2.771636992389602];//default for now
 const zoom = 17;
+const popupInformation = "LOCATION NAME";
 
-
-function getBounds(centerPoint){
-    //Works out the bounds around the central chosen point
-    
-    var boundsA = [lancasterPrisonLongLat[0], lancasterPrisonLongLat[1]];
-    var boundsB = [lancasterPrisonLongLat[0], lancasterPrisonLongLat[1]*-1];
-
-    return (boundsA, boundsB)
-}
+//TODO: When created, user can add a location name to polygons
+//      That data is stored in the db with the polygon ids and locations
+//      Fetch data from the database and update popup info with location data
 
 const InteractiveMap = () => {
 
@@ -39,6 +33,18 @@ const InteractiveMap = () => {
             const {leafletID} = layer;//used to id which polygon to edit or delete
 
             setMapLayers( (layers) => [...layers, {id: leafletID, latlngs: layer.getLatLngs()[0]}]);
+            layer.bindPopup(popupInformation);
+
+            //opens popup when hovering over polygon
+            layer.on({
+                mouseover: e => {
+                    layer.openPopup();
+                },
+                mouseout: e => {
+                    layer.closePopup();
+                }
+            });
+
         }
 
     };
