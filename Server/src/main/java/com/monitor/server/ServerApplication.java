@@ -156,7 +156,6 @@ public class ServerApplication {
 		return output.toString();
 	}
 
-
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value="loc") String loc) {
 		int total = 0;
@@ -183,6 +182,7 @@ public class ServerApplication {
 
 		return total;
 	}
+
 	@GetMapping("/getRooms")
 	private String getRooms(){
 		StringBuilder output = new StringBuilder();
@@ -205,6 +205,7 @@ public class ServerApplication {
 		output.append("]}}");
 		return output.toString();
 	}
+
 	@GetMapping("/listAll")
 	private String listAll() {
 		StringBuilder output = new StringBuilder();
@@ -285,6 +286,21 @@ public class ServerApplication {
 		}
 	}
 
+	@GetMapping("/transmitMessage")
+	private String transmitMessage(@RequestParam(value = "message") String message) {
+		try {
+			// Transmit the message to the microbit over serial
+			if (monitor != null) {
+				monitor.sendMessage(message);
+				return "Message transmitted successfully";
+			} else {
+				return "Microbit not available";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Failed to transmit message";
+		}
+	}
 
 	public static String hashPassword(String plainPassword) {
         // Adjust the log rounds to change security (larger number takes longer but more secure)

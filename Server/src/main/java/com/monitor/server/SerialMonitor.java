@@ -239,6 +239,20 @@ public class SerialMonitor {
             }
         });
     }
+
+    public void sendMessage(String message) {
+        if (microbit != null && microbit.isOpen()) {
+            try {
+                // Convert the message to bytes and send it to the microbit
+                byte[] messageBytes = message.getBytes();
+                microbit.writeBytes(messageBytes, messageBytes.length);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Microbit not available or port not open.");
+        }
+    }  
  
     public void stop(){
         try{
