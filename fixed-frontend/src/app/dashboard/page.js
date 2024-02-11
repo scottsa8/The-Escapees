@@ -1,9 +1,16 @@
 'use client'
 import { useState } from "react";
-import PeopleTable from "../components/peopleTable";
-import EnviromentContainer from "../components/enviroment";
-import LocationCountBox from "../components/locationNumber";
-import Settings from "../components/settings";
+import LocationTable from "../components/LocationTable";
+import UserButton from "../components/UserButton";
+import HomePage from "./HomePage";
+import InteractiveMap from "../components/map-components";
+
+// Lists the pages for the navigation bar on the dashboard
+const views = {
+  individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
+  homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
+  interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"}
+}
 
 export function sendNotification(title, options) {
   // Check browser support
@@ -24,61 +31,44 @@ export function sendNotification(title, options) {
       }
     });
   }
-
-}
-// sendNotification('Hello!', { body: 'You have a new message.'});
-
-function CardContainer({ children }) {
-  return <div className="card-container">{children}</div>;
 }
 
-function UserButton({ username }) {
-  return (
-    <div className="user-button">
-      <span>{username}</span>
-      <img src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png" alt="User Logo" />
-    </div>
-  );
-}
-
-
-function InteractivePage(){
-  return(
-    <>
-      <EnviromentContainer/>
-      <LocationCountBox/>
-    </>
-  )
-}
-
-
-
-export default function Dashboard() {
+//Used by the user to navigate through pages
+//It's the constant border around the main page
+const Dashboard = () => {
   const views = {
-
     "table": <PeopleTable/>,
     "test": <InteractivePage/>,
     "settings": <Settings/>
   }
-
-  const[currentView,setView] = useState("test")
-
+  
+  const [currentView,setView] = useState(views.homePage);
 
   return (
+
     <body>
-      <div className="sidebar dark:bg-gray-700 dark:text-blue-100">
-        <button className="sidebar-button" onClick={() => setView("test")}>FrontPage</button>
-        <button className="sidebar-button" onClick={() => setView("table")}>Individuals</button>
-        <button className="sidebar-button" onClick={() => setView("settings")}>Settings</button>
-      </div>
-      <div className="banner dark:bg-gray-700">
-        <h1 className="title">Dashboard</h1>
-        <UserButton username="Username" />
-      </div>
-      <CardContainer>
-       {views[currentView]}
-      </CardContainer>
-      
-    </body>
-  );
+        {/* Used to navigate pages */}
+        <div className="sidebar">
+
+          <button className="sidebar-button" onClick={() => setView(views.homePage)}>{views.homePage.pageTitle}</button>
+          <button className="sidebar-button" onClick={() => setView(views.individualLocations)}>{views.individualLocations.pageTitle}</button>
+          <button className="sidebar-button" onClick={() => setView(views.interactiveMap)}>{views.interactiveMap.pageTitle}</button>
+
+        </div>
+
+        <div className="banner">
+
+          <h1 className="title">{currentView.pageTitle}</h1>
+          <UserButton username="Username" /> {/*UPDATE FOR ACTUAL USERNAME*/}
+
+
+        </div>
+
+        {/* Where the screen contents are shown */}
+        <div className="card-container">
+          {currentView.page}
+        </div>
+      </body>
+   );
 }
+export default Dashboard;
