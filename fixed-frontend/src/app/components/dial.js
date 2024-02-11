@@ -26,7 +26,7 @@ function Dial({ value, min, max, onMaxValue }) {
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
-                    fill="white"
+                    fill="#374151"
                     stroke="#e6e6e6"
                     strokeWidth={strokeWidth}
                 />
@@ -36,7 +36,7 @@ function Dial({ value, min, max, onMaxValue }) {
                     cy={size / 2}
                     r={radius}
                     fill="transparent"
-                    stroke="blue"
+                    stroke="red"
                     strokeWidth={strokeWidth}
                     strokeDasharray={circumference}
                     strokeDashoffset={offset}
@@ -50,6 +50,7 @@ function Dial({ value, min, max, onMaxValue }) {
                     textAnchor="middle"
                     fontSize="1.7em"
                     fontWeight="bold"
+                    fill="rgb(219 234 254)"
                 >
                     {value}
                 </text>
