@@ -4,23 +4,33 @@
 
 body {
   background-color: #EAEAEB;
-
+}
+.dark body{
+  background-color: #0C4A6E;
 }
 
 .banner {
   background-color: #B7B6B7;
   height: 100px;
-  color: black;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+.dark .title{
+  color: rgb(219 234 254);
+}
+
 .title {
   color: black;
   font-size: 34px;
-  padding-left: 230px;
+  padding-left: 220px;
   font-weight: bold;
+  z-index: 10
+}
+
+.dot {
+  @apply transition-transform duration-500 ease-in-out;
 }
 
 .sidebar {
@@ -51,19 +61,19 @@ body {
 
 .card-container {
   display: flex;
-  flex-wrap: wrap;
   padding-left: 200px;
   width: 100%-200px;
+  flex-direction: column;
 }
 
 .card {
   width: 200px;
-  height: 200px;
-  margin: 10px;
-  border: 1px solid black;
   border-radius: 15px;
-  box-sizing: border-box;
   background-color: #BDBDBC;
+}
+
+.dark .card{
+  background-color: #374151;
 }
 
 .card-title {
