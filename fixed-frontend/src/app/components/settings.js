@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ToggleSwitch from './toggleSwitch';
 import {SunIcon, MoonIcon} from './heroIcons'
-
+import {setCookie, getCookie} from './cookies'
 
 export default function Settings() {
     const [x, setX] = useState(50);
@@ -14,18 +14,17 @@ export default function Settings() {
     };
 
     const toggleTheme = () => {
-        if (theme === 'light') {
-          setTheme('dark');
-          document.documentElement.classList.add('dark');
-        } else {
-          setTheme('light');
-          document.documentElement.classList.remove('dark');
-        }
-      };
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        setCookie('theme', newTheme);
+        document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    };
     
-      useEffect(() => {
-        document.documentElement.classList.add(theme);
-      }, [theme]);
+    useEffect(() => {
+        const savedTheme = getCookie('theme') || 'light';
+        setTheme(savedTheme);
+        document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    }, []);
 
     return (
         <div className="card-container p-4 dark:text-neutral-50">

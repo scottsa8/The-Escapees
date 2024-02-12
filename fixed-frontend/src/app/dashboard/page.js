@@ -4,13 +4,9 @@ import LocationTable from "../components/LocationTable";
 import UserButton from "../components/UserButton";
 import HomePage from "./HomePage";
 import InteractiveMap from "../components/map-components";
-
+import Settings from "../components/settings"
 // Lists the pages for the navigation bar on the dashboard
-const views = {
-  individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
-  homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
-  interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"}
-}
+
 
 export function sendNotification(title, options) {
   // Check browser support
@@ -37,11 +33,11 @@ export function sendNotification(title, options) {
 //It's the constant border around the main page
 const Dashboard = () => {
   const views = {
-    "table": <PeopleTable/>,
-    "test": <InteractivePage/>,
-    "settings": <Settings/>
+    individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
+    homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
+    interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"},
+    settings: {page: <Settings/>, pageTitle: "Settings"}
   }
-  
   const [currentView,setView] = useState(views.homePage);
 
   return (
@@ -53,6 +49,7 @@ const Dashboard = () => {
           <button className="sidebar-button" onClick={() => setView(views.homePage)}>{views.homePage.pageTitle}</button>
           <button className="sidebar-button" onClick={() => setView(views.individualLocations)}>{views.individualLocations.pageTitle}</button>
           <button className="sidebar-button" onClick={() => setView(views.interactiveMap)}>{views.interactiveMap.pageTitle}</button>
+          <button className="sidebar-button" onClick={() => setView(views.settings)}>{views.settings.pageTitle}</button>
 
         </div>
 
@@ -60,8 +57,6 @@ const Dashboard = () => {
 
           <h1 className="title">{currentView.pageTitle}</h1>
           <UserButton username="Username" /> {/*UPDATE FOR ACTUAL USERNAME*/}
-
-
         </div>
 
         {/* Where the screen contents are shown */}
