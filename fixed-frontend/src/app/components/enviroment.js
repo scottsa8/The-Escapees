@@ -3,7 +3,7 @@ import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
 import Dial from "./dial";
 import { sendNotification } from "./notifications";
-
+import { getCookie } from "./cookies"
 const EnviromentBox = ({ measurement, value }) => {
     return (
         <div className="flex flex-col items-center p-4 bg-transparent">
@@ -72,16 +72,27 @@ export default function EnviromentContainer(){
     // };
     // console.log(list)
     
-    
-    
 
     useEffect(() => {
-        getLocations().then(newLocations => {
-            console.log(newLocations)
+        const fetchUpdateDelay = () => {
+          const delay = getCookie('updateDelay');
+          return delay ? parseInt(delay, 10) * 1000 : 10000;
+        };
+    
+        const fetchLocations = () => {
+          getLocations().then(newLocations => {
+            console.log(newLocations);
             setLocations(newLocations);
             getEnvData();
-        });
-    }, );
+          });
+        };
+        fetchLocations();
+    
+        const interval = setInterval(() => {
+          fetchLocations();
+        }, fetchUpdateDelay());
+        return () => clearInterval(interval);
+      }, []);
 
     return (
         <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-transparent">

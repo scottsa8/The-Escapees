@@ -6,6 +6,7 @@ import {setCookie, getCookie} from './cookies'
 export default function Settings() {
     const [x, setX] = useState(50);
     const [y, setY] = useState(50);
+    const [updateDelay, setUpdateDelay] = useState(10);
     const [theme, setTheme] = useState('light');
     const [isEnabled, setIsEnabled] = useState(false);
     
@@ -20,9 +21,17 @@ export default function Settings() {
         document.documentElement.classList.toggle('dark', newTheme === 'dark');
     };
 
+    const handleUpdateDelayChange = (e) => {
+        const newValue = e.target.value;
+        setUpdateDelay(newValue);
+        setCookie('updateDelay', newValue);
+    };
+
     useEffect(() => {
         const savedTheme = getCookie('theme') || 'light';
+        const savedUpdateDelay = parseInt(getCookie('updateDelay'), 10) || 5;
         setTheme(savedTheme);
+        setUpdateDelay(savedUpdateDelay);
         document.documentElement.classList.toggle('dark', savedTheme === 'dark');
     }, []);
 
@@ -60,7 +69,19 @@ export default function Settings() {
                     />
                     <div className="text-right text-sm">{y}%</div>
                 </div>
-            </div>
+                {/* Update Delay slider */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-neutral-50">Update Delay</label>
+                <input
+                    type="range"
+                    id="update-delay-slider"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+                    min="1"
+                    max="10"
+                    value={updateDelay}
+                    onChange={handleUpdateDelayChange}
+                />
+                    <div className="text-right text-sm">{updateDelay}s</div>
+                </div>
             {/*Theme Toggle*/}
             <button onClick={toggleTheme} className="rounded-full w-10 p-2">
                 {theme === 'light' ? (<MoonIcon/>) : (<SunIcon className/>)}
