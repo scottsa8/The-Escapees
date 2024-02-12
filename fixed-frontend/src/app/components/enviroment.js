@@ -6,7 +6,7 @@ import { sendNotification } from "./notifications";
 
 const EnviromentBox = ({ measurement, value }) => {
     return (
-        <div className="flex flex-col items-center p-4 dark:bg-sky-900 dark:text-blue-100">
+        <div className="flex flex-col items-center p-4 bg-transparent">
             <Dial value={value} min={0} max={40} onMaxValue={() => {
                 sendNotification('Max Value Reached', { body: `Measurement: ${measurement}, Value: ${value}`});
             }}/>
@@ -84,12 +84,12 @@ export default function EnviromentContainer(){
     }, );
 
     return (
-        <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-neutral-200 dark:bg-sky-900">
-            <div className="w-full flex justify-center bg-neutral-300 p-3 dark:bg-sky-900">
+        <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-transparent">
+            <div className="w-full flex justify-center p-3 bg-transparent">
                 <Listbox value={selectedLocation} onChange={setLocation}>
                     <div className="flex flex-col justify-center w-24">
                         <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900 dark:text-blue-100">Location:</Listbox.Label>
-                        <Listbox.Button className="rounded hover:underline text-xl w-24 h-11 grow text-center text-white bg-neutral-600 dark:bg-sky-700 dark:text-blue-100">{selectedLocation.name}</Listbox.Button>
+                        <Listbox.Button className="rounded hover:underline text-xl w-24 h-11 grow text-center text-white bg-neutral-600 dark:bg-sky-800 dark:text-blue-100">{selectedLocation.name}</Listbox.Button>
                         <Listbox.Options className="flex flex-col self-center dark:text-blue-100">
                             {locations.map((location, index) => (
                                 <Listbox.Option
@@ -104,7 +104,7 @@ export default function EnviromentContainer(){
                     </div>
                 </Listbox>
             </div>
-            <div className="w-full flex justify-between dark:dark:bg-sky-900">
+            <div className="w-full flex justify-between bg-transparent dark:text-blue-100">
                 <EnviromentBox measurement="Temp" value={values["temp"]}/>
                 <EnviromentBox measurement="Light" value={values["light"]}/>
                 <EnviromentBox measurement="Noise" value={values["noise"]}/>

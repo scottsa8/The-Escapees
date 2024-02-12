@@ -5,8 +5,9 @@
 body {
   background-color: #EAEAEB;
 }
+
 .dark body{
-  background-color: #0C4A6E;
+  background-color: #22314f;
 }
 
 .banner {
@@ -15,6 +16,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.dark .banner{
+  background-color: #1b2030;
 }
 
 .dark .title{
@@ -44,6 +48,10 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+.dark .sidebar{
+  background-color: #1b2030;
+  color: #DBE9FE;
 }
 
 

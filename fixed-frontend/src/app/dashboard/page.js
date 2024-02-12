@@ -1,10 +1,13 @@
 'use client'
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from 'next/router';
 import LocationTable from "../components/LocationTable";
 import UserButton from "../components/UserButton";
 import HomePage from "./HomePage";
 import InteractiveMap from "../components/map-components";
 import Settings from "../components/settings"
+import {getCookie} from "../components/cookies"
+
 // Lists the pages for the navigation bar on the dashboard
 
 
@@ -29,6 +32,9 @@ export function sendNotification(title, options) {
   }
 }
 
+
+
+
 //Used by the user to navigate through pages
 //It's the constant border around the main page
 const Dashboard = () => {
@@ -38,7 +44,13 @@ const Dashboard = () => {
     interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"},
     settings: {page: <Settings/>, pageTitle: "Settings"}
   }
+  const [username, setUsername] = useState('');
   const [currentView,setView] = useState(views.homePage);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
+    setUsername(getCookie("username"));
+  }, []);
 
   return (
 
@@ -56,7 +68,7 @@ const Dashboard = () => {
         <div className="banner">
 
           <h1 className="title">{currentView.pageTitle}</h1>
-          <UserButton username="Username" /> {/*UPDATE FOR ACTUAL USERNAME*/}
+          <UserButton username={username} />
         </div>
 
         {/* Where the screen contents are shown */}

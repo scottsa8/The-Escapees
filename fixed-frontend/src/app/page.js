@@ -6,6 +6,8 @@ import { useId } from 'react';
 import Image from "next/image";
 import "./main.css"
 import { network } from './layout';
+import {setCookie} from './components/cookies'
+
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -55,10 +57,9 @@ export default function Login() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     const isLoggedIn = await login(username, password);
-
     if (isLoggedIn) {
+      setCookie("username",username);
       router.push('/dashboard');
     }
   };

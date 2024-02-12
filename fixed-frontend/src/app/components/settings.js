@@ -19,7 +19,7 @@ export default function Settings() {
         setCookie('theme', newTheme);
         document.documentElement.classList.toggle('dark', newTheme === 'dark');
     };
-    
+
     useEffect(() => {
         const savedTheme = getCookie('theme') || 'light';
         setTheme(savedTheme);
