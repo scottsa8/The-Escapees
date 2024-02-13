@@ -298,7 +298,6 @@ public class ServerApplication {
 			ResultSet rs = selectStatement.executeQuery();
 			if (rs.next()) {
 				type = rs.getString("user_type");
-				System.out.println(type);
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
