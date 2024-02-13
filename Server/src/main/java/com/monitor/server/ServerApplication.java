@@ -243,14 +243,20 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/createAcc")
-	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
+	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass,
+	@RequestParam(value="type", required=false)String type){
 		try {
 			PreparedStatement insertStatement = connection.prepareStatement(
 					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)"
 			);
 			insertStatement.setString(1, user);
 			insertStatement.setString(2, hashPassword(pass));
-			insertStatement.setString(3, "user"); // Assuming default user_type is "user"
+			if(type==null){
+				insertStatement.setString(3, "user"); // Assuming default user_type is "user"
+			}else{
+				insertStatement.setString(3, type);
+			}
+
 			insertStatement.executeUpdate();
 			return true; // Success
 		} catch (SQLException e) {
