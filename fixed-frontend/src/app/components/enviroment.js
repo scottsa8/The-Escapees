@@ -67,9 +67,11 @@ export default function EnviromentContainer(){
                 values.temp = realData['Temperature'];
                 values.noise = realData['NoiseLevel'];  
                 values.light = realData['LightLevel'];
+                // console.log(realData['Timestamp']);
                 // console.log(values.temp)
                 // console.log(values.noise)
                 // console.log(values.light)
+                
             }
         }catch(err){
             console.error(err) //UNCOMMENT ME OUT TO SEE CONSOLE ERROR SPAM !
