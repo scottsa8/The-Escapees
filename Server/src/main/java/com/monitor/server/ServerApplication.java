@@ -287,6 +287,24 @@ public class ServerApplication {
 			return false; // Failed
 		}
 	}
+	@GetMapping("/getUserType")
+	private String getUserType(@RequestParam(value="user") String user){
+		String type="";
+		try{
+			PreparedStatement selectStatement = connection.prepareStatement(
+					"SELECT user_type FROM users WHERE username = ?"
+			);
+			selectStatement.setString(1, user);
+			ResultSet rs = selectStatement.executeQuery();
+			if (rs.next()) {
+				type = rs.getString("user_type");
+				System.out.println(type);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return type;
+	}
 	@GetMapping("/setup")
 	private boolean setup(@RequestParam(value="user") String user){return false;}
 
