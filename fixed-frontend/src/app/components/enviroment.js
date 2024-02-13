@@ -53,21 +53,26 @@ export default function EnviromentContainer(){
 
      const getEnvData = async () => {
         try{
+            console.log("name:"+selectedLocation.name)
             const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.name}`)        
             const data = await response.json();
-            //console.log(data)
-            let data2 = data['enviornment'];
+            //console.log("data:"+data['environment'])
+            let data2 = data['environment'];
             let data3 = data2['data'];
-            let realData = data3['0']; //index of the data you want from array
-    
-            values.temp = realData['Temperature'];
-            values.noise = realData['NoiseLevel'];  
-            values.light = realData['LightLevel'];
-            // console.log(values.temp)
-            // console.log(values.noise)
-            // console.log(values.light)
+            let realData = data3['0']; //index of the data you want from array 0 = most recent
+            if(!realData['error']==""){
+                console.error("room, "+selectedLocation.name+" not found");
+                return;
+            }else{
+                values.temp = realData['Temperature'];
+                values.noise = realData['NoiseLevel'];  
+                values.light = realData['LightLevel'];
+                // console.log(values.temp)
+                // console.log(values.noise)
+                // console.log(values.light)
+            }
         }catch(err){
-            //console.error(err) UNCOMMENT ME OUT TO SEE CONSOLE ERROR SPAM !
+            console.error(err) //UNCOMMENT ME OUT TO SEE CONSOLE ERROR SPAM !
             return;
         }
      };
@@ -101,7 +106,7 @@ export default function EnviromentContainer(){
     
         const fetchLocations = () => {
           getLocations().then(newLocations => {
-            console.log(newLocations);
+            //console.log(newLocations);
             setLocations(newLocations);
             getEnvData();
           });
