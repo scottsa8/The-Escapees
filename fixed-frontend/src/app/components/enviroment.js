@@ -28,28 +28,48 @@ export default function EnviromentContainer(){
     }
 
     const getLocations = async () => {
-        const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
-        const data = await response.json();
-        let data2 = data['rooms'];
-        let data3 = data2['data'];
-        return data3;
+        try{
+            const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
+            const data = await response.json();
+            let data2 = data['rooms'];
+            let data3 = data2['data'];
+            let allRooms =[];
+            for (let i = 0; i < data3.length; i++) {
+                let realdata=data3[i]
+                if(realdata['room']==="gate1" || realdata['room']==="gate2"){
+                }else{
+                    allRooms.push(data3[i])
+                }
+               
+            }
+            return allRooms;
+        }catch(error){
+            console.error("no rooms, server running?")
+            return;
+        }
+       
     };
 
 
      const getEnvData = async () => {
-        const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.name}`)
-        const data = await response.json();
-        //console.log(data)
-        let data2 = data['enviornment'];
-        let data3 = data2['data'];
-        let realData = data3['0']; //index of the data you want from array
-   
-        values.temp = realData['Temperature'];
-        values.noise = realData['NoiseLevel'];  
-        values.light = realData['LightLevel'];
-        // console.log(values.temp)
-        // console.log(values.noise)
-        // console.log(values.light)
+        try{
+            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.name}`)        
+            const data = await response.json();
+            //console.log(data)
+            let data2 = data['enviornment'];
+            let data3 = data2['data'];
+            let realData = data3['0']; //index of the data you want from array
+    
+            values.temp = realData['Temperature'];
+            values.noise = realData['NoiseLevel'];  
+            values.light = realData['LightLevel'];
+            // console.log(values.temp)
+            // console.log(values.noise)
+            // console.log(values.light)
+        }catch(err){
+            //console.error(err) UNCOMMENT ME OUT TO SEE CONSOLE ERROR SPAM !
+            return;
+        }
      };
         
 
