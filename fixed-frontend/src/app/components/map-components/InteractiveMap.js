@@ -3,14 +3,15 @@ import "leaflet-defaulticon-compatibility"
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
 import { MapContainer, TileLayer, Marker, Popup, FeatureGroup} from 'react-leaflet';
 import "leaflet-draw/dist/leaflet.draw.css";
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { EditControl } from 'react-leaflet-draw';
 import { useState } from 'react';
+import { popup } from 'leaflet';
+import PopupContent from './PopupContent';
+import { renderToString } from 'react-dom/server';
 
 const lancasterPrisonLongLat = [54.05287592589365, -2.771636992389602];//default for now
 const zoom = 17;
-const popupInformation = "LOCATION NAME";
-
 //TODO: When created, user can add a location name to polygons
 //      That data is stored in the db with the polygon ids and locations
 //      Fetch data from the database and update popup info with location data
@@ -18,6 +19,7 @@ const popupInformation = "LOCATION NAME";
 const InteractiveMap = () => {
 
     const [mapLayers, setMapLayers] = useState([]);
+    const [drawnRooms, setDrawnRooms] = useState([]);
 
     //callback functions to create shapes on the map
 
@@ -33,17 +35,20 @@ const InteractiveMap = () => {
             const {leafletID} = layer;//used to id which polygon to edit or delete
 
             setMapLayers( (layers) => [...layers, {id: leafletID, latlngs: layer.getLatLngs()[0]}]);
-            layer.bindPopup(popupInformation);
+
+            //the popup contents
+            layer.bindPopup(renderToString(<PopupContent/>));
+
+            drawnRooms.push({polygonObject: layer, roomName: ""})//save store the polygons on the screen
+
+            const polyInfo = {roomName: "", points: layer.getLatLngs()[0]}; //info that needs to be saved to draw a polygon
+            localStorage.setItem('drawnRooms', JSON.stringify(polyInfo));
+
+            console.log(drawnRooms);            
+            console.log("==================")
 
             //opens popup when hovering over polygon
-            layer.on({
-                mouseover: e => {
-                    layer.openPopup();
-                },
-                mouseout: e => {
-                    layer.closePopup();
-                }
-            });
+            //layer.on;
 
         }
 
