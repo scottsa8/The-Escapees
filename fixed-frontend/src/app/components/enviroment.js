@@ -45,7 +45,7 @@ export default function EnviromentContainer(){
             return allRooms;
         }catch(error){
             console.error("no rooms, server running?")
-            return;
+            return allRooms;
         }
        
     };
