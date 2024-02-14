@@ -2,9 +2,20 @@ import { useEffect, useState } from "react";
 import { network } from "../layout";
 
 
+function RoomCard({ roomName, prisonerCount, guardCount }) {
+    return (
+      <div className="bg-white shadow-md rounded-lg p-4 max-w-sm w-full mx-auto dark:bg-gray-700 dark:text-blue-100">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-blue-200">{`Room ${roomName}`}</h2>
+        <p className="text-gray-600 mt-2 dark:text-blue-100">{`Prisoners: ${prisonerCount}`}</p>
+        <p className="text-gray-600 mt-2 dark:text-blue-100">{`Guards: ${guardCount}`}</p>
+      </div>
+    );
+} 
+
 
 function LocationCount({location}){
     const [count,setCount] = useState(0)
+
 
     // useEffect(() => {
     //     fetch(`http://${network.ip}:${network.port}/getPeople?loc=${location}`)
@@ -48,11 +59,10 @@ function LocationCount({location}){
 export default function LocationCountBox(){
 
     const locations = [
-        { name:"Room1"},
-        { name:"Room2"},
-        { name:"Room3"},
-        
-    ]
+        { name: 'a', prisonerCount: 10, guardCount: 2 },
+        { name: 'b', prisonerCount: 15, guardCount: 4 },
+        { name: 'c', prisonerCount: 8, guardCount: 1 },
+      ];
     // const [locations,setLocation] = useState([])
 
     // useEffect(() => {
@@ -75,17 +85,23 @@ export default function LocationCountBox(){
 
     return(
         
-        <div id="container" className="w-full flex flex-col border border-neutral-900 rounded m-0.5">
-            <div className="bg-neutral-300 flex justify-center"> 
-            <label className=" text-center text-xl text-neutral-900">Location Count</label>
-            </div>
+        // <div id="container" className="w-full flex flex-col border border-neutral-900 rounded m-0.5">
+        //     <div className="bg-neutral-300 flex justify-center"> 
+        //     <label className=" text-center text-xl text-neutral-900">Location Count</label>
+        //     </div>
             
-            <div id="content" className="flex">
-                {locations.map( (location) => (
-                    <LocationCount
-                    location={location.name}/>
-                ) )}
-            </div>
+        //     <div id="content" className="flex">
+        //         {locations.map( (location) => (
+        //             <LocationCount
+        //             location={location.name}/>
+        //         ) )}
+        //     </div>
+        // </div>
+
+        <div className="flex justify-left items-center space-x-4 p-4">
+            {locations.map(room => (
+            <RoomCard key={room.id} roomName={room.name.toUpperCase()} prisonerCount={room.prisonerCount} guardCount={room.guardCount} />
+            ))}
         </div>
 
     )

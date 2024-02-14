@@ -13,6 +13,9 @@ target/
 *.ipr
 *.class
 *.bin
+Server/build/tmp/compileJava/previous-compilation-data.bin
+Server/bin/
+Server/build/
 ### VS Code ###
 .idea
 .mvn/wrapper

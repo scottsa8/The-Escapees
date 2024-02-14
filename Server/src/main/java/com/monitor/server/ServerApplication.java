@@ -1,5 +1,7 @@
 package com.monitor.server;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.json.JsonParser;
+import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
@@ -7,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import org.mindrot.jbcrypt.BCrypt;
 import java.math.BigDecimal;
-import java.time.LocalTime;
 import java.sql.*;
+import java.util.Map;
 
 
 @EnableScheduling
@@ -241,14 +243,20 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/createAcc")
-	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
+	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass,
+	@RequestParam(value="type", required=false)String type){
 		try {
 			PreparedStatement insertStatement = connection.prepareStatement(
 					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)"
 			);
 			insertStatement.setString(1, user);
 			insertStatement.setString(2, hashPassword(pass));
-			insertStatement.setString(3, "user"); // Assuming default user_type is "user"
+			if(type==null){
+				insertStatement.setString(3, "user"); // Assuming default user_type is "user"
+			}else{
+				insertStatement.setString(3, type);
+			}
+
 			insertStatement.executeUpdate();
 			return true; // Success
 		} catch (SQLException e) {
@@ -284,6 +292,49 @@ public class ServerApplication {
 			e.printStackTrace();
 			return false; // Failed
 		}
+	}
+	@GetMapping("/getUserType")
+	private String getUserType(@RequestParam(value="user") String user){
+		String type="";
+		try{
+			PreparedStatement selectStatement = connection.prepareStatement(
+					"SELECT user_type FROM users WHERE username = ?"
+			);
+			selectStatement.setString(1, user);
+			ResultSet rs = selectStatement.executeQuery();
+			if (rs.next()) {
+				type = rs.getString("user_type");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return type;
+	}
+	@GetMapping("/setup")
+	private boolean setup(@RequestParam(value="user") String user){return false;}
+
+	@GetMapping("/saveMap")
+	private void saveMap(@RequestParam(value="map")String map){
+		//string = json
+		JsonParser parser = JsonParserFactory.getJsonParser();
+		Map<String, Object> jsonMap = parser.parseMap(map);
+
+	}
+	@GetMapping("/getMap")
+	private String getMap(){
+		StringBuilder output = new StringBuilder();
+		output.append("{\"map\":{"+
+				"\"data\":[");
+
+		//SQL STATEMENT
+		//output.append("{\"user\": \""+username+"\", \"Location\": \""+roomName+"\"}");
+//		if(!rs.isLast()){
+//			output.append(",");
+//		}
+		//^^EXAMPLE^^
+
+		output.append("]}}");
+		return output.toString();
 	}
 
 	@GetMapping("/transmitMessage")
