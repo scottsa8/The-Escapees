@@ -19,8 +19,6 @@ export default function EnviromentContainer(){
     const [locations, setLocations] = useState([{name:""}]);
     const [selectedLocation, setLocation] = useState(locations[0])
 
-
-
     const values = {
         temp: "20",
         light: "30",

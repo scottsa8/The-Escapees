@@ -15,9 +15,6 @@ const views = {
   interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"},
   settings: {page: <Settings/>, pageTitle: "Settings"}
 }
-const [username, setUsername] = useState('');
-const [currentView,setView] = useState(views.homePage);
-
   
 export function sendNotification(title, options){
   //Check browser support 
@@ -39,17 +36,12 @@ export function sendNotification(title, options){
     });
   }
 }
-<<<<<<<<< Temporary merge branch 1
 //Used by the user to navigate through pages
 //It's the constant border around the main page
 const Dashboard = () => {
-=========
 
-
-  const[currentView,setView] = useState(views.homePage)
->>>>>>>>> Temporary merge branch 2
-
-  
+  const[currentView,setView] = useState(views.homePage);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
