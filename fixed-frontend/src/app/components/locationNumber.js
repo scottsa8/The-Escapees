@@ -5,7 +5,7 @@ import { network } from "../layout";
 function RoomCard({ roomName, prisonerCount, guardCount }) {
     return (
       <div className="bg-white shadow-md rounded-lg p-4 max-w-sm w-full mx-auto dark:bg-gray-700 dark:text-blue-100">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-blue-200">{`Room ${roomName}`}</h2>
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-blue-300">{`Room ${roomName}`}</h2>
         <p className="text-gray-600 mt-2 dark:text-blue-100">{`Prisoners: ${prisonerCount}`}</p>
         <p className="text-gray-600 mt-2 dark:text-blue-100">{`Guards: ${guardCount}`}</p>
       </div>
