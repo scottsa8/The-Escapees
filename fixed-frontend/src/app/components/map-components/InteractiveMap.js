@@ -19,11 +19,6 @@ const InteractiveMap = () => {
     const [drawnRooms, setDrawnRooms] = useState([]);
     const [showDataBox, setShowDataBox] = useState(false);
     const [selectedPolygon, setSelectedPolygon] = useState(null);
-
-    const openDataBox = (e) => {
-        //Show popup div
-        setShowDataBox(true);        
-    };
     
     const closeDataPage = () => {
         setShowDataBox(false);
@@ -42,20 +37,18 @@ const InteractiveMap = () => {
 
             setMapLayers( (layers) => [...layers, {id: leafletID, latlngs: layer.getLatLngs()[0]}]);
 
-            //the popup contents
-            layer.on('click',openDataBox);
+            const polyInfo = {object: layer, points: layer.getLatLngs()[0], id: layer._leaflet_id}; //info that needs to be saved to draw a polygon
 
-            //drawnRooms.push({polygonObject: layer, roomName: "", id: leafletID})//save store the polygons on the screen
-            
-            const polyInfo = {roomName: "", object: layer, points: layer.getLatLngs()[0]}; //info that needs to be saved to draw a polygon
-            
             setSelectedPolygon(polyInfo);
-            
-            console.log("==================")
 
-            //opens popup when hovering over polygon
-            //layer.on;
+            //If this polygon is clicked
+            layer.on('click',() => {
+                //Show the data box
+                setSelectedPolygon(polyInfo)
+                setShowDataBox(true);  
+            });
 
+            //drawnRooms.push({polygonObject: layer, roomName: "", id: leaf letID})//save store the polygons on the screen
         }
 
     };
@@ -113,6 +106,9 @@ const InteractiveMap = () => {
                         Hello World!
                     </Popup>
                 </Marker>
+
+                {/* Loads any polygons added to local storage */}
+                
 
             </MapContainer>
             <div className="overlay-data-box">

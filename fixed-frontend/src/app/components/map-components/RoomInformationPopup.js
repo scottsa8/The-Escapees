@@ -1,24 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const RoomInfoPopup = ({polygonClicked}) => {
 
     //Get the data from the polygon that is currently in use
     const polyObj = polygonClicked.object;
     const polyPoints = polygonClicked.points;
-    const polyName = polygonClicked.roomName;
+    const polyID = polygonClicked.id;
 
     const [roomName, setRoomName] = useState("");
     const [nameAdded, setNameAdded] = useState(false);
 
-    if(polyName){
-        setRoomName(polyName);
-        setNameAdded(true);
+    // Searches in local storage for the polygon
+    function getPolyName(){
+        //Get all key names from local storage
+        var keys = Object.keys(localStorage);
+        let selectedName = undefined;
+        //search through data to find the polygon with the same ID
+        for(let i=0; i<keys.length; i++){
+            
+            if(keys[i] === ("polygon"+polyID)){
+                console.log("Found polygon");
+                try{
+                    let polyData = JSON.parse(localStorage.getItem(keys[i]));
+                    selectedName = polyData.name;
+                    break;
+                }catch(e){
+                    
+                }
+            }
+
+        }
+
+        return selectedName;
     }
 
-    function savePolygon(name){
-        localStorage.setItem("roomID"+name, JSON.stringify(polyPoints));//Save the polygons points with it's name
-        console.log(name)
+    function savePolygon(newName){
+        localStorage.setItem("polygon"+polyID, JSON.stringify({points: polyPoints, name: newName}));//Save the polygons points with it's name
     }
+
+    //Ran ons 1st load
+    useEffect(() => {
+        let polyName = getPolyName();
+
+        if(polyName != undefined){
+            setRoomName(polyName);
+            setNameAdded(true);
+        }
+    },[])
 
     return ( 
         <div>
@@ -31,6 +59,7 @@ const RoomInfoPopup = ({polygonClicked}) => {
                     setRoomName(newName);
                     setNameAdded(true);
                     savePolygon(newName);
+
                 }}>Enter</button>
                 
             </label>}
