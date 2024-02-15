@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useId } from 'react';
 import Image from "next/image";
+import {settingsOutline} from 'ionicons/icons'
 import "./main.css"
 import { network } from './layout';
 import {setCookie} from './components/cookies'
+import { IonButton, IonIcon } from '@ionic/react';
 
 
 export default function Login() {
@@ -104,7 +106,12 @@ export default function Login() {
               
               <section className="flex flex-row-reverse justify-between">
                   <button type="submit" className="bg-slate-100 rounded p-1 border w-24 h-12 border-slate-900 ">Submit</button>
+                  <IonButton>
+                    <IonIcon slot='icon-only'className='w-10 h-10' icon={settingsOutline} ></IonIcon>
+                  </IonButton>
               </section>
+
+
           </form> 
       </div>
     </div>
