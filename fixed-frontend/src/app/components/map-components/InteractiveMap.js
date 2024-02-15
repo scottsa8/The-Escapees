@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { popup } from 'leaflet';
 import PopupContent from './PopupContent';
 import { renderToString } from 'react-dom/server';
+import RoomInfoPopup from './RoomInformationPopup';
 
 const lancasterPrisonLongLat = [54.05287592589365, -2.771636992389602];//default for now
 const zoom = 17;
@@ -20,15 +21,24 @@ const InteractiveMap = () => {
 
     const [mapLayers, setMapLayers] = useState([]);
     const [drawnRooms, setDrawnRooms] = useState([]);
+    const [showDataBox, setShowDataBox] = useState(false);
+
+    const openDataBox = (e) => {
+        //Show popup div
+        setShowDataBox(true);        
+    };
+    
+    const closeDataPage = () => {
+        setShowDataBox(false);
+    };
 
     //callback functions to create shapes on the map
 
     //when an object is created, store it
     const onCreate = (e) => {
-        console.log(e)
-
         
         const {layerType, layer} = e;
+    
 
         //if the user has drawn a polygon
         if(layerType === "polygon"){
@@ -37,7 +47,8 @@ const InteractiveMap = () => {
             setMapLayers( (layers) => [...layers, {id: leafletID, latlngs: layer.getLatLngs()[0]}]);
 
             //the popup contents
-            layer.bindPopup(renderToString(<PopupContent/>));
+            //layer.bindPopup(renderToString(<PopupContent/>));
+            layer.on('click', openDataBox);
 
             drawnRooms.push({polygonObject: layer, roomName: ""})//save store the polygons on the screen
 
@@ -109,6 +120,12 @@ const InteractiveMap = () => {
                 </Marker>
 
             </MapContainer>
+            <div className="overlay-data-box">
+                {showDataBox && <div>
+                    <RoomInfoPopup/>
+                    <button onClick={closeDataPage}>Close</button>
+                </div>}
+            </div>
         </div>
      );
 }
