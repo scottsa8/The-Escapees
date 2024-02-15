@@ -98,7 +98,7 @@ export default function LocationCountBox(){
         //     </div>
         // </div>
 
-        <div className="flex justify-evenly min-w-0 items-center p-4">
+        <div className="w-full flex justify-between">
             {locations.map(room => (
             <RoomCard key={room.id} roomName={room.name.toUpperCase()} prisonerCount={room.prisonerCount} guardCount={room.guardCount} />
             ))}

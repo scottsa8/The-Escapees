@@ -24,7 +24,7 @@ export default function EnviromentContainer(){
     const values = {
         temp: "20",
         light: "30",
-        noise: "40"
+        noise: "39"
     }
 
     const getLocations = async () => {
