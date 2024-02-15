@@ -12,7 +12,6 @@ import {HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon} from "../components/
 
 // Lists the pages for the navigation bar on the dashboard
 
-
 export function sendNotification(title, options) {
   // Check browser support
   if (!("Notification" in window)) {

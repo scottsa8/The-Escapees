@@ -90,14 +90,12 @@ export default function LocationCountBox(){
         //     <label className=" text-center text-xl text-neutral-900">Location Count</label>
         //     </div>
             
-            <div id="content" className="flex">
-                {locations.map( (location) => (
-                    <LocationCount
-                    key={location}
-                    location={location.name}/>
-                ) )}
-            </div>
-        </div>
+        <div className="flex justify-left items-center space-x-4 p-4">
+        {locations.map(room => (
+        <RoomCard key={room.id} roomName={room.name.toUpperCase()} prisonerCount={room.prisonerCount} guardCount={room.guardCount} />
+        ))}
+    </div>
+        // </div>
 
     )
 
