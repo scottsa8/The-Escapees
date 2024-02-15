@@ -1,10 +1,36 @@
-const UserButton = ({username}) => {
-    return ( 
-        <div className="user-button">
-            <span>{username}</span>
-            <img src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png" alt="User Logo" />
+import React, { useState, useRef } from 'react';
+import { UserIcon, LogoutIcon } from './heroIcons';
+import { useRouter } from 'next/navigation';
+
+const UserButton = ({ username }) => {
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const router = useRouter();
+  const popupRef = useRef(null);
+
+  const togglePopup = () => {
+    setIsPopupOpen(!isPopupOpen);
+  };
+
+  const handleLogout = () => {
+    togglePopup();
+    router.push('/');
+  };
+
+  return (
+    <div className="relative inline-block" ref={popupRef}>
+      <div className="user-button transition transform hover:-translate-y-0.5" onClick={togglePopup}>
+        <span className="mr-2">{username}</span>
+        <UserIcon className="w-6 h-6" />
+      </div>
+      {isPopupOpen && (
+        <div className="absolute z-10 right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
+          <button className="block px-4 py-2 text-sm text-gray-700 hover:no-underline rounded-md transition shadow-lg hover:bg-gray-100 w-full text-left" onClick={handleLogout}>
+            <LogoutIcon className="w-4 h-4 inline-block mr-2" />Logout
+          </button>
         </div>
-    );
-}
- 
+      )}
+    </div>
+  );
+};
+
 export default UserButton;

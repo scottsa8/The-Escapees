@@ -6,7 +6,9 @@ import UserButton from "../components/UserButton";
 import HomePage from "./HomePage";
 import InteractiveMap from "../components/map-components";
 import Settings from "../components/settings"
+import Chart from "../components/charts"
 import {getCookie} from "../components/cookies"
+import {HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon} from "../components/heroIcons"
 
 // Lists the pages for the navigation bar on the dashboard
 const views = {
@@ -36,9 +38,20 @@ export function sendNotification(title, options){
     });
   }
 }
+
+
+
+
 //Used by the user to navigate through pages
 //It's the constant border around the main page
 const Dashboard = () => {
+  const views = {
+    individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
+    homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
+    interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"},
+    settings: {page: <Settings/>, pageTitle: "Settings"},
+    charts: {page: <Chart/>, pageTitle: "Charts"}
+  }
 
   const[currentView,setView] = useState(views.homePage);
   const [username, setUsername] = useState('');
@@ -52,13 +65,12 @@ const Dashboard = () => {
 
     <body>
         {/* Used to navigate pages */}
-        <div className="sidebar">
-
-          <button className="sidebar-button" onClick={() => setView(views.homePage)}>{views.homePage.pageTitle}</button>
-          <button className="sidebar-button" onClick={() => setView(views.individualLocations)}>{views.individualLocations.pageTitle}</button>
-          <button className="sidebar-button" onClick={() => setView(views.interactiveMap)}>{views.interactiveMap.pageTitle}</button>
-          <button className="sidebar-button" onClick={() => setView(views.settings)}>{views.settings.pageTitle}</button>
-
+        <div className='sidebar'>
+          <button className="sidebar-button" onClick={() => setView(views.homePage)}><HomeIcon/></button>
+          <button className="sidebar-button" onClick={() => setView(views.individualLocations)}><LocPin/></button>
+          <button className="sidebar-button" onClick={() => setView(views.interactiveMap)}><MapIcon/></button>
+          <button className="sidebar-button" onClick={() => setView(views.settings)}><SettingsIcon/></button>
+          <button className="sidebar-button" onClick={() => setView(views.charts)}><AnalyticsIcon/></button>
         </div>
 
         <div className="banner">
@@ -68,7 +80,7 @@ const Dashboard = () => {
         </div>
 
         {/* Where the screen contents are shown */}
-        <div className="card-container">
+        <div className="card-container p-4">
           {currentView.page}
         </div>
       </body>

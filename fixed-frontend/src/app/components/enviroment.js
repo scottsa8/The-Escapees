@@ -22,7 +22,7 @@ export default function EnviromentContainer(){
     const values = {
         temp: "20",
         light: "30",
-        noise: "40"
+        noise: "39"
     }
 
     const getLocations = async () => {
@@ -52,7 +52,7 @@ export default function EnviromentContainer(){
      const getEnvData = async () => {
         try{
             console.log("name:"+selectedLocation.name)
-            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.name}`)        
+            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=cell1`)        
             const data = await response.json();
             //console.log("data:"+data['environment'])
             let data2 = data['environment'];
@@ -65,10 +65,10 @@ export default function EnviromentContainer(){
                 values.temp = realData['Temperature'];
                 values.noise = realData['NoiseLevel'];  
                 values.light = realData['LightLevel'];
-                // console.log(realData['Timestamp']);
-                // console.log(values.temp)
-                // console.log(values.noise)
-                // console.log(values.light)
+                console.log(realData['Timestamp']);
+                console.log(values.temp)
+                console.log(values.noise)
+                console.log(values.light)
                 
             }
         }catch(err){

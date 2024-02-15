@@ -16,3 +16,8 @@ export function getCookie(name) {
     }
     return null;
 }
+
+export function fetchUpdateDelay () {
+  const delay = getCookie('updateDelay');
+  return delay ? parseInt(delay, 10) * 1000 : 10000;
+}

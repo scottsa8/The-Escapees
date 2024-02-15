@@ -5,7 +5,7 @@ import { network } from "../layout";
 function RoomCard({ roomName, prisonerCount, guardCount }) {
     return (
       <div className="bg-white shadow-md rounded-lg p-4 max-w-sm w-full mx-auto dark:bg-gray-700 dark:text-blue-100">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-blue-200">{`Room ${roomName}`}</h2>
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-blue-300">{`Room ${roomName}`}</h2>
         <p className="text-gray-600 mt-2 dark:text-blue-100">{`Prisoners: ${prisonerCount}`}</p>
         <p className="text-gray-600 mt-2 dark:text-blue-100">{`Guards: ${guardCount}`}</p>
       </div>
@@ -98,7 +98,7 @@ export default function LocationCountBox(){
         //     </div>
         // </div>
 
-        <div className="flex justify-left items-center space-x-4 p-4">
+        <div className="w-full min-w-0 flex space-between">
             {locations.map(room => (
             <RoomCard key={room.id} roomName={room.name.toUpperCase()} prisonerCount={room.prisonerCount} guardCount={room.guardCount} />
             ))}

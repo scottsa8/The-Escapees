@@ -84,7 +84,7 @@ export default function Settings() {
                 </div>
             {/*Theme Toggle*/}
             <button onClick={toggleTheme} className="rounded-full w-10 p-2">
-                {theme === 'light' ? (<MoonIcon/>) : (<SunIcon className/>)}
+                {theme === 'light' ? (<MoonIcon/>) : (<SunIcon/>)}
             </button>
         </div>
     );
