@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useId } from 'react';
 import Image from "next/image";
-import {settingsOutline} from 'ionicons/icons'
 import "./main.css"
 import { network } from './layout';
 import {setCookie} from './components/cookies'
@@ -23,7 +22,6 @@ export default function Login() {
   const [isSettingsOpen,setSettingsOpen] = useState(false)
 
   const router = useRouter();
-
   const usernameId = useId();
   const passwordId = useId();
   const ipId = useId();
@@ -147,8 +145,6 @@ export default function Login() {
               <section className="flex flex-row-reverse justify-between">
                   <button type="submit" className="bg-purple-700 m-4 w-full h-12 rounded-lg">Log In</button>
               </section>
-
-
           </form> 
           <button aria-label='Network settings' className='flex justify-center text-center bg-purple-700 m-4 p-1  rounded-lg' onClick={toggleSettings}>
 
@@ -177,6 +173,24 @@ export default function Login() {
             </div>
           )}
       </div>
+      {isSettingsOpen && (
+            <div className='flex flex-col w-5/6 min-h-48 sm:mx-auto sm:max-w-md bg-slate-300 rounded p-2 border border-slate-800 ' onSubmit={handleNetworkSave}>
+              <div id="input-fields" className="justify-between flex flex-col grow">    
+                  <label htmlFor={ipId} >
+                      IP Address: <input name="IP address" type="text"  
+                      value={ip} onChange={e => setIP(e.target.value)} />
+                  </label>
+                  
+                  <label htmlFor={portId} className="">
+                      Port: <input name="Port" type="text" 
+                      value={port} onChange={e => setPort(e.target.value)} />
+                  </label>
+              </div>
+              <section className="flex flex-row-reverse justify-between">
+                <button onClick={handleNetworkSave}  className="bg-slate-100 rounded p-1 border w-24 h-12 border-slate-900 ">Save</button>
+              </section>
+            </div>
+          )}
     </div>
   );
 }
