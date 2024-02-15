@@ -70,8 +70,8 @@ body {
 
 .card-container {
   display: flex;
-  padding-left: 200px;
-  width: 100%-200px;
+  padding-left: 120px;
+  width: 100%-120px;
   flex-direction: column;
 }
 
