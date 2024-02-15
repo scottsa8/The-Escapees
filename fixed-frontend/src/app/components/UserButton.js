@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { UserIcon, LogoutIcon } from './heroIcons';
 import { useRouter } from 'next/navigation';
 
@@ -15,14 +15,6 @@ const UserButton = ({ username }) => {
     togglePopup();
     router.push('/');
   };
-
-  const handleClickOutside = (event) => {
-    setIsPopupOpen(false);
-  };
-
-  useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-  }, []);
 
   return (
     <div className="relative inline-block" ref={popupRef}>
