@@ -1,10 +1,9 @@
 import React, { useEffect, useReducer } from "react";
 import { network } from "../layout";
-
 import {Table, Header, HeaderRow, Body, Row, HeaderCell, Cell,} from '@table-library/react-table-library/table';
 import { useTheme } from '@table-library/react-table-library/theme';
 import {DEFAULT_OPTIONS, getTheme} from '@table-library/react-table-library/mantine';
-
+import {fetchUpdateDelay} from './cookies'
 
 const mantineTheme = getTheme(DEFAULT_OPTIONS);
 const theme = useTheme(mantineTheme);
@@ -45,7 +44,7 @@ const LocationTable = () => {
     const interval=setInterval(()=>{
       getLocations()
       forceUpdate();
-    },getCookie("updateDelay"))
+    },fetchUpdateDelay())
 
     return()=>clearInterval(interval)
   });

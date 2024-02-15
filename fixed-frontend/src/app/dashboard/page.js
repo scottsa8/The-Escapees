@@ -46,7 +46,7 @@ const Dashboard = () => {
     charts: {page: <Chart/>, pageTitle: "Charts"}
   }
   const [username, setUsername] = useState('');
-  const [currentView,setView] = useState(views.homePage);
+  const [currentView, setView] = useState(views.homePage);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
@@ -57,7 +57,7 @@ const Dashboard = () => {
 
     <body>
         {/* Used to navigate pages */}
-        <div className="sidebar">
+        <div className='sidebar'>
           <button className="sidebar-button" onClick={() => setView(views.homePage)}><HomeIcon/></button>
           <button className="sidebar-button" onClick={() => setView(views.individualLocations)}><LocPin/></button>
           <button className="sidebar-button" onClick={() => setView(views.interactiveMap)}><MapIcon/></button>
