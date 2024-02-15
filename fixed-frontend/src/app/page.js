@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useId } from 'react';
 import Image from "next/image";
+import {settingsOutline} from 'ionicons/icons'
 import "./main.css"
 import { network } from './layout';
 import {setCookie} from './components/cookies'
@@ -146,6 +147,8 @@ export default function Login() {
               <section className="flex flex-row-reverse justify-between">
                   <button type="submit" className="bg-purple-700 m-4 w-full h-12 rounded-lg">Log In</button>
               </section>
+
+
           </form> 
           <button aria-label='Network settings' className='flex justify-center text-center bg-purple-700 m-4 p-1  rounded-lg' onClick={toggleSettings}>
 

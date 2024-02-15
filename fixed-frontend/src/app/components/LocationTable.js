@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { network } from "../layout";
+
 import {Table, Header, HeaderRow, Body, Row, HeaderCell, Cell,} from '@table-library/react-table-library/table';
 import { useTheme } from '@table-library/react-table-library/theme';
 import {DEFAULT_OPTIONS, getTheme} from '@table-library/react-table-library/mantine';
-import {fetchUpdateDelay} from './cookies'
 
-const mantineTheme = getTheme(DEFAULT_OPTIONS);
-const theme = useTheme(mantineTheme);
-const nodes = [];
+
+
+const nodes = [
+//    {name: "Adam", loc: "B80"},
+//   //   {name: "Scott", loc: "B76"},
+//   //   {name: "Hannah", loc: "B70"},
+ ];
 
 //Table containing the locations of users
 
