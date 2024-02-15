@@ -15,7 +15,8 @@ const views = {
   individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
   homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
   interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"},
-  settings: {page: <Settings/>, pageTitle: "Settings"}
+  settings: {page: <Settings/>, pageTitle: "Settings"},
+  charts: {page: <Chart/>, pageTitle: "Charts"}
 }
   
 export function sendNotification(title, options){
@@ -39,19 +40,9 @@ export function sendNotification(title, options){
   }
 }
 
-
-
-
 //Used by the user to navigate through pages
 //It's the constant border around the main page
 const Dashboard = () => {
-  const views = {
-    individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
-    homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
-    interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"},
-    settings: {page: <Settings/>, pageTitle: "Settings"},
-    charts: {page: <Chart/>, pageTitle: "Charts"}
-  }
 
   const[currentView,setView] = useState(views.homePage);
   const [username, setUsername] = useState('');

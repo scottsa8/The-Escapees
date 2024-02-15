@@ -3,12 +3,8 @@ import "leaflet-defaulticon-compatibility"
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
 import { MapContainer, TileLayer, Marker, Popup, FeatureGroup} from 'react-leaflet';
 import "leaflet-draw/dist/leaflet.draw.css";
-import { useEffect, useRef } from 'react';
 import { EditControl } from 'react-leaflet-draw';
 import { useState } from 'react';
-import { popup } from 'leaflet';
-import PopupContent from './PopupContent';
-import { renderToString } from 'react-dom/server';
 import RoomInfoPopup from './RoomInformationPopup';
 
 const lancasterPrisonLongLat = [54.05287592589365, -2.771636992389602];//default for now
@@ -39,6 +35,9 @@ const InteractiveMap = () => {
         
         const {layerType, layer} = e;
     
+        const savePolygon = () => {
+            localStorage.setItem("drawPolygon", JSON.stringify(createdPolygon));
+        }
 
         //if the user has drawn a polygon
         if(layerType === "polygon"){
@@ -52,8 +51,8 @@ const InteractiveMap = () => {
 
             drawnRooms.push({polygonObject: layer, roomName: ""})//save store the polygons on the screen
 
-            const polyInfo = {roomName: "", points: layer.getLatLngs()[0]}; //info that needs to be saved to draw a polygon
-            localStorage.setItem('drawnRooms', JSON.stringify(polyInfo));
+            //const polyInfo = {roomName: "", points: layer.getLatLngs()[0]}; //info that needs to be saved to draw a polygon
+            //localStorage.setItem('drawnRooms', JSON.stringify(polyInfo));
 
             console.log(drawnRooms);            
             console.log("==================")
@@ -98,7 +97,7 @@ const InteractiveMap = () => {
 
                 {/* The sidepannel with shape drawing options */}
                 <FeatureGroup>
-                    <EditControl position="topright" onCreated={onCreate} onEdited={onEdit} onDeleted = {onDelete} draw={{
+                    <EditControl position="topleft" onCreated={onCreate} onEdited={onEdit} onDeleted = {onDelete} draw={{
                         // Disabling the other draw features so there is onlt a polygon option
                       rectangle: false,
                       circle: false,
@@ -121,9 +120,17 @@ const InteractiveMap = () => {
 
             </MapContainer>
             <div className="overlay-data-box">
-                {showDataBox && <div>
+                {showDataBox && <div style={{
+                    position: "absolute",
+                    top: "200px",
+                    left: "100px",
+                    backgroundColor: "white",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    zIndex: "1000"
+                }}>
                     <RoomInfoPopup/>
-                    <button onClick={closeDataPage}>Close</button>
+                    <button onClick={closeDataPage}>X</button>
                 </div>}
             </div>
         </div>
