@@ -1,9 +1,24 @@
 import { useState } from "react";
 
-const RoomInfoPopup = () => {
+const RoomInfoPopup = ({polygonClicked}) => {
+
+    //Get the data from the polygon that is currently in use
+    const polyObj = polygonClicked.object;
+    const polyPoints = polygonClicked.points;
+    const polyName = polygonClicked.roomName;
 
     const [roomName, setRoomName] = useState("");
     const [nameAdded, setNameAdded] = useState(false);
+
+    if(polyName){
+        setRoomName(polyName);
+        setNameAdded(true);
+    }
+
+    function savePolygon(name){
+        localStorage.setItem("roomID"+name, JSON.stringify(polyPoints));//Save the polygons points with it's name
+        console.log(name)
+    }
 
     return ( 
         <div>
@@ -12,9 +27,12 @@ const RoomInfoPopup = () => {
                 {/* Needs to be changed to a drop down with names */}
                 <input type="text"></input>
                 <button onClick={(e) => {
-                    setRoomName(e.target.parentNode.childNodes[1].value);
+                    const newName = e.target.parentNode.childNodes[1].value
+                    setRoomName(newName);
                     setNameAdded(true);
+                    savePolygon(newName);
                 }}>Enter</button>
+                
             </label>}
 
             {/* Once a name has been added, load content of page */}

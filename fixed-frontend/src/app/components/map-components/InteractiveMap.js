@@ -18,6 +18,7 @@ const InteractiveMap = () => {
     const [mapLayers, setMapLayers] = useState([]);
     const [drawnRooms, setDrawnRooms] = useState([]);
     const [showDataBox, setShowDataBox] = useState(false);
+    const [selectedPolygon, setSelectedPolygon] = useState(null);
 
     const openDataBox = (e) => {
         //Show popup div
@@ -34,10 +35,6 @@ const InteractiveMap = () => {
     const onCreate = (e) => {
         
         const {layerType, layer} = e;
-    
-        const savePolygon = () => {
-            localStorage.setItem("drawPolygon", JSON.stringify(createdPolygon));
-        }
 
         //if the user has drawn a polygon
         if(layerType === "polygon"){
@@ -46,15 +43,14 @@ const InteractiveMap = () => {
             setMapLayers( (layers) => [...layers, {id: leafletID, latlngs: layer.getLatLngs()[0]}]);
 
             //the popup contents
-            //layer.bindPopup(renderToString(<PopupContent/>));
-            layer.on('click', openDataBox);
+            layer.on('click',openDataBox);
 
-            drawnRooms.push({polygonObject: layer, roomName: ""})//save store the polygons on the screen
-
-            //const polyInfo = {roomName: "", points: layer.getLatLngs()[0]}; //info that needs to be saved to draw a polygon
-            //localStorage.setItem('drawnRooms', JSON.stringify(polyInfo));
-
-            console.log(drawnRooms);            
+            //drawnRooms.push({polygonObject: layer, roomName: "", id: leafletID})//save store the polygons on the screen
+            
+            const polyInfo = {roomName: "", object: layer, points: layer.getLatLngs()[0]}; //info that needs to be saved to draw a polygon
+            
+            setSelectedPolygon(polyInfo);
+            
             console.log("==================")
 
             //opens popup when hovering over polygon
@@ -129,7 +125,7 @@ const InteractiveMap = () => {
                     borderRadius: "5px",
                     zIndex: "1000"
                 }}>
-                    <RoomInfoPopup/>
+                    <RoomInfoPopup polygonClicked = {selectedPolygon}/>
                     <button onClick={closeDataPage}>X</button>
                 </div>}
             </div>
