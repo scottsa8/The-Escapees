@@ -78,7 +78,7 @@ const InteractiveMap = () => {
 
     return ( 
         <div>
-            <MapContainer className="interactive-map" style={{height: "100vh", width: "100vw"}} center={lancasterPrisonLongLat} zoom = {zoom} scrollWheelZoom={true}>
+            <MapContainer className="interactive-map" center={lancasterPrisonLongLat} zoom = {zoom} scrollWheelZoom={true}>
 
                 {/* The sidepannel with shape drawing options */}
                 <FeatureGroup>

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 const UserButton = ({ username }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const router = useRouter();
-  const popupRef = useRef(null);
 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
@@ -17,7 +16,7 @@ const UserButton = ({ username }) => {
   };
 
   return (
-    <div className="relative inline-block" ref={popupRef}>
+    <div className="relative inline-block">
       <div className="user-button transition transform hover:-translate-y-0.5" onClick={togglePopup}>
         <span className="mr-2">{username}</span>
         <UserIcon className="w-6 h-6" />

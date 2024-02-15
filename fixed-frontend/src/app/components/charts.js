@@ -1,7 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export default function Chart() {
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=cell1`);        
+  //       const data = await response.json();
+  //       let data2 = data['environment'];
+  //       let data3 = data2['data'];
+        
+  //       setData(prevData => prevData.concat(data3));
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+  
+  //   fetchData();
+  // }, []);
+  // const [data, setData] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState('Room A');
   const [selectedTimeRange, setSelectedTimeRange] = useState('24h');
   const data = generateRandomData();
@@ -37,6 +54,8 @@ export default function Chart() {
     }
     return data;
   }
+
+
 
   return (
     <div className="card-container">
