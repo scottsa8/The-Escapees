@@ -28,7 +28,7 @@ body {
 .title {
   color: black;
   font-size: 34px;
-  padding-left: 220px;
+  padding-left: 20px;
   font-weight: bold;
   z-index: 10
 }
@@ -39,6 +39,7 @@ body {
 
 
 .sidebar {
+  Z-index: 100000;
   background-color: #D9D9D9;
   width: 120px;
   height: 100vh;
@@ -75,8 +76,8 @@ body {
 
 .card-container {
   display: flex;
-  padding-left: 120px;
-  width: 100%-120px;
+  padding-left: 30px;
+  width: 100%;
   flex-direction: column;
 }
 
