@@ -34,7 +34,7 @@ const RoomInfoPopup = ({polygonClicked}) => {
     }
 
     function savePolygon(newName){
-        localStorage.setItem("polygon"+polyID, JSON.stringify({points: polyPoints, name: newName}));//Save the polygons points with it's name
+        localStorage.setItem("polygon"+polyID, JSON.stringify({points: polyPoints, name: newName, id:polyID}));//Save the polygons points with it's name
     }
 
     //Ran ons 1st load

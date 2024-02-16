@@ -14,17 +14,6 @@ const zoom = 17;
 //      That data is stored in the db with the polygon ids and locations
 //      Fetch data from the database and update popup info with location data
 
-// const LoadedPolygons = ({loadedPositions}) => {
-
-
-//     return(
-//         <>
-//             <Polyline positions={loadedPositions}/>
-//         </>
-//     )
-// }
-
-
 const InteractiveMap = () => {
 
     const [mapLayers, setMapLayers] = useState([]);
@@ -54,8 +43,6 @@ const InteractiveMap = () => {
                 //If the saved data isn't a polygon
             }
         }
-
-        //console.log(polygons);
     }
 
     //callback functions to create shapes on the map
@@ -82,7 +69,6 @@ const InteractiveMap = () => {
                 setShowDataBox(true);  
             });
 
-            //drawnRooms.push({polygonObject: layer, roomName: "", id: leaf letID})//save store the polygons on the screen
         }
 
     };
