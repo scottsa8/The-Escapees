@@ -1,11 +1,12 @@
 import 'leaflet/dist/leaflet.css'
 import "leaflet-defaulticon-compatibility"
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
-import { MapContainer, TileLayer, Marker, Popup, FeatureGroup} from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, FeatureGroup, Polyline} from 'react-leaflet';
 import "leaflet-draw/dist/leaflet.draw.css";
 import { EditControl } from 'react-leaflet-draw';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import RoomInfoPopup from './RoomInformationPopup';
+import LoadedPolygon from './LoadedPolygon.js';
 
 const lancasterPrisonLongLat = [54.05287592589365, -2.771636992389602];//default for now
 const zoom = 17;
@@ -13,16 +14,49 @@ const zoom = 17;
 //      That data is stored in the db with the polygon ids and locations
 //      Fetch data from the database and update popup info with location data
 
+// const LoadedPolygons = ({loadedPositions}) => {
+
+
+//     return(
+//         <>
+//             <Polyline positions={loadedPositions}/>
+//         </>
+//     )
+// }
+
+
 const InteractiveMap = () => {
 
     const [mapLayers, setMapLayers] = useState([]);
-    const [drawnRooms, setDrawnRooms] = useState([]);
+    const [savedData, setSavedData] = useState(false);
     const [showDataBox, setShowDataBox] = useState(false);
     const [selectedPolygon, setSelectedPolygon] = useState(null);
+    const [polygons, setPolygons] = useState([]);
     
     const closeDataPage = () => {
         setShowDataBox(false);
     };
+
+    function loadSavedPolygons(){
+        var keys = Object.keys(localStorage);
+
+        for(let i=0; i<keys.length; i++){
+
+            try{
+                let currentPolygon =  JSON.parse(localStorage.getItem(keys[i]))
+                let points = currentPolygon.points;
+                if(points){
+                    setSavedData(true);
+                    polygons.push(currentPolygon);
+
+                }
+            }catch(e){
+                //If the saved data isn't a polygon
+            }
+        }
+
+        //console.log(polygons);
+    }
 
     //callback functions to create shapes on the map
 
@@ -37,7 +71,7 @@ const InteractiveMap = () => {
 
             setMapLayers( (layers) => [...layers, {id: leafletID, latlngs: layer.getLatLngs()[0]}]);
 
-            const polyInfo = {object: layer, points: layer.getLatLngs()[0], id: layer._leaflet_id}; //info that needs to be saved to draw a polygon
+            const polyInfo = {points: layer.getLatLngs()[0], id: layer._leaflet_id}; //info that needs to be saved to draw a polygon
 
             setSelectedPolygon(polyInfo);
 
@@ -80,6 +114,11 @@ const InteractiveMap = () => {
         });
     };
 
+    useEffect(() => {
+        loadSavedPolygons()
+    },[]);
+
+
     return ( 
         <div>
             <MapContainer className="interactive-map" center={lancasterPrisonLongLat} zoom = {zoom} scrollWheelZoom={true}>
@@ -108,6 +147,7 @@ const InteractiveMap = () => {
                 </Marker>
 
                 {/* Loads any polygons added to local storage */}
+                {savedData && <LoadedPolygon polygons={polygons}/>}
                 
 
             </MapContainer>
@@ -122,7 +162,7 @@ const InteractiveMap = () => {
                     zIndex: "1000"
                 }}>
                     <RoomInfoPopup polygonClicked = {selectedPolygon}/>
-                    <button onClick={closeDataPage}>X</button>
+                    <button onClick={closeDataPage}>close x</button>
                 </div>}
             </div>
         </div>

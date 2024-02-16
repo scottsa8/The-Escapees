@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 const RoomInfoPopup = ({polygonClicked}) => {
 
     //Get the data from the polygon that is currently in use
-    const polyObj = polygonClicked.object;
     const polyPoints = polygonClicked.points;
     const polyID = polygonClicked.id;
 
