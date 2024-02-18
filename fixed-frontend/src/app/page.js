@@ -13,7 +13,7 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPopup, setShowPopup] = useState(false);
-
+  const [showPopup2, setShowPopup2] = useState(false);
   const router = useRouter();
 
   const usernameId = useId();
@@ -41,6 +41,10 @@ export default function Login() {
         throw new Error('Login failed');
       }
     } catch (error) {
+      setShowPopup2(true);
+      setInterval(() => {
+        setShowPopup2(false);
+      }, 10000);
       if (username === 'admin' && password === 'password') {
         return true;
       } else {
@@ -91,6 +95,12 @@ export default function Login() {
             <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded relative" role="alert">
               <strong className="font-bold">Invalid login!</strong>
               <span className="block sm:inline">The username or password you entered is incorrect.</span>
+            </div>
+          )}
+           {showPopup2 && (
+            <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded relative" role="alert">
+              <strong className="font-bold">No connection to server found!</strong>
+              <span className="block sm:inline">Server running?</span>
             </div>
           )}
           <form onSubmit={handleSubmit} className="flex flex-col grow justify-center">

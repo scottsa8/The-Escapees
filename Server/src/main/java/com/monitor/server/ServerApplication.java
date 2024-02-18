@@ -83,7 +83,6 @@ public class ServerApplication {
 			//e.printStackTrace();
 		}
 	}
-
 	@GetMapping("/getAllNames")
 	private String getAllNames(){
 		StringBuilder output = new StringBuilder();
