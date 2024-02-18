@@ -54,7 +54,7 @@ const LocationTable = () => {
         placeholder="Search" 
         value={searchTerm} 
         onChange={(event) => setSearchTerm(event.target.value)}
-        className="form-input"
+        className="form-input p-4 my-2 border border-gray-300 rounded-md shadow-sm focus:outline-none dark:bg-gray-800 dark:text-gray-100"
       />
       <Table data={dataTable} theme={theme}>
         {(tableList) => (
