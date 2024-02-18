@@ -14,6 +14,7 @@ const nodes = [];
 const LocationTable = () => {
   const dataTable = {nodes};
   const [, forceUpdate] = useReducer(x => x+1, 0);
+  const [searchTerm, setSearchTerm] = React.useState("");
   
   useEffect(() => {
 
@@ -53,6 +54,13 @@ const LocationTable = () => {
   return ( 
     <div className="grow">
       {/* The table containing location data */}
+      <input 
+        type="text" 
+        placeholder="Search" 
+        value={searchTerm} 
+        onChange={(event) => setSearchTerm(event.target.value)}
+        className="form-input"
+      />
       <Table data={dataTable} theme={theme}>
         {(tableList) => (
           <>
@@ -64,13 +72,14 @@ const LocationTable = () => {
           </Header>
 
           <Body>
-              {tableList.map((item) => (
+          {tableList
+            .filter(item => item.name.includes(searchTerm) || item.loc.includes(searchTerm))
+            .map((item) => (
               <Row key={item.name} item={item}>
-                  <Cell>{item.name}</Cell>
-                  <Cell>{item.loc}</Cell>
-                  
+                <Cell>{item.name}</Cell>
+                <Cell>{item.loc}</Cell>
               </Row>
-              ))}
+          ))}
           </Body>
           </>
         )}
