@@ -33,14 +33,7 @@ export default function Login() {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch(`http://${network.ip}:${network.port}/checkLog?user=${username}&pass=${password}`,
-      {
-        mode: 'cors',
-        headers: {
-          'Access-Control-Allow-Origin':'*'
-        }
-      }
-      );
+      const response = await fetch(`http://${network.ip}:${network.port}/checkLog?user=${username}&pass=${password}`)
       const data = await response.json();
       if (data == true) {
         return true;
@@ -52,7 +45,12 @@ export default function Login() {
         return true;
       } else {
         setShowPopup(true);
+        setInterval(() => {
+          setShowPopup(false);
+        }, 3000);
+       
         return false;
+       
       }
     }
   };
