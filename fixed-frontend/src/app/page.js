@@ -12,6 +12,8 @@ import {setCookie} from './components/cookies'
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
+
   const router = useRouter();
 
   const usernameId = useId();
@@ -40,7 +42,6 @@ export default function Login() {
       }
       );
       const data = await response.json();
-      console.log(data)
       if (data == true) {
         return true;
       } else {
@@ -50,6 +51,7 @@ export default function Login() {
       if (username === 'admin' && password === 'password') {
         return true;
       } else {
+        setShowPopup(true);
         return false;
       }
     }
@@ -82,12 +84,17 @@ export default function Login() {
 
     
     <div className="flex items-center justify-center h-screen">
-      <div className=" flex flex-col w-5/6 h-64 sm:mx-auto sm:max-w-md bg-slate-300 rounded p-2">
+      <div className=" flex flex-col w-5/6 sm:mx-auto sm:max-w-md bg-slate-300 rounded p-2">
 
           <h2 className="pl-2 text-slate-700">
               Sign in to your account
           </h2>
-
+          {showPopup && (
+            <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded relative" role="alert">
+              <strong className="font-bold">Invalid login!</strong>
+              <span className="block sm:inline">The username or password you entered is incorrect.</span>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="flex flex-col grow justify-center">
 
               <div id="input-fields" className="justify-center flex flex-col grow">    
