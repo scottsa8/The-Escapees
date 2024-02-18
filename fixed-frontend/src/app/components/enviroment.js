@@ -26,6 +26,7 @@ export default function EnviromentContainer(){
       });
 
     const getLocations = async () => {
+        
         try{
             const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
             const data = await response.json();
@@ -43,6 +44,12 @@ export default function EnviromentContainer(){
             return allRooms;
         }catch(error){
             console.error("no rooms, server running?")
+            let newValues = {
+                temp: "0",
+                noise: "0",
+                light: "0"
+            };
+            setValues(newValues);
             return allRooms;
         }
        
@@ -60,32 +67,22 @@ export default function EnviromentContainer(){
             console.log(realData)
             if(!realData['error']==""){
                 console.error("room, "+selectedLocation.name+" not found");
-                let newValues = {
-                    temp: 0,
-                    noise: 0,
-                    light: 0
-                  };
-                  setValues(newValues);
-                return;
+                throw new Error("no room in DB")
             }else{
-                if(realData==undefined){
-                    let newValues = {
-                        temp: 0,
-                        noise: 0,
-                        light: 0
-                      };
-                      setValues(newValues);
-                }else{
-                    let newValues = {
-                        temp: realData['Temperature'],
-                        noise: realData['NoiseLevel'],
-                        light: realData['LightLevel']
-                      };
-                      setValues(newValues);
-                }
+                let newValues = {
+                    temp: realData['Temperature'],
+                    noise: realData['NoiseLevel'],
+                    light: realData['LightLevel']
+                };
+                setValues(newValues);         
             }
         }catch(err){
-            //console.error(err) //UNCOMMENT ME OUT TO SEE CONSOLE ERROR SPAM !
+            let newValues = {
+                temp: "0",
+                noise: "0",
+                light: "0"
+            };
+            setValues(newValues);
             return;
         }
      };
