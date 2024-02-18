@@ -102,8 +102,10 @@ export default function EnviromentContainer(){
     
         const fetchLocations = () => {
           getLocations().then(newLocations => {
-            //console.log(newLocations);
             setLocations(newLocations);
+            if (newLocations.length > 0) {
+                setSelectedLocation(newLocations[0]);
+              }
             getEnvData();
           });
         };
