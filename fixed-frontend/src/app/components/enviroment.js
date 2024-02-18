@@ -26,6 +26,7 @@ export default function EnviromentContainer(){
       });
 
     const getLocations = async () => {
+        
         try{
             const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
             const data = await response.json();
@@ -43,6 +44,12 @@ export default function EnviromentContainer(){
             return allRooms;
         }catch(error){
             console.error("no rooms, server running?")
+            let newValues = {
+                temp: "0",
+                noise: "0",
+                light: "0"
+            };
+            setValues(newValues);
             return allRooms;
         }
        
