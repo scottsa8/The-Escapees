@@ -51,7 +51,6 @@ export default function EnviromentContainer(){
 
      const getEnvData = async () => {
         try{
-            console.log("name:"+selectedLocation.room)
             const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`)        
             const data = await response.json();
             //console.log("data:"+data['environment'])
@@ -103,7 +102,9 @@ export default function EnviromentContainer(){
         const fetchLocations = () => {
           getLocations().then(newLocations => {
             setLocations(newLocations);
-            if (newLocations.length > 0) {
+            console.log(selectedLocation);
+            console.log(newLocations[0])
+            if (selectedLocation.name == "") {
                 setSelectedLocation(newLocations[0]);
               }
             getEnvData();
