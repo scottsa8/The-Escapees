@@ -84,9 +84,9 @@ export default function Login() {
 
     
     <div className="flex items-center justify-center h-screen">
-      <div className=" flex flex-col w-5/6 sm:mx-auto sm:max-w-md bg-slate-300 rounded p-2">
+      <div className="p-10 flex flex-col w-5/6 sm:mx-auto sm:max-w-md bg-gradient-to-r from-indigo-800 to-purple-950 text-sky-300 rounded-lg p-2">
 
-          <h2 className="pl-2 text-slate-700">
+          <h2 className="pb-10 self-center">
               Sign in to your account
           </h2>
           {showPopup && (
@@ -98,19 +98,18 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="flex flex-col grow justify-center">
 
               <div id="input-fields" className="justify-center flex flex-col grow">    
-                  <label htmlFor={usernameId} >
-                      Username: <input name="username" type="text" id={usernameId} 
+                  <label htmlFor={usernameId} className="self-start pl-4"> Username </label>
+                  <input name="username" className="ml-4 mr-4 mb-4 p-4 bg-black opacity-30 rounded-md" type="text" id={usernameId} 
                       value={username} onChange={e => setUsername(e.target.value)} placeholder="Username"/>
-                  </label>
-                  
-                  <label htmlFor={passwordId} className="">
-                      Password: <input name="password" type="password" id={passwordId}
+
+                  <label htmlFor={passwordId} className="self-start pl-4"> Password  </label>
+                      <input name="password" className="ml-4 mr-4 p-4 mb-4 bg-black opacity-30 rounded-md" type="password" id={passwordId}
                       value={password} onChange={e => setPassword(e.target.value)} placeholder="Password"/>
-                  </label>
+                  
               </div>
               
               <section className="flex flex-row-reverse justify-between">
-                  <button type="submit" className="bg-slate-100 rounded p-1 border w-24 h-12 border-slate-900 ">Submit</button>
+                  <button type="submit" className="bg-purple-700 m-4 w-full h-12 rounded-lg">Log In</button>
               </section>
           </form> 
       </div>
