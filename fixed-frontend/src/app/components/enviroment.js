@@ -57,20 +57,35 @@ export default function EnviromentContainer(){
             let data2 = data['environment'];
             let data3 = data2['data'];
             let realData = data3['0']; //index of the data you want from array 0 = most recent
+            console.log(realData)
             if(!realData['error']==""){
                 console.error("room, "+selectedLocation.name+" not found");
+                let newValues = {
+                    temp: 0,
+                    noise: 0,
+                    light: 0
+                  };
+                  setValues(newValues);
                 return;
             }else{
-                let newValues = {
-                    temp: realData['Temperature'],
-                    noise: realData['NoiseLevel'],
-                    light: realData['LightLevel']
-                  };
-                setValues(newValues);
-                
+                if(realData==undefined){
+                    let newValues = {
+                        temp: 0,
+                        noise: 0,
+                        light: 0
+                      };
+                      setValues(newValues);
+                }else{
+                    let newValues = {
+                        temp: realData['Temperature'],
+                        noise: realData['NoiseLevel'],
+                        light: realData['LightLevel']
+                      };
+                      setValues(newValues);
+                }
             }
         }catch(err){
-            console.error(err) //UNCOMMENT ME OUT TO SEE CONSOLE ERROR SPAM !
+            //console.error(err) //UNCOMMENT ME OUT TO SEE CONSOLE ERROR SPAM !
             return;
         }
      };
