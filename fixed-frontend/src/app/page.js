@@ -42,15 +42,22 @@ export default function Login() {
       }
     } catch (error) {
       setShowPopup2(true);
-      setInterval(() => {
+      const intervalId1 = setInterval(() => {
         setShowPopup2(false);
       }, 10000);
+      setTimeout(() => {
+        clearInterval(intervalId1);
+      }, 10000);
+  
       if (username === 'admin' && password === 'password') {
         return true;
       } else {
         setShowPopup(true);
-        setInterval(() => {
+        const intervalId2 = setInterval(() => {
           setShowPopup(false);
+        }, 3000);
+        setTimeout(() => {
+          clearInterval(intervalId2);
         }, 3000);
        
         return false;
