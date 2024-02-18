@@ -107,35 +107,34 @@ export default function EnviromentContainer(){
     // };
     // console.log(list)
     
+    useEffect(() => {
+        getLocations().then(newLocations => {
+            setLocations(newLocations);
+            if (selectedLocation.name == "") {
+                setSelectedLocation(newLocations[0]);
+            }
+        });
+    }, []);
 
     useEffect(() => {
         const fetchUpdateDelay = () => {
-          const delay = getCookie('updateDelay');
-          return delay ? parseInt(delay, 10) * 1000 : 10000;
+            const delay = getCookie('updateDelay');
+            return delay ? parseInt(delay, 10) * 1000 : 10000;
         };
-    
+
         const fetchLocations = () => {
-          getLocations().then(newLocations => {
-            setLocations(newLocations);
-            console.log(selectedLocation);
-            console.log(newLocations[0])
-            if (selectedLocation.name == "") {
-                setSelectedLocation(newLocations[0]);
-              }
-            getEnvData();
-          });
+            getLocations().then(newLocations => {
+                setLocations(newLocations);
+                getEnvData();
+            });
         };
         fetchLocations();
-    
+
         const interval = setInterval(() => {
-          fetchLocations();
+            fetchLocations();
         }, fetchUpdateDelay());
         return () => clearInterval(interval);
-      }, []);
-
-      useEffect(() => {
-        getEnvData();
-      }, [selectedLocation]);
+    }, [selectedLocation]);
 
     return (
         <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-transparent">
