@@ -159,7 +159,7 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/getPeople")
-	private int getPeople(@RequestParam(value="loc") String loc) {
+	private int getPeople(@RequestParam(value="loc") String loc,@RequestParam(value="type", required=false,defaultValue = "user")String type) {
 		int total = 0;
 
 		try {
@@ -168,10 +168,9 @@ public class ServerApplication {
 					"SELECT COUNT(*) AS total_people " +
 							"FROM roomOccupants ro " +
 							"JOIN rooms r ON ro.room_id = r.room_id " +
-							"WHERE r.room_name = ?"
+							"WHERE r.room_name = ?" //and type = passed in
 			);
 			selectStatement.setString(1, loc);
-
 			ResultSet rs = selectStatement.executeQuery();
 
 			// Retrieve the total count
