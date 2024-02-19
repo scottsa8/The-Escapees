@@ -11,6 +11,7 @@ body {
   background-color: #22314f;
 }
 
+
 .banner {
   background-color: #B7B6B7;
   height: 100px;
@@ -94,12 +95,12 @@ body {
 
   /* Sidebar code */
   .sidebar-button {
-    display: block;
+    display: flex;
     width: 100%;
     padding-right: 7px;
     padding-top: 10px;
     padding-bottom: 10px;
-    float: right;
+    justify-content: end;
     text-indent: -999px;
   }
 
@@ -118,13 +119,6 @@ body {
     width: 100%;
     justify-content: center;
     align-items: center;
-  }
-
-  .dark .topbar-button{
-    display: flex;
-    width: 100%;
-    justify-content: end;
-    align-items: right;
   }
 
   .topbar-button:hover {
