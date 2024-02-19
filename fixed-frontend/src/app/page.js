@@ -113,7 +113,7 @@ export default function Login() {
 
     
     <div className="flex items-center justify-center h-screen">
-      <div className="p-10 flex flex-col w-5/6 sm:mx-auto sm:max-w-md bg-gradient-to-r from-indigo-800 to-purple-950 text-sky-300 rounded-lg p-2">
+      <div className="p-10 flex flex-col w-5/6 sm:mx-auto sm:max-w-md bg-gradient-to-r from-indigo-800 to-purple-950 text-sky-200 rounded-lg p-2">
 
           <h2 className="pb-10 self-center">
               Sign in to your account

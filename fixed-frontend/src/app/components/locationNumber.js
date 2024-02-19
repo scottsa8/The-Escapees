@@ -22,6 +22,7 @@ function RoomCard({ roomName, onClick, isSelected}) {
         <h2 className="text-xl font-semibold text-gray-800 dark:text-blue-300">{`${roomName}`}</h2>
         <p className="text-gray-600 mt-2 dark:text-blue-100">{`Prisoners: ${inmateCount}`}</p>
         <p className="text-gray-600 mt-2 dark:text-blue-100">{`Guards: ${guardCount}`}</p>
+        <p className="text-gray-600 mt-2 dark:text-blue-100">{`Total: ${guardCount+inmateCount}`}</p>
       </div>
     );
 } 

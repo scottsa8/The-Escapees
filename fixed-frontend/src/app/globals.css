@@ -26,6 +26,11 @@ body {
   color: rgb(219 234 254);
 }
 
+.dial-container {
+  padding-left: 5vw;
+  padding-right: 5vw;
+}
+
 .title {
   color: black;
   font-size: 34px;
