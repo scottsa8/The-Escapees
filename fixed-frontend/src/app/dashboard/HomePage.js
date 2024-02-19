@@ -8,7 +8,7 @@ const HomePage = () => {
     return (
         <>
             <EnviromentContainer/>
-            <LocationCountBox/>
+            {/* <LocationCountBox/> */}
         </>
     );
 }
