@@ -26,9 +26,38 @@ const InteractiveMap = () => {
         setShowDataBox(false);
     };
 
+    //Re-write the polygon list to not have any duplicate polygons
+    function removeDoubleSaves(polygonList){ 
+
+        let newPolygonList = polygonList;
+
+        for(let i=0; i<newPolygonList.length; i++){
+
+            for(let j=i; j<newPolygonList.length; j++){
+
+                //so you don't compare against self
+                if(i!=j){
+
+                    if(JSON.stringify(newPolygonList[i]) == JSON.stringify(newPolygonList[j])){
+                        
+                        newPolygonList.splice(j,1);//remove current polygon object from list
+                        j--;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return newPolygonList;
+    }
+
     function loadSavedPolygons(){
        
         var keys = Object.keys(localStorage);
+        let polygonList = polygons;
 
         for(let i=0; i<keys.length; i++){
 
@@ -38,14 +67,16 @@ const InteractiveMap = () => {
                 if(points){
                     
                     setSavedData(true);
-                    polygons.push(currentPolygon);
-                    localStorage.removeItem(keys[i]);
+                    polygonList.push(currentPolygon);
 
                 }
             }catch(e){
                 //If the saved data isn't a polygon
             }
         }
+
+        setPolygons(removeDoubleSaves(polygonList));
+
     }
 
     //callback functions to create shapes on the map
