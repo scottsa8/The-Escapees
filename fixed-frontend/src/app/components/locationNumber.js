@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { network } from "../layout";
 
-
 function RoomCard({ roomName, onClick, isSelected}) {
     const [inmateCount,setInmateCount] = useState(0)
     const [guardCount,setGuardCount] = useState(0)
@@ -27,9 +26,7 @@ function RoomCard({ roomName, onClick, isSelected}) {
     );
 } 
 
-
 export default function LocationCountBox({onRoomClick}){
-
     const [locations, setLocations] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState("Room1");
 
@@ -37,7 +34,9 @@ export default function LocationCountBox({onRoomClick}){
       fetch(`http://${network.ip}:${network.port}/getRooms`)
         .then(response => response.json())
         .then(data => {
-          const roomNames = data.rooms.data.map(roomObj => roomObj.room);
+          const roomNames = data.rooms.data
+          .map(roomObj => roomObj.room)
+          .filter(roomName => !roomName.includes('gate'));
           setLocations(roomNames);
         });
     }, []);
@@ -48,7 +47,5 @@ export default function LocationCountBox({onRoomClick}){
           <RoomCard roomName={room} onClick={() => {setSelectedRoom(room); onRoomClick(room);}} isSelected={selectedRoom === room}/>
           ))}
       </div>
-
     )
-
 }
