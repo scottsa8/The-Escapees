@@ -27,8 +27,9 @@ export default function EnviromentContainer(){
         noise: "0"
       });
     let timeout=0;
+    const debug=false;
     const handleRoomClick = (roomName) => {
-        console.log(`Room clicked: ${roomName}`);
+        if(debug){console.log(`Room clicked: ${roomName}`);}
         const room = locations.find(location => location.room === roomName);
         setSelectedLocation(room ? room : null);
     };
@@ -50,7 +51,7 @@ export default function EnviromentContainer(){
             }
             return allRooms;
         }catch(error){
-            console.error("no rooms, server running?")
+            if(debug){console.error("no rooms, server running?")}
             let newValues = {
                 temp: "0",
                 noise: "0",
@@ -66,24 +67,18 @@ export default function EnviromentContainer(){
      const getEnvData = async () => {
         let d= new Date();
         let timeoutTime= d.toTimeString().split(" ")[0]
-        console.log(timeoutTime)
         try{    
-            console.log("selectedLocation.room:"+selectedLocation.room)
+            //console.log("selectedLocation.room:"+selectedLocation.room)
             const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`)        
             const data = await response.json();
-            //console.log("data:"+data['environment'])
             let data2 = data['environment'];
             let data3 = data2['data'];
             let realData = data3['0']; //index of the data you want from array 0 = most recent
             let inTime = realData['Timestamp'].split(" ")[1].split(".")[0]
-            
-            console.log("in:"+inTime)
-            console.log("curr:"+timeoutTime)
             if(inTime!=timeoutTime){
                 timeout=timeout+1;
-                console.log(timeout)
                 if(timeout>=3){
-                    console.log("lost con")
+                    if(debug){console.log("lost con")}
                     throw new Error("lost connection")
                 }
             }else{
@@ -100,7 +95,6 @@ export default function EnviromentContainer(){
                     setValues(newValues);         
                 }
             }
-           
         }catch(err){
             let newValues = {
                 temp: "0",
@@ -116,18 +110,6 @@ export default function EnviromentContainer(){
     function handleLocationChange(value){
         setSelectedLocation(value);
     }
-    
-
-    // const splitString =  "Data ID: 1, Timestamp: 2023-01-31 16:00:00.0, Temperature: 25.00, Noise Level: 0.00, Light Level: 10.00!Data ID: 2, Timestamp: 2023-01-31 16:30:00.0, Temperature: 22.00, Noise Level: 1.00, Light Level: 5.00!".split("!");
-    // // console.log(JSON.parse(splitString[splitString.length - 1])) // Last element is most recent
-    // console.log(splitString[splitString.length - 1])
-    
-    // const list = async() => {
-    //     const response = await fetch("http://localhost:5500/getEnv");
-    //     const data = await response.json()
-    //     return data
-    // };
-    // console.log(list)
     
     useEffect(() => {
         getLocations().then(newLocations => {
@@ -150,7 +132,7 @@ export default function EnviromentContainer(){
                 getEnvData();
             });
         };
-        console.log("Updating....");
+        if(debug){console.log("Updating....");}
         fetchLocations();
 
         const interval = setInterval(() => {
