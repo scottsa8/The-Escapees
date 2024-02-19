@@ -5,6 +5,8 @@ import Dial from "./dial";
 import { sendNotification } from "./notifications";
 import { getCookie } from "./cookies"
 import { get } from "http";
+import LocationCountBox from "./locationNumber";
+
 const EnviromentBox = ({ measurement, value }) => {
     return (
         <div className="flex flex-col items-center p-4 bg-transparent">
@@ -20,10 +22,16 @@ export default function EnviromentContainer(){
     const [locations, setLocations] = useState([{name:""}]);
     const [selectedLocation, setSelectedLocation] = useState(locations[0])
     const [values, setValues] = useState({
-        temp: "20",
-        light: "30",
-        noise: "39"
+        temp: "0",
+        light: "0",
+        noise: "0"
       });
+
+    const handleRoomClick = (roomName) => {
+        console.log(`Room clicked: ${roomName}`);
+        const room = locations.find(location => location.room === roomName);
+        setSelectedLocation(room ? room : null);
+    };
 
     const getLocations = async () => {
         
@@ -58,13 +66,14 @@ export default function EnviromentContainer(){
 
      const getEnvData = async () => {
         try{
+            console.log("selectedLocation.room:"+selectedLocation.room)
             const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`)        
             const data = await response.json();
             //console.log("data:"+data['environment'])
             let data2 = data['environment'];
             let data3 = data2['data'];
             let realData = data3['0']; //index of the data you want from array 0 = most recent
-            console.log(realData)
+            console.log("realData:"+realData['Temperature'])
             if(!realData['error']==""){
                 console.error("room, "+selectedLocation.name+" not found");
                 throw new Error("no room in DB")
@@ -125,6 +134,7 @@ export default function EnviromentContainer(){
                 getEnvData();
             });
         };
+        console.log("Updating....");
         fetchLocations();
 
         const interval = setInterval(() => {
@@ -134,32 +144,37 @@ export default function EnviromentContainer(){
     }, [selectedLocation]);
 
     return (
-        <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-transparent">
-            <div className="w-full flex justify-center p-3 bg-transparent">
-                <Listbox value={selectedLocation} onChange={handleLocationChange}>
-                    <div className="flex flex-col justify-center w-24">
-                        <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900 dark:text-blue-100">Location:</Listbox.Label>
-                        <Listbox.Button className="rounded hover:underline text-xl w-24 h-11 grow text-center text-white bg-neutral-600 dark:bg-sky-800 dark:text-blue-100">{selectedLocation.room}</Listbox.Button>
-                        <Listbox.Options className="flex flex-col self-center dark:text-blue-100">
-                            {locations.map((location, index) => (
-                                <Listbox.Option
-                                    key={index}
-                                    value={location}
-                                    className="text-xl rounded text-center hover:bg-neutral-400 hover:cursor-pointer h-11 w-24 p-2"
-                                >
-                                    {location.room}
-                                </Listbox.Option>
-                            ))}
-                        </Listbox.Options>
-                    </div>
-                </Listbox>
+        <div>
+            <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-transparent">
+                <div className="w-full flex justify-center p-3 bg-transparent">
+                    <Listbox value={selectedLocation} onChange={handleLocationChange}>
+                        <div className="flex flex-col justify-center w-24">
+                            <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900 dark:text-blue-100">Location:</Listbox.Label>
+                            <Listbox.Button className="rounded hover:underline text-xl w-24 h-11 grow text-center text-white bg-neutral-600 dark:bg-sky-800 dark:text-blue-100">{selectedLocation.room}</Listbox.Button>
+                            <Listbox.Options className="flex flex-col self-center dark:text-blue-100">
+                                {locations.map((location, index) => (
+                                    <Listbox.Option
+                                        key={index}
+                                        value={location}
+                                        className="text-xl rounded text-center hover:bg-neutral-400 hover:cursor-pointer h-11 w-24 p-2"
+                                    >
+                                        {location.room}
+                                    </Listbox.Option>
+                                ))}
+                            </Listbox.Options>
+                        </div>
+                    </Listbox>
+                </div>
+                <div className="w-full flex justify-between bg-transparent dark:text-blue-100">
+                    <EnviromentBox measurement="Temp" value={values["temp"]}/>
+                    <EnviromentBox measurement="Light" value={values["light"]}/>
+                    <EnviromentBox measurement="Noise" value={values["noise"]}/>
+                </div>
             </div>
-            <div className="w-full flex justify-between bg-transparent dark:text-blue-100">
-                <EnviromentBox measurement="Temp" value={values["temp"]}/>
-                <EnviromentBox measurement="Light" value={values["light"]}/>
-                <EnviromentBox measurement="Noise" value={values["noise"]}/>
-            </div>
+        <LocationCountBox onRoomClick={handleRoomClick} />
         </div>
+            
+        
     )
 }
 
