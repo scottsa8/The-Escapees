@@ -19,7 +19,7 @@ body {
   justify-content: space-between;
 }
 .dark .banner{
-  background-color: #1b2030;
+  background: linear-gradient(to right, #1d2232, #1b2030);
 }
 
 .dark .title{
@@ -79,7 +79,7 @@ body {
     }
   
     .dark .topbar{
-      background-color: #1b2030;
+      background: linear-gradient(to right, #2b3040, #1b2030);
       color: #DBE9FE;
     }
 }
