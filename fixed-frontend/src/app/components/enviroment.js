@@ -144,7 +144,7 @@ export default function EnviromentContainer(){
     return (
         <div>
             <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-transparent">
-                <div className="w-full flex justify-center p-3 bg-transparent">
+                {/* <div className="w-full flex justify-center p-3 bg-transparent">
                     <Listbox value={selectedLocation} onChange={handleLocationChange}>
                         <div className="flex flex-col justify-center w-24">
                             <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900 dark:text-blue-100">Location:</Listbox.Label>
@@ -162,7 +162,7 @@ export default function EnviromentContainer(){
                             </Listbox.Options>
                         </div>
                     </Listbox>
-                </div>
+                </div> */}
                 <div className="w-full flex justify-between bg-transparent dark:text-blue-100">
                     <EnviromentBox measurement="Temp" value={values["temp"]}/>
                     <EnviromentBox measurement="Light" value={values["light"]}/>
