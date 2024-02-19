@@ -10,7 +10,7 @@ import LocationCountBox from "./locationNumber";
 const EnviromentBox = ({ measurement, value }) => {
     return (
         <div className="flex flex-col items-center p-4 bg-transparent">
-            <Dial value={value} min={0} max={40} onMaxValue={() => {
+            <Dial value={value} min={0} max={100} onMaxValue={() => {
                 sendNotification('Max Value Reached', { body: `Measurement: ${measurement}, Value: ${value}`});
             }}/>
             <span className="text-lg font-medium mt-2">{measurement}</span>
@@ -34,13 +34,12 @@ export default function EnviromentContainer(){
     };
 
     const getLocations = async () => {
-        
+        let allRooms =[];
         try{
             const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
             const data = await response.json();
             let data2 = data['rooms'];
             let data3 = data2['data'];
-            let allRooms =[];
             for (let i = 0; i < data3.length; i++) {
                 let realdata=data3[i]
                 if(realdata['room']==="gate1" || realdata['room']==="gate2"){
@@ -142,7 +141,6 @@ export default function EnviromentContainer(){
         }, fetchUpdateDelay());
         return () => clearInterval(interval);
     }, [selectedLocation]);
-
     return (
         <div>
             <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-transparent">
