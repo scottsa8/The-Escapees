@@ -6,28 +6,25 @@ import { network } from "../layout";
 
 export default function Chart() {
   const getEnvData = async () => {
-        const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=cell1`)        
-        const data = await response.json();
-        console.log(data)
-        let data2 = data['environment'];
-        let data3 = data2['data'];
-        let out =[]
-          for(let x=0;x<data3.length;x++){
-            let realData = data3[x]; //index of the data you want from array 0 = most recent
-            
-            out.push({"timestamp":realData['Timestamp'],"name":"Room A","temp":realData['Temperature'],"noise":realData['NoiseLevel'],"light":realData['LightLevel']});  
-            console.log(out)
-          }
-        return out;   
+    const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=cell1`)        
+    const data = await response.json();
+    console.log(data)
+    let data2 = data['environment'];
+    let data3 = data2['data'];
+    let out =[]
+      for(let x=0;x<data3.length;x++){
+        let realData = data3[x]; //index of the data you want from array 0 = most recent
+        out.push({"timestamp":realData['Timestamp'],"name":"Room A","temp":realData['Temperature'],"noise":realData['NoiseLevel'],"light":realData['LightLevel']});  
+      }
+    console.log(out)
+  return out;   
         
-   
-
  };
 
   const [selectedRoom, setSelectedRoom] = useState('Room A');
   const [selectedTimeRange, setSelectedTimeRange] = useState('24h');
   const data = getEnvData() //generateRandomData();
-  //const roomData = data.filter(item => item.name === selectedRoom);
+  const roomData = data.filter(item => item.name === selectedRoom);
   const timeRangeMs = {
     '24h': 24 * 60 * 60 * 1000,
     '7d': 7 * 24 * 60 * 60 * 1000,
@@ -35,7 +32,7 @@ export default function Chart() {
     '90d': 90 * 24 * 60 * 60 * 1000,
     '1Y': 365 * 24 * 60 * 60 * 1000
   };
- // const filteredData = roomData.filter(item => Date.now() - item.timestamp <= timeRangeMs[selectedTimeRange]);
+  const filteredData = roomData.filter(item => Date.now() - item.timestamp <= timeRangeMs[selectedTimeRange]);
   
   const handleRoomChange = (e) => {
     setSelectedRoom(e.target.value);
@@ -71,7 +68,7 @@ export default function Chart() {
         </select>
       </div>
       <ResponsiveContainer aspect={3} width="55%">
-        <LineChart data={data}>
+        <LineChart data={filteredData}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>
           <YAxis/>
