@@ -38,6 +38,9 @@ body {
   @apply transition-transform duration-500 ease-in-out;
 }
 
+.grow {
+  padding-left: 20px;
+}
 
 /* Change design from bottom bar to side bar based on the screen size */
 @layer components {
