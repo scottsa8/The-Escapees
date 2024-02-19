@@ -148,11 +148,13 @@ public class SerialMonitor {
                     }
                 }                               
                 else if (packetType == 2) { //env
+                    System.out.println(sensorData.length);
+                    if(sensorData.length>5){return;}
                     String microbitName = sensorData[1];
                     String temperature = sensorData[2];
                     BigDecimal lightLevel = new BigDecimal(sensorData[3]).setScale(2, RoundingMode.HALF_EVEN);
                     String noiseLevel = sensorData[4];
-                    
+
                     try {
                         // Retrieve room_id based on room_microbit
                         PreparedStatement selectRoomIdStatement = connection.prepareStatement(
