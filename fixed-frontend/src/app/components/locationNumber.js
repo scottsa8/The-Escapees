@@ -25,10 +25,10 @@ function LocationCount({location}){
     useEffect(() => {
       fetch(`http://${network.ip}:${network.port}/getPeople?loc=${location}$type=inmate`)
         .then(response => response.json())
-        .then(num => inmateCount = num);
+        .then(num => setInmateCount(num));
       fetch(`http://${network.ip}:${network.port}/getPeople?loc=${location}$type=guard`)
         .then(response => response.json())
-        .then(num => guardCount = num);
+        .then(num => setGuardCount(num));
       console.log(inmateCount, guardCount);
       }, []);
 
