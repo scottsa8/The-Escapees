@@ -7,10 +7,11 @@ function RoomCard({ roomName, onClick, isSelected}) {
     const [guardCount,setGuardCount] = useState(0)
 
     useEffect(() => {
-      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${roomName}$type=inmate`)
+      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${roomName}&type=inmate`)
         .then(response => response.json())
         .then(num => setInmateCount(num));
-      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${roomName}$type=guard`)
+        
+      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${roomName}&type=guard`)
         .then(response => response.json())
         .then(num => setGuardCount(num));
       }, []);
