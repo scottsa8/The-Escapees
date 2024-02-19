@@ -44,7 +44,7 @@ export default function LocationCountBox({onRoomClick}){
     return(
       <div className="w-full min-w-0 flex flex-wrap justify-start space-between">
           {locations.map(room => (
-          <RoomCard roomName={room} onClick={() => {setSelectedRoom(room); onRoomClick(room);}} isSelected={selectedRoom === room}/>
+          <RoomCard key={room} roomName={room} onClick={() => {setSelectedRoom(room); onRoomClick(room);}} isSelected={selectedRoom === room}/>
           ))}
       </div>
     )

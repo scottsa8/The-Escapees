@@ -5,13 +5,14 @@ import { useTheme } from '@table-library/react-table-library/theme';
 import {DEFAULT_OPTIONS, getTheme} from '@table-library/react-table-library/mantine';
 import {fetchUpdateDelay} from './cookies'
 
-const mantineTheme = getTheme(DEFAULT_OPTIONS);
-const theme = useTheme(mantineTheme);
+
 const nodes = [];
 
 //Table containing the locations of users
 
 const LocationTable = () => {
+  const mantineTheme = getTheme(DEFAULT_OPTIONS);
+const theme = useTheme(mantineTheme);
   const [nodes, setNodes] = useState([]);
   const dataTable = {nodes};
   const [searchTerm, setSearchTerm] = useState("");
