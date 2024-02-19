@@ -84,7 +84,7 @@ public class ServerApplication {
 //		}
 //	}
 	@GetMapping("/panic")
-	private void panic(@RequestParam(value="bool")boolean alarmed){
+	private void panic(@RequestParam(value="alarmed")boolean alarmed){
 		if(alarmed){
 			//set off alarm
 		}
