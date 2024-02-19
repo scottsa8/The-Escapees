@@ -83,6 +83,12 @@ public class ServerApplication {
 //			//e.printStackTrace();
 //		}
 //	}
+	@GetMapping("/panic")
+	private void panic(@RequestParam(value="bool")boolean alarmed){
+		if(alarmed){
+			//set off alarm
+		}
+	}
 	@GetMapping("/getAllNames")
 	private String getAllNames(){
 		StringBuilder output = new StringBuilder();

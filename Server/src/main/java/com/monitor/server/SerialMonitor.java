@@ -148,7 +148,6 @@ public class SerialMonitor {
                     }
                 }                               
                 else if (packetType == 2) { //env
-                    System.out.println(sensorData.length);
                     if(sensorData.length>5){return;}
                     String microbitName = sensorData[1];
                     String temperature = sensorData[2];
