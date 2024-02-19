@@ -158,23 +158,24 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/getPeople")
-	private int getPeople(@RequestParam(value="loc") String loc,@RequestParam(value="type", required=false,defaultValue = "user")String type) {
+	private int getPeople(@RequestParam(value="loc") String loc, @RequestParam(value="type", required=false, defaultValue="user") String type) {
 		int total = 0;
 
-		try {
-			// Fetch the total number of people in a specific location from the database
-			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT COUNT(*) AS total_people " +
-							"FROM roomOccupants ro " +
-							"JOIN rooms r ON ro.room_id = r.room_id " +
-							"WHERE r.room_name = ?" //and type = passed in
-			);
-			selectStatement.setString(1, loc);
-			ResultSet rs = selectStatement.executeQuery();
+		try (PreparedStatement selectStatement = connection.prepareStatement(
+				"SELECT COUNT(*) AS total_people " +
+						"FROM roomOccupants ro " +
+						"JOIN rooms r ON ro.room_id = r.room_id " +
+						"JOIN users u ON ro.user_id = u.user_id " +
+						"WHERE r.room_name = ? AND u.user_type = ?")) {
 
-			// Retrieve the total count
-			if (rs.next()) {
-				total = rs.getInt("total_people");
+			selectStatement.setString(1, loc);
+			selectStatement.setString(2, type);
+
+			try (ResultSet rs = selectStatement.executeQuery()) {
+				// Retrieve the total count
+				if (rs.next()) {
+					total = rs.getInt("total_people");
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -182,6 +183,7 @@ public class ServerApplication {
 
 		return total;
 	}
+
 
 	@GetMapping("/getRooms")
 	private String getRooms(){
