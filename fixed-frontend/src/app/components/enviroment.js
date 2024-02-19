@@ -26,7 +26,7 @@ export default function EnviromentContainer(){
         light: "0",
         noise: "0"
       });
-
+    let timeout=0;
     const handleRoomClick = (roomName) => {
         console.log(`Room clicked: ${roomName}`);
         const room = locations.find(location => location.room === roomName);
@@ -64,7 +64,10 @@ export default function EnviromentContainer(){
 
 
      const getEnvData = async () => {
-        try{
+        let d= new Date();
+        let timeoutTime= d.toTimeString().split(" ")[0]
+        console.log(timeoutTime)
+        try{    
             console.log("selectedLocation.room:"+selectedLocation.room)
             const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`)        
             const data = await response.json();
@@ -72,18 +75,32 @@ export default function EnviromentContainer(){
             let data2 = data['environment'];
             let data3 = data2['data'];
             let realData = data3['0']; //index of the data you want from array 0 = most recent
-            console.log("realData:"+realData['Temperature'])
-            if(!realData['error']==""){
-                console.error("room, "+selectedLocation.name+" not found");
-                throw new Error("no room in DB")
+            let inTime = realData['Timestamp'].split(" ")[1].split(".")[0]
+            
+            console.log("in:"+inTime)
+            console.log("curr:"+timeoutTime)
+            if(inTime!=timeoutTime){
+                timeout=timeout+1;
+                console.log(timeout)
+                if(timeout>=3){
+                    console.log("lost con")
+                    throw new Error("lost connection")
+                }
             }else{
-                let newValues = {
-                    temp: realData['Temperature'],
-                    noise: realData['NoiseLevel'],
-                    light: realData['LightLevel']
-                };
-                setValues(newValues);         
+                if(!realData['error']==""){
+                    console.error("room, "+selectedLocation.name+" not found");
+                    throw new Error("no room in DB")
+                }else{
+                    timeout=0;
+                    let newValues = {
+                        temp: realData['Temperature'],
+                        noise: realData['NoiseLevel'],
+                        light: realData['LightLevel']
+                    };
+                    setValues(newValues);         
+                }
             }
+           
         }catch(err){
             let newValues = {
                 temp: "0",
