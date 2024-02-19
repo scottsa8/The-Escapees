@@ -158,7 +158,7 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/getPeople")
-	private int getPeople(@RequestParam(value="loc") String loc, @RequestParam(value="type", required=false, defaultValue="user") String type) {
+	private int getPeople(@RequestParam(value="loc") String loc, @RequestParam(value="type", required=false, defaultValue="inmate") String type) {
 		int total = 0;
 
 		try (PreparedStatement selectStatement = connection.prepareStatement(
