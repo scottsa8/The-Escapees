@@ -69,8 +69,8 @@ const Dashboard = () => {
           <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.homePage)}>Home <HomeIcon/></button>
           <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.individualLocations)}>Locations <LocPin/></button>
           <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.interactiveMap)}>Map <MapIcon/></button>
-          <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.settings)}>Settings <SettingsIcon/></button>
           <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.charts)}>Analytics <AnalyticsIcon/></button>
+          <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.settings)}>Settings <SettingsIcon/></button>
         </div>
 
         {/* Where the screen contents are shown */}
