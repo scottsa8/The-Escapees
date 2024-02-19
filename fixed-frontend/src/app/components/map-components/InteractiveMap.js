@@ -27,6 +27,7 @@ const InteractiveMap = () => {
     };
 
     function loadSavedPolygons(){
+       
         var keys = Object.keys(localStorage);
 
         for(let i=0; i<keys.length; i++){
@@ -35,8 +36,10 @@ const InteractiveMap = () => {
                 let currentPolygon =  JSON.parse(localStorage.getItem(keys[i]))
                 let points = currentPolygon.points;
                 if(points){
+                    
                     setSavedData(true);
                     polygons.push(currentPolygon);
+                    localStorage.removeItem(keys[i]);
 
                 }
             }catch(e){
@@ -46,7 +49,6 @@ const InteractiveMap = () => {
     }
 
     //callback functions to create shapes on the map
-
     //when an object is created, store it
     const onCreate = (e) => {
         
@@ -75,7 +77,6 @@ const InteractiveMap = () => {
 
     //When you edit a polygon it saves the updated polygon values
     const onEdit = (e) => {
-        console.log(e)
 
         const {layers: {_layers}} = e;
 
@@ -101,7 +102,7 @@ const InteractiveMap = () => {
     };
 
     useEffect(() => {
-        loadSavedPolygons()
+        return(loadSavedPolygons());
     },[]);
 
 

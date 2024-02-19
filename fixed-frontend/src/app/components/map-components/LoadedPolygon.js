@@ -5,11 +5,11 @@ const LoadedPolygon = ({polygons}) => {
     //console.log(polygons);
 
     function updatePolygonSave(polygon, event){
-        //console.log(event);
+        
         let newPolyID = event.target._leaflet_id;
-        console.log(newPolyID);
-        localStorage.setItem("polygon"+newPolyID, JSON.stringify({points: polygon.points, name: polygon.name}));
-        console.log("removing: "+polygon.id);
+        // Create a new polygon with a the new ID
+        localStorage.setItem("polygon"+newPolyID, JSON.stringify({points: polygon.points, name: polygon.name, id: newPolyID}));
+        
         localStorage.removeItem("polygon"+polygon.id);//removes old saved data
     }
 

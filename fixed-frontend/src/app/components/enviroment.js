@@ -34,13 +34,13 @@ export default function EnviromentContainer(){
     };
 
     const getLocations = async () => {
-        
+        let allRooms =[];
         try{
             const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
             const data = await response.json();
             let data2 = data['rooms'];
             let data3 = data2['data'];
-            let allRooms =[];
+            
             for (let i = 0; i < data3.length; i++) {
                 let realdata=data3[i]
                 if(realdata['room']==="gate1" || realdata['room']==="gate2"){
@@ -143,6 +143,17 @@ export default function EnviromentContainer(){
         return () => clearInterval(interval);
     }, [selectedLocation]);
 
+    const getSelectedRoom = () =>{
+        let room = "";
+        try{
+            room = selectedLocation.room;
+        }catch(e){
+            room = "";
+        }
+
+        return room;
+    }
+
     return (
         <div>
             <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-transparent">
@@ -150,7 +161,7 @@ export default function EnviromentContainer(){
                     <Listbox value={selectedLocation} onChange={handleLocationChange}>
                         <div className="flex flex-col justify-center w-24">
                             <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900 dark:text-blue-100">Location:</Listbox.Label>
-                            <Listbox.Button className="rounded hover:underline text-xl w-24 h-11 grow text-center text-white bg-neutral-600 dark:bg-sky-800 dark:text-blue-100">{selectedLocation.room}</Listbox.Button>
+                            <Listbox.Button className="rounded hover:underline text-xl w-24 h-11 grow text-center text-white bg-neutral-600 dark:bg-sky-800 dark:text-blue-100">{getSelectedRoom}</Listbox.Button>
                             <Listbox.Options className="flex flex-col self-center dark:text-blue-100">
                                 {locations.map((location, index) => (
                                     <Listbox.Option

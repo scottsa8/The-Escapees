@@ -5,6 +5,7 @@ const RoomInfoPopup = ({polygonClicked}) => {
     //Get the data from the polygon that is currently in use
     const polyPoints = polygonClicked.points;
     const polyID = polygonClicked.id;
+    console.log("poly id"+polygonClicked.id);
 
     const [roomName, setRoomName] = useState("");
     const [nameAdded, setNameAdded] = useState(false);
@@ -34,17 +35,23 @@ const RoomInfoPopup = ({polygonClicked}) => {
     }
 
     function savePolygon(newName){
-        localStorage.setItem("polygon"+polyID, JSON.stringify({points: polyPoints, name: newName, id:polyID}));//Save the polygons points with it's name
+        localStorage.setItem("polygon"+polyID, JSON.stringify({points: polyPoints, name: newName, id: polyID}));//Save the polygons points with it's name
     }
 
-    //Ran ons 1st load
-    useEffect(() => {
+    const handleLoad = (e) => {
         let polyName = getPolyName();
 
         if(polyName != undefined){
             setRoomName(polyName);
             setNameAdded(true);
         }
+    }
+
+    //Ran ons 1st load
+    useEffect(() => {
+        
+        return handleLoad;
+        
     },[])
 
     return ( 
