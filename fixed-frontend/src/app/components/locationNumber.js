@@ -1,5 +1,3 @@
-// TODO: Implement fetchData to get no of users from server
-
 import { useEffect, useState } from "react";
 import { network } from "../layout";
 
@@ -20,14 +18,19 @@ function RoomCard({ roomName, prisonerCount, guardCount, onClick, isSelected}) {
 
 
 function LocationCount({location}){
-    const [count,setCount] = useState(0)
+  const [inmateCount,setInmateCount] = useState(0)
+  const [guardCount,setGuardCount] = useState(0)
 
 
-    // useEffect(() => {
-    //     fetch(`http://${network.ip}:${network.port}/getPeople?loc=${location}`)
-    //       .then(response => response.json())
-    //       .then(num => count = num);
-    //   }, []);
+    useEffect(() => {
+      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${location}$type=inmate`)
+        .then(response => response.json())
+        .then(num => inmateCount = num);
+      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${location}$type=guard`)
+        .then(response => response.json())
+        .then(num => guardCount = num);
+      console.log(inmateCount, guardCount);
+      }, []);
 
     // const getPeople = async () => {
     //     const response = await fetch(`http://${network.ip}:${network.port}/getPeople?loc=${location}`)
@@ -105,7 +108,7 @@ export default function LocationCountBox({onRoomClick}){
 
     <div className="w-full min-w-0 flex flex-wrap justify-start space-between">
         {locations.map(room => (
-        <RoomCard roomName={room} prisonerCount="1" guardCount="1" onClick={() => {setSelectedRoom(room); onRoomClick(room);}} isSelected={selectedRoom === room}/>
+        <RoomCard roomName={room} prisonerCount={inmateCount} guardCount={guardCount} onClick={() => {setSelectedRoom(room); onRoomClick(room);}} isSelected={selectedRoom === room}/>
         ))}
     </div>
 
