@@ -60,6 +60,7 @@ const InteractiveMap = () => {
         return newPolygonList;
     }
 
+    //Creates a list of what polygons need drawing on the map based on local storage
     function loadSavedPolygons(){
        
         var keys = Object.keys(localStorage);

@@ -1,11 +1,7 @@
 import {Polygon} from 'react-leaflet';
-import { useState } from 'react';
 
 //Manages the saves for polygons on screen when created
 const LoadedPolygon = ({polygons, openDataPage}) => {
-
-    const [selectedPolygon, setSelectedPolygon] = useState(""); 
-    const [showDataPage, setShowDataPage] = useState(false);
 
     function updatePolygonSave(polygon, event){
         
@@ -14,6 +10,7 @@ const LoadedPolygon = ({polygons, openDataPage}) => {
         //if it needs updating
         if(newPolyID != polygon.id){
 
+            console.log("Creating polygon "+newPolyID);
             // Create a new polygon with a the new ID
             localStorage.setItem("polygon"+newPolyID, JSON.stringify({points: polygon.points, name: polygon.name, id: newPolyID}));
         
@@ -22,24 +19,25 @@ const LoadedPolygon = ({polygons, openDataPage}) => {
         
     }
 
-    //Will find the polygon that has been clicked and sets the selected polygon
+    //Will find the polygon that has been clicked and returns the selected polygon
     function findSelectedPolygon(polygonID){
         var keys = Object.keys(localStorage);
+        let selectedPolygon = undefined;
 
         for(let i=0; i<keys.length; i++){
 
             //found a match
             if(keys[i] === ("polygon"+polygonID)){
                 try{
-                    let selectedPolygon = JSON.parse(localStorage.getItem(keys[i]));
-                    setSelectedPolygon(selectedPolygon.name);
-                    console.log("Polygone selected");
+                    selectedPolygon = JSON.parse(localStorage.getItem(keys[i]));
                     break;
                 }catch(e){
                     console.log("Incorrect polygon save accessed");
                 }
             }
         }
+
+        return selectedPolygon;
 
     }
 
@@ -54,9 +52,8 @@ const LoadedPolygon = ({polygons, openDataPage}) => {
                             updatePolygonSave(polygon, e);
                         },
                         click: (e) => {
-                            console.log(e.target._leaflet_id+"clicked");
-                            findSelectedPolygon(e.target._leaflet_id);
-                            openDataPage(polygon);
+                            console.log(e.target._leaflet_id+"clicked");                            
+                            openDataPage(findSelectedPolygon(e.target._leaflet_id));
                         }
                     }}/>                 
                 ))
