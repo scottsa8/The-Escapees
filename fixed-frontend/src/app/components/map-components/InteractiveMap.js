@@ -163,13 +163,6 @@ const InteractiveMap = () => {
                 {/* Get data from OSM */}
                 <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
 
-                {/* Add a marker to the center of the map */}
-                <Marker position={lancasterPrisonLongLat}>
-                    <Popup>
-                        Hello World!
-                    </Popup>
-                </Marker>
-
                 {/* Loads any polygons added to local storage */}
                 {savedData && <LoadedPolygon polygons={polygons} openDataPage = {openDataPage}/>}
                 
