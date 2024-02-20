@@ -19,10 +19,11 @@ const RoomInfoPopup = ({polygonClicked}) => {
         for(let i=0; i<keys.length; i++){
             
             if(keys[i] === ("polygon"+polyID)){
-                console.log("Found polygon");
+                //console.log("Found polygon");
                 try{
                     let polyData = JSON.parse(localStorage.getItem(keys[i]));
                     selectedName = polyData.name;
+                    console.log("Found "+selectedName);
                     break;
                 }catch(e){
                     

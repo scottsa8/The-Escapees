@@ -36,7 +36,6 @@ export default function EnviromentContainer(){
 
     const getLocations = async () => {
         let allRooms =[];
-        let allRooms =[];
         try{
             const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
             const data = await response.json();

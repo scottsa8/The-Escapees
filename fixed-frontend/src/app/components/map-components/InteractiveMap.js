@@ -26,6 +26,12 @@ const InteractiveMap = () => {
         setShowDataBox(false);
     };
 
+    const openDataPage = (polygon) => {
+        setSelectedPolygon(polygon);
+        console.log("opening "+polygon.id);
+        setShowDataBox(true);
+    }
+
     //Re-write the polygon list to not have any duplicate polygons
     function removeDoubleSaves(polygonList){ 
 
@@ -136,7 +142,6 @@ const InteractiveMap = () => {
         return(loadSavedPolygons());
     },[]);
 
-
     return ( 
         <div>
             <MapContainer className="interactive-map" center={lancasterPrisonLongLat} zoom = {zoom} scrollWheelZoom={true}>
@@ -165,7 +170,7 @@ const InteractiveMap = () => {
                 </Marker>
 
                 {/* Loads any polygons added to local storage */}
-                {savedData && <LoadedPolygon polygons={polygons}/>}
+                {savedData && <LoadedPolygon polygons={polygons} openDataPage = {openDataPage}/>}
                 
 
             </MapContainer>
