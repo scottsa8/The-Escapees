@@ -20,7 +20,6 @@ function RoomCard({ roomName, onClick, isSelected}) {
       : (guardCount <= inmateCount * 0.25 && inmateCount !== 0)
           ? { backgroundColor: '#5c251a', cursor: 'pointer' } 
           : { cursor: 'pointer' };
-
     return (
       <div onClick={onClick} style={cardStyle} className="bg-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 dark:bg-gray-700 dark:text-blue-100">
         <h2 className="text-xl font-semibold text-gray-600 dark:text-blue-300">{`${roomName}`}</h2>

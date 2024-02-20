@@ -48,7 +48,7 @@ const theme = useTheme(mantineTheme);
 
   
   return ( 
-    <div className="grow">
+    <div className="grow pl-5">
       {/* The table containing location data */}
       <input 
         type="text" 
