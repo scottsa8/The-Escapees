@@ -6,11 +6,13 @@ function RoomCard({ roomName, onClick, isSelected}) {
     const [guardCount,setGuardCount] = useState(0)
 
     useEffect(() => {
-      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${roomName}&type=inmate`)
+      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${roomName}&type=inmate`,
+      {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
         .then(response => response.json())
         .then(num => setInmateCount(num));
         
-      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${roomName}&type=guard`)
+      fetch(`http://${network.ip}:${network.port}/getPeople?loc=${roomName}&type=guard`,
+      {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
         .then(response => response.json())
         .then(num => setGuardCount(num));
       }, []);
@@ -35,7 +37,8 @@ export default function LocationCountBox({onRoomClick}){
     const [selectedRoom, setSelectedRoom] = useState("Room1");
 
     useEffect(() => {
-      fetch(`http://${network.ip}:${network.port}/getRooms`)
+      fetch(`http://${network.ip}:${network.port}/getRooms`,
+      {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
         .then(response => response.json())
         .then(data => {
           const roomNames = data.rooms.data

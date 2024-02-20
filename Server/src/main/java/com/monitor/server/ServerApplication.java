@@ -16,7 +16,7 @@ import java.util.Map;
 @EnableScheduling
 @SpringBootApplication
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class ServerApplication {
 	private static final String PASSWORD = "35c4p335!";
 	private static String URL = "jdbc:mysql://localhost:3306/?useSSL=FALSE&allowPublicKeyRetrieval=True";
