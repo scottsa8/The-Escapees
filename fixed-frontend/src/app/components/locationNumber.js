@@ -15,7 +15,11 @@ function RoomCard({ roomName, onClick, isSelected}) {
         .then(num => setGuardCount(num));
       }, []);
 
-    const cardStyle = isSelected ? {color: 'DBE9FE', backgroundColor: '#1B2030', cursor: 'pointer' } : { cursor: 'pointer' };
+      const cardStyle = isSelected 
+      ? {color: 'DBE9FE', backgroundColor: '#1B2030', cursor: 'pointer' } 
+      : (guardCount <= inmateCount * 0.25 && inmateCount !== 0)
+          ? { backgroundColor: '#5c251a', cursor: 'pointer' } 
+          : { cursor: 'pointer' };
 
     return (
       <div onClick={onClick} style={cardStyle} className="bg-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 dark:bg-gray-700 dark:text-blue-100">
@@ -43,7 +47,7 @@ export default function LocationCountBox({onRoomClick}){
     }, []);
 
     return(
-      <div className="w-full min-w-0 flex flex-wrap justify-start space-between">
+      <div className="w-full pl-4 min-w-0 flex flex-wrap justify-start space-between">
           {locations.map(room => (
           <RoomCard key={room} roomName={room} onClick={() => {setSelectedRoom(room); onRoomClick(room);}} isSelected={selectedRoom === room}/>
           ))}
