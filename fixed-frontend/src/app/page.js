@@ -7,6 +7,8 @@ import Image from "next/image";
 import "./main.css"
 import { network } from './layout';
 import {setCookie} from './components/cookies'
+// import { ReactComponentElement as SettingsImage } from '../../public/settings-cog.svg';
+// import settingsimage from '/public/settings-cog.svg';
 
 
 export default function Login() {
@@ -14,10 +16,17 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [showPopup2, setShowPopup2] = useState(false);
+  const [ip, setIP] = useState(network.ip);
+  const [port, setPort] = useState(network.port);
+
+  const [isSettingsOpen,setSettingsOpen] = useState(false)
+
   const router = useRouter();
 
   const usernameId = useId();
   const passwordId = useId();
+  const ipId = useId();
+  const portId = useId();
 
   // const login = async (username, password) => {
   //   console.log("Validating")
@@ -30,6 +39,10 @@ export default function Login() {
   //     return false;
   //   }
   // };
+
+  const toggleSettings = () => {
+    setSettingsOpen(!isSettingsOpen)
+  }
 
   const login = async (username, password) => {
     try {
@@ -78,6 +91,13 @@ export default function Login() {
     }
   };
 
+  const handleNetworkSave = () => {
+    console.log("IP: %s", ip )
+    console.log("Port: %s", port)
+    network.ip = ip;
+    network.port = port;
+  }
+
   // function handleModal(ip,port){
   //   console.log(`ip: ${ip}, port: ${port}`)
   // }
@@ -93,7 +113,7 @@ export default function Login() {
 
     
     <div className="flex items-center justify-center h-screen">
-      <div className="p-10 flex flex-col w-5/6 sm:mx-auto sm:max-w-md bg-gradient-to-r from-indigo-800 to-purple-950 text-sky-300 rounded-lg p-2">
+      <div className="p-10 flex flex-col w-5/6 sm:mx-auto sm:max-w-md bg-gradient-to-r from-indigo-800 to-purple-950 text-sky-200 rounded-lg p-2">
 
           <h2 className="pb-10 self-center">
               Sign in to your account
@@ -127,6 +147,32 @@ export default function Login() {
                   <button type="submit" className="bg-purple-700 m-4 w-full h-12 rounded-lg">Log In</button>
               </section>
           </form> 
+          <button aria-label='Network settings' className='flex justify-center text-center bg-purple-700 m-4 p-1  rounded-lg' onClick={toggleSettings}>
+
+            <Image src="/settings-cog.svg" className='filter invert' width={36} height={36} 
+            alt='Cog with 6 spokes'/>
+            <label>Network Settings</label>
+          </button>
+          {isSettingsOpen && (
+            <div className='flex flex-col min-h-48 sm:mx-auto' onSubmit={handleNetworkSave}>
+              <div id="input-fields" className="justify-between flex flex-col grow">    
+
+                <label htmlFor={ipId}> IP Address: </label>
+                      <input name="IP address" type="text"  
+                      className="ml-4 mr-4 mb-4 p-4 bg-black opacity-30 rounded-md"
+                      value={ip} onChange={e => setIP(e.target.value)} />
+
+                <label htmlFor={portId} className=""> Port:</label>
+                <input name="Port" type="text" 
+                      maxLength={4}
+                      className="ml-4 mr-4 mb-4 p-4 bg-black opacity-30 rounded-md"
+                      value={port} onChange={e => setPort(e.target.value)} />
+              </div>
+              <section className="flex flex-row-reverse justify-between">
+                <button onClick={handleNetworkSave}  className="bg-purple-700 m-4 w-full h-12 rounded-lg">Save</button>
+              </section>
+            </div>
+          )}
       </div>
     </div>
   );

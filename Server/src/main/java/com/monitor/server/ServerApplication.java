@@ -71,16 +71,22 @@ public class ServerApplication {
 		}
 	}
 
-	@Scheduled(cron = "0 */2 * ? * *")
-	private void cleanup(){
-		System.out.println("cleaning up");
-		monitor.stop();
-		monitor=null;
-		try{
-			monitor= new SerialMonitor(connection);
-			monitor.start();
-		} catch (Exception e) {
-			//e.printStackTrace();
+//	@Scheduled(cron = "0 */2 * ? * *")
+//	private void cleanup(){
+//		System.out.println("cleaning up");
+//		monitor.stop();
+//		monitor=null;
+//		try{
+//			monitor= new SerialMonitor(connection);
+//			monitor.start();
+//		} catch (Exception e) {
+//			//e.printStackTrace();
+//		}
+//	}
+	@GetMapping("/panic")
+	private void panic(@RequestParam(value="alarmed")boolean alarmed){
+		if(alarmed){
+			//set off alarm
 		}
 	}
 	@GetMapping("/getAllNames")
@@ -124,7 +130,7 @@ public class ServerApplication {
 
 				// Fetch records from roomEnvironment using the obtained room_id
 				PreparedStatement selectStatement = connection.prepareStatement(
-						"SELECT * FROM roomEnvironment WHERE room_id = ?"
+						"SELECT * FROM roomEnvironment WHERE room_id = ? ORDER BY timestamp DESC"
 				);
 				selectStatement.setInt(1, roomId);
 
@@ -158,7 +164,7 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/getPeople")
-	private int getPeople(@RequestParam(value="loc") String loc, @RequestParam(value="type", required=false, defaultValue="user") String type) {
+	private int getPeople(@RequestParam(value="loc") String loc, @RequestParam(value="type", required=false, defaultValue="inmate") String type) {
 		int total = 0;
 
 		try (PreparedStatement selectStatement = connection.prepareStatement(

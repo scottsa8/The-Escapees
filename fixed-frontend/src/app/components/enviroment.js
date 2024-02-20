@@ -10,7 +10,7 @@ import LocationCountBox from "./locationNumber";
 const EnviromentBox = ({ measurement, value }) => {
     return (
         <div className="flex flex-col items-center p-4 bg-transparent">
-            <Dial value={value} min={0} max={40} onMaxValue={() => {
+            <Dial value={value} min={0} max={100} onMaxValue={() => {
                 sendNotification('Max Value Reached', { body: `Measurement: ${measurement}, Value: ${value}`});
             }}/>
             <span className="text-lg font-medium mt-2">{measurement}</span>
@@ -26,14 +26,16 @@ export default function EnviromentContainer(){
         light: "0",
         noise: "0"
       });
-
+    let timeout=0;
+    const debug=false;
     const handleRoomClick = (roomName) => {
-        console.log(`Room clicked: ${roomName}`);
+        if(debug){console.log(`Room clicked: ${roomName}`);}
         const room = locations.find(location => location.room === roomName);
         setSelectedLocation(room ? room : null);
     };
 
     const getLocations = async () => {
+        let allRooms =[];
         let allRooms =[];
         try{
             const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
@@ -51,7 +53,7 @@ export default function EnviromentContainer(){
             }
             return allRooms;
         }catch(error){
-            console.error("no rooms, server running?")
+            if(debug){console.error("no rooms, server running?")}
             let newValues = {
                 temp: "0",
                 noise: "0",
@@ -65,25 +67,35 @@ export default function EnviromentContainer(){
 
 
      const getEnvData = async () => {
-        try{
-            console.log("selectedLocation.room:"+selectedLocation.room)
+        let d= new Date();
+        let timeoutTime= d.toTimeString().split(" ")[0]
+        try{    
+            //console.log("selectedLocation.room:"+selectedLocation.room)
             const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`)        
             const data = await response.json();
-            //console.log("data:"+data['environment'])
             let data2 = data['environment'];
             let data3 = data2['data'];
             let realData = data3['0']; //index of the data you want from array 0 = most recent
-            console.log("realData:"+realData['Temperature'])
-            if(!realData['error']==""){
-                console.error("room, "+selectedLocation.name+" not found");
-                throw new Error("no room in DB")
+            let inTime = realData['Timestamp'].split(" ")[1].split(".")[0]
+            if(inTime!=timeoutTime){
+                timeout=timeout+1;
+                if(timeout>=3){
+                    if(debug){console.log("lost con")}
+                    throw new Error("lost connection")
+                }
             }else{
-                let newValues = {
-                    temp: realData['Temperature'],
-                    noise: realData['NoiseLevel'],
-                    light: realData['LightLevel']
-                };
-                setValues(newValues);         
+                if(!realData['error']==""){
+                    console.error("room, "+selectedLocation.name+" not found");
+                    throw new Error("no room in DB")
+                }else{
+                    timeout=0;
+                    let newValues = {
+                        temp: realData['Temperature'],
+                        noise: realData['NoiseLevel'],
+                        light: realData['LightLevel']
+                    };
+                    setValues(newValues);         
+                }
             }
         }catch(err){
             let newValues = {
@@ -100,18 +112,6 @@ export default function EnviromentContainer(){
     function handleLocationChange(value){
         setSelectedLocation(value);
     }
-    
-
-    // const splitString =  "Data ID: 1, Timestamp: 2023-01-31 16:00:00.0, Temperature: 25.00, Noise Level: 0.00, Light Level: 10.00!Data ID: 2, Timestamp: 2023-01-31 16:30:00.0, Temperature: 22.00, Noise Level: 1.00, Light Level: 5.00!".split("!");
-    // // console.log(JSON.parse(splitString[splitString.length - 1])) // Last element is most recent
-    // console.log(splitString[splitString.length - 1])
-    
-    // const list = async() => {
-    //     const response = await fetch("http://localhost:5500/getEnv");
-    //     const data = await response.json()
-    //     return data
-    // };
-    // console.log(list)
     
     useEffect(() => {
         getLocations().then(newLocations => {
@@ -134,7 +134,7 @@ export default function EnviromentContainer(){
                 getEnvData();
             });
         };
-        console.log("Updating....");
+        if(debug){console.log("Updating....");}
         fetchLocations();
 
         const interval = setInterval(() => {
@@ -156,8 +156,8 @@ export default function EnviromentContainer(){
 
     return (
         <div>
-            <div className="w-full flex flex-col items-center rounded p-2 m-0.5 bg-transparent">
-                <div className="w-full flex justify-center p-3 bg-transparent">
+            <div className="flex flex-col items-center p-2 bg-transparent">
+                {/* <div className="w-full flex justify-center p-3 bg-transparent">
                     <Listbox value={selectedLocation} onChange={handleLocationChange}>
                         <div className="flex flex-col justify-center w-24">
                             <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900 dark:text-blue-100">Location:</Listbox.Label>
@@ -175,8 +175,8 @@ export default function EnviromentContainer(){
                             </Listbox.Options>
                         </div>
                     </Listbox>
-                </div>
-                <div className="w-full flex justify-between bg-transparent dark:text-blue-100">
+                </div> */}
+                <div className="w-full flex justify-center bg-transparent dark:text-blue-100">
                     <EnviromentBox measurement="Temp" value={values["temp"]}/>
                     <EnviromentBox measurement="Light" value={values["light"]}/>
                     <EnviromentBox measurement="Noise" value={values["noise"]}/>

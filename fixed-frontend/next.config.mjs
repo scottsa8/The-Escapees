@@ -1,15 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // async redirects() {
-    //     return[
-    //         {
-    //             source: '/',
-    //             destination: '/dashboard',
-    //             permanent: false,
-            
-    //         }
-    //     ]
-    // }
+    output: "export",
+    typescript: {
+        ignoreBuildErrors: true,
+     },
 };
 
 // module.exports ={

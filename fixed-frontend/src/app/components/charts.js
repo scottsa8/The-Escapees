@@ -2,28 +2,28 @@
 
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { network } from "../layout";
 
 export default function Chart() {
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=cell1`);        
-  //       const data = await response.json();
-  //       let data2 = data['environment'];
-  //       let data3 = data2['data'];
+  const getEnvData = async () => {
+    const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=cell1`)        
+    const data = await response.json();
+    console.log(data)
+    let data2 = data['environment'];
+    let data3 = data2['data'];
+    let out =[]
+      for(let x=0;x<data3.length;x++){
+        let realData = data3[x]; //index of the data you want from array 0 = most recent
+        out.push({"timestamp":realData['Timestamp'],"name":"Room A","temp":realData['Temperature'],"noise":realData['NoiseLevel'],"light":realData['LightLevel']});  
+      }
+    console.log(out)
+  return out;   
         
-  //       setData(prevData => prevData.concat(data3));
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-  
-  //   fetchData();
-  // }, []);
-  // const [data, setData] = useState([]);
+ };
+
   const [selectedRoom, setSelectedRoom] = useState('Room A');
   const [selectedTimeRange, setSelectedTimeRange] = useState('24h');
-  const data = generateRandomData();
+  const data = getEnvData() //generateRandomData();
   const roomData = data.filter(item => item.name === selectedRoom);
   const timeRangeMs = {
     '24h': 24 * 60 * 60 * 1000,
@@ -42,20 +42,20 @@ export default function Chart() {
     setSelectedTimeRange(range);
   };
 
-  function generateRandomData() {
-    const data = [];
-    const startDate = new Date('2023-02-01T00:00:00').getTime();
-    for (let i = 0; i < 1000; i++) {
-      const timestamp = new Date(startDate + i  * 10 * 3600 * 1000);
-      if (timestamp > Date.now()) {break;}
-      const name = Math.random() < 0.5 ? 'Room A' : 'Room B';
-      const temp = Math.floor(Math.random() * 30);
-      const noise = Math.floor(Math.random() * (200-50)+50);
-      const light = Math.floor(Math.random() * (1000-200)+200);
-      data.push({ timestamp, name, temp, noise, light });
-    }
-    return data;
-  }
+  // function generateRandomData() {
+  //   const data = [];
+  //   const startDate = new Date('2023-02-01T00:00:00').getTime();
+  //   for (let i = 0; i < 1000; i++) {
+  //     const timestamp = new Date(startDate + i  * 10 * 3600 * 1000);
+  //     if (timestamp > Date.now()) {break;}
+  //     const name = Math.random() < 0.5 ? 'Room A' : 'Room B';
+  //     const temp = Math.floor(Math.random() * 30);
+  //     const noise = Math.floor(Math.random() * (200-50)+50);
+  //     const light = Math.floor(Math.random() * (1000-200)+200);
+  //     data.push({ timestamp, name, temp, noise, light });
+  //   }
+  //   return data;
+  // }
 
 
 
