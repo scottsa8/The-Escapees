@@ -112,7 +112,7 @@ public class ServerApplication {
 	}
 
 	@RequestMapping(value = "/getEnv", produces = MediaType.APPLICATION_JSON_VALUE)
-	private String getEnv(@RequestParam(value = "loc") String loc){
+	private String getEnv(@RequestParam(value = "loc") String loc,@RequestParam(value="order")String order){
 		StringBuilder output = new StringBuilder();
 		output.append("{\"environment\":{\"data\":[");
 
@@ -127,14 +127,24 @@ public class ServerApplication {
 			
 			if (roomIdResultSet.next()) {
 				int roomId = roomIdResultSet.getInt("room_id");
+				ResultSet rs;
+				if(order.equals("DESC")){
+					// Fetch records from roomEnvironment using the obtained room_id
+					PreparedStatement selectStatement = connection.prepareStatement(
+							"SELECT * FROM roomEnvironment WHERE room_id = ? ORDER BY timestamp DESC"
+					);
+					selectStatement.setInt(1, roomId);
+					rs = selectStatement.executeQuery();
+				}else{
+					// Fetch records from roomEnvironment using the obtained room_id
+					PreparedStatement selectStatement = connection.prepareStatement(
+							"SELECT * FROM roomEnvironment WHERE room_id = ? ORDER BY timestamp ASC"
+					);
+					selectStatement.setInt(1, roomId);
+					rs = selectStatement.executeQuery();
+				}
 
-				// Fetch records from roomEnvironment using the obtained room_id
-				PreparedStatement selectStatement = connection.prepareStatement(
-						"SELECT * FROM roomEnvironment WHERE room_id = ? ORDER BY timestamp DESC"
-				);
-				selectStatement.setInt(1, roomId);
 
-				ResultSet rs = selectStatement.executeQuery();
 
 				while (rs.next()) {
 					int dataId = rs.getInt("data_id");

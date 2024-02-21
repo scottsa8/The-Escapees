@@ -62,7 +62,7 @@ export default function EnviromentContainer(){
         let timeoutTime= d.toTimeString().split(" ")[0]
         try{    
             //console.log("selectedLocation.room:"+selectedLocation.room)
-            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`,
+            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}&order=DESC`,
             {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
             const data = await response.json();
             console.log(data)
@@ -170,9 +170,9 @@ export default function EnviromentContainer(){
                     </Listbox>
                 </div> */}
                 <div className="w-full flex flex-row flex-wrap justify-center bg-transparent dark:text-blue-100">
-                    <EnviromentBox measurement="Temp" value={values["temp"]}/>
-                    <EnviromentBox measurement="Light" value={values["light"]}/>
-                    <EnviromentBox measurement="Noise" value={values["noise"]}/>
+                    <EnvironmentBox measurement="Temp" value={values["temp"]}/>
+                    <EnvironmentBox measurement="Light" value={values["light"]}/>
+                    <EnvironmentBox measurement="Noise" value={values["noise"]}/>
                 </div>
             </div>
         <LocationCountBox onRoomClick={handleRoomClick} />
