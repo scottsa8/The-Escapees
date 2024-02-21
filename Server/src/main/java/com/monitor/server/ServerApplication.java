@@ -90,14 +90,15 @@ public class ServerApplication {
 			//e.printStackTrace();
 		}
 	}
-@GetMapping("/panic")
-    private String triggerPanic() {
-        if (monitor != null) {
-            monitor.panic();
-            return "Panic function triggered successfully";
-        } else {
-            return "Microbit not available";
-        }
+	@GetMapping("/panic")
+		private String triggerPanic() {
+		if (monitor != null) {
+			monitor.panic();
+			return "Panic function triggered successfully";
+		} else {
+			return "Microbit not available";
+		}
+	}
 	@GetMapping("/getAllNames")
 	private String getAllNames(){
 		StringBuilder output = new StringBuilder();
