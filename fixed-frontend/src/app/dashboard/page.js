@@ -64,12 +64,12 @@ const Dashboard = () => {
         </div>
 
         {/* Used to navigate pages */}
-        <div className='topbar sm:sidebar'>
-          <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.homePage)}>Home <HomeIcon/></button>
-          <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.individualLocations)}>Locations <LocPin/></button>
-          <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.interactiveMap)}>Map <MapIcon/></button>
-          <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.charts)}>Analytics <AnalyticsIcon/></button>
-          <button className="topbar-button sm:sidebar-button" onClick={() => setView(views.settings)}>Settings <SettingsIcon/></button>
+        <div className='topbar md:sidebar'>
+          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.homePage)}>Home <HomeIcon/></button>
+          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.individualLocations)}>Locations <LocPin/></button>
+          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.interactiveMap)}>Map <MapIcon/></button>
+          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.charts)}>Analytics <AnalyticsIcon/></button>
+          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.settings)}>Settings <SettingsIcon/></button>
         </div>
 
         {/* Where the screen contents are shown */}
