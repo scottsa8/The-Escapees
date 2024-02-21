@@ -65,6 +65,7 @@ export default function EnviromentContainer(){
             const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`,
             {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
             const data = await response.json();
+            console.log(data)
             let data2 = data['environment'];
             let data3 = data2['data'];
             let realData = data3['0']; //index of the data you want from array 0 = most recent

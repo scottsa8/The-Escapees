@@ -71,18 +71,18 @@ public class ServerApplication {
 		}
 	}
 
-//	@Scheduled(cron = "0 */2 * ? * *")
-//	private void cleanup(){
-//		System.out.println("cleaning up");
-//		monitor.stop();
-//		monitor=null;
-//		try{
-//			monitor= new SerialMonitor(connection);
-//			monitor.start();
-//		} catch (Exception e) {
-//			//e.printStackTrace();
-//		}
-//	}
+	@Scheduled(cron = "0 */2 * ? * *")
+	private void cleanup(){
+		System.out.println("cleaning up");
+		monitor.stop();
+		monitor=null;
+		try{
+			monitor= new SerialMonitor(connection);
+			monitor.start();
+		} catch (Exception e) {
+			//e.printStackTrace();
+		}
+	}
 	@GetMapping("/panic")
 	private void panic(@RequestParam(value="alarmed")boolean alarmed){
 		if(alarmed){
