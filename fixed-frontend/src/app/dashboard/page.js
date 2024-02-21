@@ -75,6 +75,7 @@ const Dashboard = () => {
         {/* Where the screen contents are shown */}
         <div className="card-container p-4">
           {currentView.page}
+          <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600">Panic</button>
         </div>
       </body>
    );
