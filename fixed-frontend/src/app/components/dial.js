@@ -1,9 +1,8 @@
 import React from "react";
 import { useState, useEffect } from "react";
 
-function Dial({ value, min, max, onMaxValue }) {
+function Dial({ value, min, max, onMaxValue, size = 170 }) {
 
-    const size = 170; 
     const strokeWidth = 5; 
     const radius = (size-20 - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;

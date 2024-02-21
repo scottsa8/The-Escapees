@@ -168,10 +168,10 @@ export default function EnviromentContainer(){
                         </div>
                     </Listbox>
                 </div> */}
-                <div className="w-full flex flex-col sm:flex-row justify-center bg-transparent dark:text-blue-100">
-                    <EnvironmentBox size={dialSize} measurement="Temp" value={values["temp"]}/>
-                    <EnvironmentBox size={dialSize} measurement="Light" value={values["light"]}/>
-                    <EnvironmentBox size={dialSize} measurement="Noise" value={values["noise"]}/>
+                <div className="w-full flex flex-row flex-wrap justify-center bg-transparent dark:text-blue-100">
+                    <EnviromentBox size={dialSize} measurement="Temp" value={values["temp"]}/>
+                    <EnviromentBox size={dialSize} measurement="Light" value={values["light"]}/>
+                    <EnviromentBox size={dialSize} measurement="Noise" value={values["noise"]}/>
                 </div>
             </div>
         <LocationCountBox onRoomClick={handleRoomClick} />
