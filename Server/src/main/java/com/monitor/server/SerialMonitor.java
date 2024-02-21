@@ -148,12 +148,15 @@ public class SerialMonitor {
                     }
                 }                               
                 else if (packetType == 2) { //env
-                    if(sensorData.length>5){return;}
+                    if (sensorData.length > 5) {
+                        return;
+                    }
+                
                     String microbitName = sensorData[1];
                     String temperature = sensorData[2];
                     BigDecimal lightLevel = new BigDecimal(sensorData[3]).setScale(2, RoundingMode.HALF_EVEN);
                     String noiseLevel = sensorData[4];
-
+                
                     try {
                         // Retrieve room_id based on room_microbit
                         PreparedStatement selectRoomIdStatement = connection.prepareStatement(
@@ -164,16 +167,26 @@ public class SerialMonitor {
                 
                         // Check if a room with the specified microbitName exists
                         if (roomResult.next()) {
-                            int roomID = roomResult.getInt("room_id");                
+                            int roomID = roomResult.getInt("room_id");
+                
+                            // Scale temperature to the range [0, 100]
+                            int scaledTemperature = (int) ((Double.parseDouble(temperature) / MAX_TEMPERATURE) * 100);
+                
+                            // Scale noise level to the range [0, 100]
+                            int scaledNoiseLevel = (int) ((Double.parseDouble(noiseLevel) / MAX_NOISE_LEVEL) * 100);
+                
+                            // Scale light level to the range [0, 100]
+                            int scaledLightLevel = (int) ((lightLevel.doubleValue() / MAX_LIGHT_LEVEL) * 100);
+                
                             // Insert data into the database
                             PreparedStatement insertStatement = connection.prepareStatement(
                                 "INSERT INTO roomEnvironment (room_id, timestamp, temperature, noise_level, light_level) VALUES (?, ?, ?, ?, ?)"
                             );
                             insertStatement.setInt(1, roomID);
                             insertStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
-                            insertStatement.setBigDecimal(3, new BigDecimal(temperature));
-                            insertStatement.setBigDecimal(4, new BigDecimal(noiseLevel));
-                            insertStatement.setBigDecimal(5, lightLevel);
+                            insertStatement.setInt(3, scaledTemperature);
+                            insertStatement.setInt(4, scaledNoiseLevel);
+                            insertStatement.setInt(5, scaledLightLevel);
                             insertStatement.executeUpdate();
                         } else {
                             // Handle the case where the microbitName does not correspond to any room
@@ -182,7 +195,7 @@ public class SerialMonitor {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                }
+                }                
                 else if (packetType == 3) { // head count update
                     String roomMicrobit = sensorData[1];
                     try {
