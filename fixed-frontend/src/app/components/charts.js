@@ -3,26 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { network } from "../layout";
+import RoomSelector from './roomSelector';
 
 export default function Chart() {
   const [data, setData] = useState([]);
   const [selectedTimeRange, setSelectedTimeRange] = useState('24h');
-  const [locations, setLocations] = useState([]);
-  const [selectedRoom, setSelectedRoom] = useState("");
 
 
-  useEffect(() => {
-    fetch(`http://${network.ip}:${network.port}/getRooms`,
-    {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
-      .then(response => response.json())
-      .then(data => {
-        const roomNames = data.rooms.data
-        .map(roomObj => roomObj.room)
-        .filter(roomName => !roomName.includes('gate'));
-        setLocations(roomNames);
-        setSelectedRoom(roomNames[3]);
-      });
-  }, []);
+
+  const [selectedRoom, setSelectedRoom] = useState(null);
+
+  const handleLocationChange = (newLocation) => {
+    setSelectedRoom(newLocation);
+  };
+
   
 
   const getEnvData = async () => {
@@ -65,9 +59,6 @@ export default function Chart() {
   };
   const filteredData = roomData.filter(item => Date.now() - item.timestamp <= timeRangeMs[selectedTimeRange]);
   
-  const handleRoomChange = (e) => {
-    setSelectedRoom(e.target.value);
-  };
 
   const handleTimeRangeChange = (range) => {
     setSelectedTimeRange(range);
@@ -91,11 +82,7 @@ export default function Chart() {
   return (
     <div className="card-container">
       <div className="flex justify-end mb-5">
-      <select value={selectedRoom} onChange={handleRoomChange} className="p-2 border rounded-md shadow-md">
-        {locations.map((location, index) => (
-          <option key={index} value={location}>{location}</option>
-        ))}
-      </select>
+        <RoomSelector onLocationChange={handleLocationChange} />
       </div>
       <ResponsiveContainer aspect={3} width="55%">
         <LineChart data={filteredData} key={data.length}>
