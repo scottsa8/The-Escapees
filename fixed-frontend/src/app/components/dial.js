@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 
-function Dial({ value, min, max, onMaxValue, size = 170 }) {
+function Dial({className, value, min, max, onMaxValue, size = 170 }) {
 
     const strokeWidth = 5; 
     const radius = (size-20 - strokeWidth) / 2;
@@ -18,7 +18,7 @@ function Dial({ value, min, max, onMaxValue, size = 170 }) {
     
 
     return (
-        <div className="dial-container">
+        <div className={className}>
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block">
                 {/* circle */}
                 <circle

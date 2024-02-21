@@ -18,6 +18,7 @@ export default function EnviromentContainer(){
       });
     let timeout=0;
     const dialSize = 170;
+    const dialClassName="dial-container";
     const debug=false;
     const handleRoomClick = (roomName) => {
         if(debug){console.log(`Room clicked: ${roomName}`);}
@@ -170,9 +171,9 @@ export default function EnviromentContainer(){
                     </Listbox>
                 </div> */}
                 <div className="w-full flex flex-row flex-wrap justify-center bg-transparent dark:text-blue-100">
-                    <EnvironmentBox size={dialSize} measurement="Temp" value={values["temp"]}/>
-                    <EnvironmentBox size={dialSize} measurement="Light" value={values["light"]}/>
-                    <EnvironmentBox size={dialSize} measurement="Noise" value={values["noise"]}/>
+                    <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Temp" value={values["temp"]}/>
+                    <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Light" value={values["light"]}/>
+                    <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Noise" value={values["noise"]}/>
                 </div>
             </div>
         <LocationCountBox onRoomClick={handleRoomClick} />

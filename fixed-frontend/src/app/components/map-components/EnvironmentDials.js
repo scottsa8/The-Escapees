@@ -5,7 +5,8 @@ import { getCookie } from "../cookies";
 
 const EnvironmentDials = ({roomName}) => {
 
-    const dialSize = 10;
+    const dialSize = 80;
+    const dialClassName = "map-dial-container"
     const [values, setValues] = useState({
         temp: "0",
         light: "0",
@@ -113,9 +114,9 @@ const EnvironmentDials = ({roomName}) => {
 
     return ( 
         <div className="w-full flex flex-col sm:flex-row justify-center bg-transparent dark:text-blue-100">
-            <EnvironmentBox size = {dialSize} measurement="Temp" value={values["temp"]}/>
-            <EnvironmentBox size = {dialSize} measurement="Light" value={values["light"]}/>
-            <EnvironmentBox size = {dialSize} measurement="Noise" value={values["noise"]}/>
+            <EnvironmentBox dialClassName={dialClassName} size = {dialSize} measurement="Temp" value={values["temp"]}/>
+            <EnvironmentBox dialClassName={dialClassName} size = {dialSize} measurement="Light" value={values["light"]}/>
+            <EnvironmentBox dialClassName={dialClassName} size = {dialSize} measurement="Noise" value={values["noise"]}/>
         </div>
     );
 }
