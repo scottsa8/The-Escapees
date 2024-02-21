@@ -169,14 +169,11 @@ public class SerialMonitor {
                         if (roomResult.next()) {
                             int roomID = roomResult.getInt("room_id");
                 
-                            // Scale temperature to the range [0, 100]
-                            int scaledTemperature = (int) ((Double.parseDouble(temperature) / MAX_TEMPERATURE) * 100);
-                
                             // Scale noise level to the range [0, 100]
-                            int scaledNoiseLevel = (int) ((Double.parseDouble(noiseLevel) / MAX_NOISE_LEVEL) * 100);
+                            int scaledNoiseLevel = (int) ((Double.parseDouble(noiseLevel) / 100) * 100);
                 
                             // Scale light level to the range [0, 100]
-                            int scaledLightLevel = (int) ((lightLevel.doubleValue() / MAX_LIGHT_LEVEL) * 100);
+                            int scaledLightLevel = (int) ((lightLevel.doubleValue() / 100) * 100);
                 
                             // Insert data into the database
                             PreparedStatement insertStatement = connection.prepareStatement(
@@ -184,7 +181,7 @@ public class SerialMonitor {
                             );
                             insertStatement.setInt(1, roomID);
                             insertStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
-                            insertStatement.setInt(3, scaledTemperature);
+                            insertStatement.setString(3, temperature);
                             insertStatement.setInt(4, scaledNoiseLevel);
                             insertStatement.setInt(5, scaledLightLevel);
                             insertStatement.executeUpdate();
@@ -195,7 +192,7 @@ public class SerialMonitor {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                }                
+                }                               
                 else if (packetType == 3) { // head count update
                     String roomMicrobit = sensorData[1];
                     try {
