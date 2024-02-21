@@ -54,8 +54,9 @@ const Dashboard = () => {
   }, []);
 
   return (
-
-    <body>
+    <>
+      <title>Dashboard - Prison System</title>
+      <body>
         
 
         <div className="banner">
@@ -78,7 +79,8 @@ const Dashboard = () => {
           {currentView.page}
           <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600"
             onClick={() => {
-              fetch(`http://${network.ip}:${network.port}/panic`)
+              fetch(`http://${network.ip}:${network.port}/panic`,
+              {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
               .catch((error) => {
                 console.error('Error:', error);
               });
@@ -86,6 +88,7 @@ const Dashboard = () => {
           >Panic</button>
         </div>
       </body>
+    </>
    );
 }
 export default Dashboard;

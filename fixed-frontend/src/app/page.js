@@ -7,6 +7,7 @@ import Image from "next/image";
 import "./main.css"
 import { network } from './layout';
 import {setCookie} from './components/cookies'
+import Head from 'next/head';
 // import { ReactComponentElement as SettingsImage } from '../../public/settings-cog.svg';
 // import settingsimage from '/public/settings-cog.svg';
 
@@ -112,7 +113,8 @@ export default function Login() {
     //     <button type="submit">Login</button>
     //   </form>
     // </div>
-
+    <>
+      <title>Login - Prison System</title>
     
     <div className="flex items-center justify-center h-screen">
       <div className="p-10 flex flex-col w-5/6 sm:mx-auto sm:max-w-md bg-gradient-to-r from-indigo-800 to-purple-950 text-sky-200 rounded-lg">
@@ -177,5 +179,6 @@ export default function Login() {
           )}
       </div>
     </div>
+    </>
   );
 }
