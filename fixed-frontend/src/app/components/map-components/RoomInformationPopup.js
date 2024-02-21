@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import EnvironmentDials from "./EnvironmentDials";
+import RoomSelector from "../roomSelector";
 
 const RoomInfoPopup = ({polygonClicked}) => {
 
@@ -49,6 +50,13 @@ const RoomInfoPopup = ({polygonClicked}) => {
         }
     }
 
+    const handleLocationChange = (newLocation) => {
+        console.log(newLocation+" selected");
+        setRoomName(newLocation);
+        setNameAdded(true);
+        savePolygon(newLocation);
+    };
+
     //Ran ons 1st load
     useEffect(() => {
         
@@ -61,14 +69,15 @@ const RoomInfoPopup = ({polygonClicked}) => {
             {!nameAdded && <label>
                 Please enter the room name: 
                 {/* Needs to be changed to a drop down with names */}
-                <input type="text"></input>
+                {/* <input type="text"></input>
                 <button onClick={(e) => {
                     const newName = e.target.parentNode.childNodes[1].value
                     setRoomName(newName);
                     setNameAdded(true);
                     savePolygon(newName);
 
-                }}>Enter</button>
+                }}>Enter</button> */}
+                <RoomSelector onLocationChange={handleLocationChange}></RoomSelector>
                 
             </label>}
 
