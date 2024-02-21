@@ -6,23 +6,45 @@ count = 0
 arrivedTime = 0
 
 TIMEOUT = 2000
+PACKET_SIZE = 16
 
 #will check for any requests wanting to be sent from the server to other micro:bits
 def sendDataFromServer():
+    radio.config(channel=22)
     if uart.any():
-        data = uart.readline()
-        decodedMessage = data.decode('utf-8').strip()
-        display.scroll(decodedMessage)
-        message = str(decodedMessage)
+        uart.init(115200, 8, None, 1)
+        data = uart.read()
+        decodedMessage = data.decode('utf-8')
+        decodedMessage = str(decodedMessage)
+        # display.scroll(decodedMessage)
+        if "PANIC" in decodedMessage:
+            radio.send(decodedMessage)
+        
+        # Split the message into components
+        # components = decodedMessage.split(',')
+        # if len(components) >= 3:
+        #     name = components[0]
+        #     alert_level = components[1]
+        #     message = ','.join(components[2:])
+        
+        # # Split the message into packets of size PACKET_SIZE
+        # for packet_number, packet_start in enumerate(range(0, len(message), PACKET_SIZE)):
+        #     packet_end = packet_start + PACKET_SIZE
+        #     packet = message[packet_start:packet_end]
+            
+        #     # Prepend the name and packet number to each packet
+        #     if packet_number == 0:
+        #         packetWithPrefix = name + "," + alert_level + "," + str(packet_number) + "," + packet
+        #     else:
+        #         packetWithPrefix = name + "," + str(packet_number) + "," + packet
 
-        radio.config(channel=13)
-        radio.send(message)
-        radio.config(channel=21)
+        #     display.scroll(packet)
+        #     radio.send(packetWithPrefix)
+    radio.config(channel=21)
 
 def findEntries():
     global entriesLog
     global count
-
 
     if(entriesLog[0] != entriesLog[1]):
         #someone has entered room side entrieslog[1]
@@ -49,7 +71,6 @@ def logEntries(name):
 
 
 def main():
-
     global count
     global entriesLog
     global arrivedTime
@@ -65,7 +86,6 @@ def main():
         sendDataFromServer()
         
         currentTime = running_time()
-
         timePassed = currentTime - arrivedTime
 
         if(timePassed > TIMEOUT):
@@ -77,7 +97,6 @@ def main():
             if(messageArr[0] == "99"):
                 logEntries(messageArr[1])
                 arrivedTime = running_time()
-                
             else:
                 print(message)
 main()
