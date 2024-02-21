@@ -170,7 +170,7 @@ public class SerialMonitor {
                             int roomID = roomResult.getInt("room_id");
                 
                             // Scale noise level to the range [0, 100]
-                            int scaledNoiseLevel = (int) ((Double.parseDouble(noiseLevel) / 250) * 100);
+                            int scaledNoiseLevel = (int) ((Double.parseDouble(noiseLevel) / 100) * 100);
                 
                             // Scale light level to the range [0, 100]
                             int scaledLightLevel = (int) ((lightLevel.doubleValue() / 1000) * 100);
