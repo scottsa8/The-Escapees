@@ -1,54 +1,57 @@
+// TODO: Style popups
+
 import React, { useEffect, useState } from "react";
 import { network } from "../layout";
-import {Table, Header, HeaderRow, Body, Row, HeaderCell, Cell,} from '@table-library/react-table-library/table';
+import { Table, Header, HeaderRow, Body, Row, HeaderCell, Cell, } from '@table-library/react-table-library/table';
 import { useTheme } from '@table-library/react-table-library/theme';
-import {DEFAULT_OPTIONS, getTheme} from '@table-library/react-table-library/mantine';
-import {fetchUpdateDelay} from './cookies'
-
-
-const nodes = [];
+import { DEFAULT_OPTIONS, getTheme } from '@table-library/react-table-library/mantine';
+import { fetchUpdateDelay } from './cookies'
+import { get } from "http";
 
 //Table containing the locations of users
-
-const LocationTable = () => {
+const LocationTable = () => { 
   const mantineTheme = getTheme(DEFAULT_OPTIONS);
-const theme = useTheme(mantineTheme);
+  const theme = useTheme(mantineTheme);
   const [nodes, setNodes] = useState([]);
-  const dataTable = {nodes};
   const [searchTerm, setSearchTerm] = useState("");
-  
-  useEffect(() => {
-    const getLocations = async () => {
-      const response = await fetch(`http://${network.ip}:${network.port}/listAll`,
-      {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}});
-      const data = await response.json();
-  
-      let data2 = data['locations'];
-      let realData = data2['data'];
-     
-      let newNodes = [];
-      
-      for(let i=0; i < realData.length; i++) {
-        let entry = realData[i];
-        console.log(entry)
-        console.log((new Date(entry['Timestamp'])))
-        newNodes.push({name:entry['user'],loc:entry['Location']});
+
+  const removeDuplicates = async (arr) => {
+    arr.sort((x, y) => new Date(y.Timestamp) - new Date(x.Timestamp));
+    let map = new Map();
+    for(let item of arr) {
+      if(!map.has(item.name)) {
+        map.set(item.name, item);
       }
-  
-      // Remove duplicates
-      newNodes = newNodes.filter((node, index, self) =>
-        index === self.findIndex((t) => (
-          t.name === node.name && t.loc === node.loc
-        ))
-      );
-  
-      setNodes(newNodes);
     }
+    return Array.from(map.values());
+  }
+
+  const getLocations = async () =>{
+    const response = await fetch(`http://${network.ip}:${network.port}/listAll`,
+    {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}});
+    const responseJson = await response.json();
+    return responseJson['locations']['data'];
+  }
   
-    // use update delay from coookies (set on settings page)
-    const interval = setInterval(getLocations, fetchUpdateDelay());
-  
-    return () => clearInterval(interval);
+  const getCurrentLocations = async () => {
+    let newNodes = [];
+    let data = await getLocations();
+    for(let i=0; i < data.length; i++) {
+      let entry = data[i];
+      newNodes.push({name:entry['user'],loc:entry['Location'],Timestamp:entry['Timestamp']});
+    }
+    return await removeDuplicates(newNodes); 
+  };
+
+  const getAllLocations = async (user) => {
+    let data = await getLocations();
+    let userLocations = data.filter(entry => entry['user'] === user);
+    return userLocations.map(entry => ({ name: entry['user'], loc: entry['Location'], Timestamp: entry['Timestamp'] }));
+  };
+    
+
+  useEffect(() => {
+    getCurrentLocations().then(newNodes => setNodes(newNodes));
   }, []);
 
   
@@ -62,7 +65,7 @@ const theme = useTheme(mantineTheme);
         onChange={(event) => setSearchTerm(event.target.value)}
         className="form-input p-4 my-2 border border-gray-300 rounded-md shadow-sm focus:outline-none dark:bg-gray-800 dark:text-gray-100"
       />
-      <Table data={dataTable} theme={theme}>
+      <Table data={{nodes}} theme={theme}>
         {(tableList) => (
           <>
           <Header>
@@ -77,7 +80,10 @@ const theme = useTheme(mantineTheme);
             .filter(item => item.name.includes(searchTerm) || item.loc.includes(searchTerm))
             .map((item) => (
               <Row key={item.name} item={item}>
-                <Cell>{item.name}</Cell>
+                <Cell onClick={async () => {
+                  let locations = await getAllLocations(item.name);
+                  alert(JSON.stringify(locations));}}>
+                {item.name}</Cell>
                 <Cell>{item.loc}</Cell>
               </Row>
           ))}
