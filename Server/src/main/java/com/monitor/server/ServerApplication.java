@@ -74,8 +74,6 @@ public class ServerApplication {
 		} catch (Exception e) {
 			System.out.println("no Microbit detected");
 		}
-		//transmitMessage(1, 1, "Hello, this is ethan and i just wanted /EOM/to say what a nice day it isnt.");
-		triggerPanic();
 	}
 	
 	@Scheduled(cron = "0 */2 * ? * *")

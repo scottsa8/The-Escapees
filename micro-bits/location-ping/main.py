@@ -154,7 +154,6 @@ def main():
         if message:
             message_str = message[0][3:].decode('utf-8')
             if "PANIC" in message_str and name in message_str:
-                display.scroll(message_str)
                 panic()
             message_data = message_str.split(',')
 
