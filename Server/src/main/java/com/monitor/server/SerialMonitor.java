@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SerialMonitor {
     private boolean DEBUG=true;
@@ -84,6 +86,10 @@ public class SerialMonitor {
                 String data = new String(delimitedMessage);
                 data = data.strip();
                 System.out.println("INPUT:" + data);
+                 if(data == "PANIC"){
+                    System.out.println("Panicking");
+                    panic();
+                }
                 String[] sensorData = data.split(",");
                 int packetType = Integer.parseInt(sensorData[0]);
                 if (packetType == 1) { //moving device
@@ -250,7 +256,29 @@ public class SerialMonitor {
             }
         });
     }
+    public void panic() {
+        try {
+            // Retrieve all users with type "guard"
+            PreparedStatement selectGuardsStatement = connection.prepareStatement(
+                    "SELECT user_microbit FROM users WHERE user_type = 'guard'"
+            );
+            ResultSet guardsResult = selectGuardsStatement.executeQuery();
 
+            List<String> guardMicrobits = new ArrayList<>();
+            while (guardsResult.next()) {
+                String guardMicrobit = guardsResult.getString("user_microbit");
+                guardMicrobits.add(guardMicrobit);
+            }
+
+            // Send "PANIC" message to all guard microbits
+            for (String guardMicrobit : guardMicrobits) {
+                String panicMessage = guardMicrobit + ",PANIC";
+                sendMessage(panicMessage);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     public void sendMessage(String message) {
         if (microbit != null && microbit.isOpen()) {
             try {
