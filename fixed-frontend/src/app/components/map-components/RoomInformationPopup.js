@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import EnvironmentDials from "./EnvironmentDials";
 import RoomSelector from "../roomSelector";
+import RoomCard from "../RoomCard";
 
 const RoomInfoPopup = ({polygonClicked}) => {
 
@@ -86,6 +87,7 @@ const RoomInfoPopup = ({polygonClicked}) => {
                 <div>
                     <h1>{roomName} Data</h1>
                     <EnvironmentDials roomName = {roomName}></EnvironmentDials>
+                    <RoomCard roomName={roomName} onClick={null} isSelected={null}></RoomCard>
                 </div>
             }
 
