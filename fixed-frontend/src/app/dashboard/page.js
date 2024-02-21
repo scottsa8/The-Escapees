@@ -53,8 +53,9 @@ const Dashboard = () => {
   }, []);
 
   return (
-
-    <body>
+    <>
+      <title>Dashboard - Prison System</title>
+      <body>
         
 
         <div className="banner">
@@ -77,6 +78,7 @@ const Dashboard = () => {
           {currentView.page}
         </div>
       </body>
+    </>
    );
 }
 export default Dashboard;
