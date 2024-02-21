@@ -168,20 +168,19 @@ const InteractiveMap = () => {
                 
 
             </MapContainer>
-            <div className="overlay-data-box">
-                {showDataBox && <div style={{
-                    position: "absolute",
-                    top: "200px",
-                    left: "100px",
-                    backgroundColor: "white",
-                    padding: "10px",
-                    borderRadius: "5px",
-                    zIndex: "1000"
-                }}>
-                    <RoomInfoPopup polygonClicked = {selectedPolygon}/>
-                    <button onClick={closeDataPage}>close x</button>
-                </div>}
-            </div>
+            
+            {showDataBox && <div style={{
+                position: "absolute",
+                top: "200px",
+                left: "100px",
+                backgroundColor: "white",
+                padding: "10px",
+                borderRadius: "5px",
+                zIndex: "1000"
+            }}>
+                <RoomInfoPopup polygonClicked = {selectedPolygon} />
+                <button onClick={closeDataPage}>close x</button>
+            </div>}
         </div>
      );
 }

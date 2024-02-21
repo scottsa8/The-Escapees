@@ -6,17 +6,8 @@ import { sendNotification } from "./notifications";
 import { getCookie } from "./cookies"
 import { get } from "http";
 import LocationCountBox from "./locationNumber";
+import EnvironmentBox from "./EnvironmentBox";
 
-const EnviromentBox = ({ measurement, value }) => {
-    return (
-        <div className="flex flex-col items-center p-4 bg-transparent">
-            <Dial value={value} min={0} max={100} onMaxValue={() => {
-                sendNotification('Max Value Reached', { body: `Measurement: ${measurement}, Value: ${value}`});
-            }}/>
-            <span className="text-lg font-medium mt-2">{measurement}</span>
-        </div>
-    );
-};
 
 export default function EnviromentContainer(){
     const [locations, setLocations] = useState([{name:""}]);
@@ -178,9 +169,9 @@ export default function EnviromentContainer(){
                     </Listbox>
                 </div> */}
                 <div className="w-full flex flex-col sm:flex-row justify-center bg-transparent dark:text-blue-100">
-                    <EnviromentBox measurement="Temp" value={values["temp"]}/>
-                    <EnviromentBox measurement="Light" value={values["light"]}/>
-                    <EnviromentBox measurement="Noise" value={values["noise"]}/>
+                    <EnvironmentBox measurement="Temp" value={values["temp"]}/>
+                    <EnvironmentBox measurement="Light" value={values["light"]}/>
+                    <EnvironmentBox measurement="Noise" value={values["noise"]}/>
                 </div>
             </div>
         <LocationCountBox onRoomClick={handleRoomClick} />
