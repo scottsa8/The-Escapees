@@ -4,7 +4,7 @@ import { network } from "../../layout";
 import { getCookie } from "../cookies";
 
 const EnvironmentDials = ({roomName}) => {
-    let timeout=0;
+    let timeout;
     const dialSize = 80;
     const dialClassName = "map-dial-container"
     const [values, setValues] = useState({
@@ -15,7 +15,20 @@ const EnvironmentDials = ({roomName}) => {
     const [locations, setLocations] = useState([{name:""}]);
     const [selectedLocation, setSelectedLocation] = useState(locations[0])
 
+    useEffect(() => {
+        const fetchUpdateDelay = () => {
+            const delay = getCookie('updateDelay');
+            return delay ? parseInt(delay, 10) * 1000 : 10000;
+        };
 
+        const fetchLocations = () => {
+            getEnvData();
+        };
+        const interval = setInterval(() => {
+            fetchLocations();
+        }, fetchUpdateDelay());
+        return () => clearInterval(interval);
+    }, []);
 
     //afte the popup loads?
     // const handleRoomClick = (roomName) => {
@@ -44,6 +57,7 @@ const EnvironmentDials = ({roomName}) => {
             }
             return allRooms;
         }catch(error){
+            if(debug){console.error("no rooms, server running?")}
             let newValues = {
                 temp: "0",
                 noise: "0",
@@ -63,36 +77,31 @@ const EnvironmentDials = ({roomName}) => {
             const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${roomName}&order=DESC`,
             {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
             const data = await response.json();
-           // console.log(data)
             let data2 = data['environment'];
             let data3 = data2['data'];
             let realData = data3['0']; //index of the data you want from array 0 = most recent
             let inTime = realData['Timestamp'].split(" ")[1].split(".")[0]
             if(inTime!=timeoutTime){
                 timeout=timeout+1;
-                if(timeout>=10){
+                if(timeout>=3){
                     if(debug){console.log("lost con")}
                     throw new Error("lost connection")
                 }
             }else{
-                console.log(!realData['error']=="")
                 if(!realData['error']==""){
                     console.error("room, "+roomName+" not found");
                     throw new Error("no room in DB")
                 }else{
                     timeout=0;
-                    console.log("asjkdadskj")
-                    console.log(realData['Temperature'])
                     let newValues = {
-                        temp: realData['Temperature'],
-                        noise: realData['NoiseLevel'],
-                        light: realData['LightLevel']
+                        temp: realData['Temperature'].split(".")[0],
+                        noise: realData['NoiseLevel'].split(".")[0],
+                        light: realData['LightLevel'].split(".")[0]
                     };
                     setValues(newValues);         
                 }
             }
         }catch(err){
-            console.log(err)
             let newValues = {
                 temp: "0",
                 noise: "0",
@@ -102,17 +111,7 @@ const EnvironmentDials = ({roomName}) => {
             return;
         }
     };
-    useEffect(() => {
-        const fetchUpdateDelay = () => {
-            const delay = getCookie('updateDelay');
-            return delay ? parseInt(delay, 10) * 1000 : 10000;
-        };
 
-        const interval = setInterval(() => {
-            getEnvData();
-        }, fetchUpdateDelay());
-        return () => clearInterval(interval);
-    }, []);
     return ( 
         <div className="w-full flex flex-col sm:flex-row justify-center bg-transparent dark:text-blue-100">
             <EnvironmentBox dialClassName={dialClassName} size = {dialSize} measurement="Temp" value={values["temp"]}/>
