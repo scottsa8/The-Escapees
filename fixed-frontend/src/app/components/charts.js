@@ -92,7 +92,27 @@ export default function Chart() {
           <Tooltip contentStyle={{ backgroundColor: '#435585', color: '#F5E8C7' }} />
           <Legend />
           <Line dataKey="noise" name="Noise" stroke="#82ca9d" />
+        </LineChart>
+      </ResponsiveContainer>
+
+      <ResponsiveContainer aspect={3} width="55%">
+        <LineChart data={filteredData} key={data.length}>
+          <CartesianGrid stroke="#ccc" />
+          <XAxis dataKey="timestamp"/>
+          <YAxis/>
+          <Tooltip contentStyle={{ backgroundColor: '#435585', color: '#F5E8C7' }} />
+          <Legend />
           <Line dataKey="temp" name="Temperature" stroke="#8884d8" />
+        </LineChart>
+      </ResponsiveContainer>
+
+      <ResponsiveContainer aspect={3} width="55%">
+        <LineChart data={filteredData} key={data.length}>
+          <CartesianGrid stroke="#ccc" />
+          <XAxis dataKey="timestamp"/>
+          <YAxis/>
+          <Tooltip contentStyle={{ backgroundColor: '#435585', color: '#F5E8C7' }} />
+          <Legend />
           <Line dataKey="light" name="Light" stroke="#FFA500" />
         </LineChart>
       </ResponsiveContainer>
