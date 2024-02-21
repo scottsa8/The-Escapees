@@ -20,7 +20,7 @@ export default function Chart() {
   
 
   const getEnvData = async () => {
-    const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedRoom}`,
+    const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedRoom}&order=ASC`,
     {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
     const data = await response.json();
     let data2 = data['environment'];
