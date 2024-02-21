@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
 import Dial from "./dial";
-import { sendNotification } from "./notifications";
 import { getCookie } from "./cookies"
 import { get } from "http";
 import LocationCountBox from "./locationNumber";
@@ -18,6 +17,7 @@ export default function EnviromentContainer(){
         noise: "0"
       });
     let timeout=0;
+    const dialSize = 170;
     const debug=false;
     const handleRoomClick = (roomName) => {
         if(debug){console.log(`Room clicked: ${roomName}`);}
@@ -65,6 +65,7 @@ export default function EnviromentContainer(){
             const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`,
             {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
             const data = await response.json();
+            console.log(data)
             let data2 = data['environment'];
             let data3 = data2['data'];
             let realData = data3['0']; //index of the data you want from array 0 = most recent
@@ -168,6 +169,10 @@ export default function EnviromentContainer(){
                         </div>
                     </Listbox>
                 </div> */}
+                <div className="w-full flex flex-row flex-wrap justify-center bg-transparent dark:text-blue-100">
+                    <EnviromentBox size={dialSize} measurement="Temp" value={values["temp"]} max="25"/>
+                    <EnviromentBox size={dialSize} measurement="Light" value={values["light"]} max="30"/>
+                    <EnviromentBox size={dialSize} measurement="Noise" value={values["noise"]} max="50"/>
                 <div className="w-full flex flex-col sm:flex-row justify-center bg-transparent dark:text-blue-100">
                     <EnvironmentBox measurement="Temp" value={values["temp"]} max="25"/>
                     <EnvironmentBox measurement="Light" value={values["light"]} max="30"/>
