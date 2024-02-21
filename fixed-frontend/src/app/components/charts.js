@@ -10,7 +10,7 @@ export default function Chart() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('24h');
 
   const isMobile = navigator.userAgent.includes("Android")
-  console.log(isMobile)
+  // console.log(isMobile)
 
   const [selectedRoom, setSelectedRoom] = useState(null);
 
@@ -86,7 +86,7 @@ export default function Chart() {
         <RoomSelector onLocationChange={handleLocationChange} />
       </div>
       <div className="flex flex-wrap flex-row">
-      <ResponsiveContainer aspect={3} width="45%">
+      <ResponsiveContainer aspect={3} width={isMobile?"100%":"45%"}>
         <LineChart data={filteredData} key={data.length}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>
@@ -97,7 +97,7 @@ export default function Chart() {
         </LineChart>
       </ResponsiveContainer>
 
-      <ResponsiveContainer aspect={3} width="45%">
+      <ResponsiveContainer aspect={3} width={isMobile?"100%":"45%"}>
         <LineChart data={filteredData} key={data.length}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>
@@ -108,7 +108,7 @@ export default function Chart() {
         </LineChart>
       </ResponsiveContainer>
 
-      <ResponsiveContainer aspect={3} width="45%">
+      <ResponsiveContainer aspect={3} width={isMobile?"100%":"45%"}>
         <LineChart data={filteredData} key={data.length}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>

@@ -55,6 +55,12 @@ const theme = useTheme(mantineTheme);
   return ( 
     <div className="grow pl-5">
       {/* The table containing location data */}
+      <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded relative" role="alert">
+              <strong className="font-bold">Senstive data warning</strong>
+              <span className="block">Unauthorised access and use of this data is a breach of the
+               General Data Protection Regulation and the Computer Missue Act. Failure to comply may result in legal action
+              </span>
+      </div>
       <input 
         type="text" 
         placeholder="Search" 
