@@ -1,7 +1,7 @@
 import 'leaflet/dist/leaflet.css'
 import "leaflet-defaulticon-compatibility"
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
-import { MapContainer, TileLayer, Marker, Popup, FeatureGroup, Polyline} from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, FeatureGroup, Polyline, ZoomControl} from 'react-leaflet';
 import "leaflet-draw/dist/leaflet.draw.css";
 import { EditControl } from 'react-leaflet-draw';
 import { useEffect, useState } from 'react';
@@ -145,11 +145,11 @@ const InteractiveMap = () => {
 
     return ( 
         <div>
-            <MapContainer className="interactive-map" center={lancasterPrisonLongLat} zoom = {zoom} scrollWheelZoom={true}>
-
+            <MapContainer className="interactive-map" zoom={zoom} center={lancasterPrisonLongLat} scrollWheelZoom={true} zoomControl = {false}> 
+                <ZoomControl position = "topright"/>
                 {/* The sidepannel with shape drawing options */}
                 <FeatureGroup>
-                    <EditControl position="topleft" onCreated={onCreate} onEdited={onEdit} onDeleted = {onDelete} draw={{
+                    <EditControl position="topright" onCreated={onCreate} onEdited={onEdit} onDeleted = {onDelete} draw={{
                         // Disabling the other draw features so there is onlt a polygon option
                       rectangle: false,
                       circle: false,
@@ -163,32 +163,24 @@ const InteractiveMap = () => {
                 {/* Get data from OSM */}
                 <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
 
-                {/* Add a marker to the center of the map */}
-                <Marker position={lancasterPrisonLongLat}>
-                    <Popup>
-                        Hello World!
-                    </Popup>
-                </Marker>
-
                 {/* Loads any polygons added to local storage */}
                 {savedData && <LoadedPolygon polygons={polygons} openDataPage = {openDataPage}/>}
                 
 
             </MapContainer>
-            <div className="overlay-data-box">
-                {showDataBox && <div style={{
-                    position: "absolute",
-                    top: "200px",
-                    left: "100px",
-                    backgroundColor: "white",
-                    padding: "10px",
-                    borderRadius: "5px",
-                    zIndex: "1000"
-                }}>
-                    <RoomInfoPopup polygonClicked = {selectedPolygon}/>
-                    <button onClick={closeDataPage}>close x</button>
-                </div>}
-            </div>
+            
+            {showDataBox && <div style={{
+                position: "absolute",
+                top: "200px",
+                left: "100px",
+                backgroundColor: "white",
+                padding: "10px",
+                borderRadius: "5px",
+                zIndex: "1000"
+            }}>
+                <RoomInfoPopup polygonClicked = {selectedPolygon} />
+                <button onClick={closeDataPage}>close x</button>
+            </div>}
         </div>
      );
 }

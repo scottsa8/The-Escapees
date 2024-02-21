@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import EnvironmentDials from "./EnvironmentDials";
+import RoomSelector from "../roomSelector";
+import RoomCard from "../RoomCard";
 
 const RoomInfoPopup = ({polygonClicked}) => {
 
@@ -18,8 +21,8 @@ const RoomInfoPopup = ({polygonClicked}) => {
         //search through data to find the polygon with the same ID
         for(let i=0; i<keys.length; i++){
             
-            if(keys[i] === ("polygon"+polyID)){
-                //console.log("Found polygon");
+            if(keys[i] === ("polygon"+polygonClicked.id)){
+                
                 try{
                     let polyData = JSON.parse(localStorage.getItem(keys[i]));
                     selectedName = polyData.name;
@@ -36,7 +39,7 @@ const RoomInfoPopup = ({polygonClicked}) => {
     }
 
     function savePolygon(newName){
-        localStorage.setItem("polygon"+polyID, JSON.stringify({points: polyPoints, name: newName, id: polyID}));//Save the polygons points with it's name
+        localStorage.setItem("polygon"+polygonClicked.id, JSON.stringify({points: polygonClicked.points, name: newName, id: polygonClicked.id}));//Save the polygons points with it's name
     }
 
     const handleLoad = (e) => {
@@ -47,6 +50,13 @@ const RoomInfoPopup = ({polygonClicked}) => {
             setNameAdded(true);
         }
     }
+
+    const handleLocationChange = (newLocation) => {
+        console.log(newLocation+" selected");
+        setRoomName(newLocation);
+        setNameAdded(true);
+        savePolygon(newLocation);
+    };
 
     //Ran ons 1st load
     useEffect(() => {
@@ -60,14 +70,15 @@ const RoomInfoPopup = ({polygonClicked}) => {
             {!nameAdded && <label>
                 Please enter the room name: 
                 {/* Needs to be changed to a drop down with names */}
-                <input type="text"></input>
+                {/* <input type="text"></input>
                 <button onClick={(e) => {
                     const newName = e.target.parentNode.childNodes[1].value
                     setRoomName(newName);
                     setNameAdded(true);
                     savePolygon(newName);
 
-                }}>Enter</button>
+                }}>Enter</button> */}
+                <RoomSelector onLocationChange={handleLocationChange}></RoomSelector>
                 
             </label>}
 
@@ -75,6 +86,8 @@ const RoomInfoPopup = ({polygonClicked}) => {
             {nameAdded &&
                 <div>
                     <h1>{roomName} Data</h1>
+                    <EnvironmentDials roomName = {roomName}></EnvironmentDials>
+                    <RoomCard roomName={roomName} onClick={null} isSelected={null}></RoomCard>
                 </div>
             }
 

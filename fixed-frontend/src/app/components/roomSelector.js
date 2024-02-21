@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import {network} from '../layout';
 
 export default function RoomSelector({onLocationChange}){
-  const [locations, setLocations] = useState([]);
+  const [locations, setLocations] = useState(["","Kitchen", "Cell"]);
   const [selectedRoom, setSelectedRoom] = useState("");
 
 
@@ -21,7 +21,7 @@ export default function RoomSelector({onLocationChange}){
 
   const handleRoomChange = (e) => {
     setSelectedRoom(e.target.value);
-    onLocationChange(event.target.value);
+    onLocationChange(e.target.value);
   };
 
   return (
