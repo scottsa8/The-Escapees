@@ -37,7 +37,8 @@ export default function EnviromentContainer(){
     const getLocations = async () => {
         let allRooms =[];
         try{
-            const response = await fetch(`http://${network.ip}:${network.port}/getRooms`)
+            const response = await fetch(`http://${network.ip}:${network.port}/getRooms`,
+            {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
             const data = await response.json();
             let data2 = data['rooms'];
             let data3 = data2['data'];
@@ -70,7 +71,8 @@ export default function EnviromentContainer(){
         let timeoutTime= d.toTimeString().split(" ")[0]
         try{    
             //console.log("selectedLocation.room:"+selectedLocation.room)
-            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`)        
+            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}`,
+            {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
             const data = await response.json();
             let data2 = data['environment'];
             let data3 = data2['data'];
@@ -175,7 +177,7 @@ export default function EnviromentContainer(){
                         </div>
                     </Listbox>
                 </div> */}
-                <div className="w-full flex justify-center bg-transparent dark:text-blue-100">
+                <div className="w-full flex flex-col sm:flex-row justify-center bg-transparent dark:text-blue-100">
                     <EnviromentBox measurement="Temp" value={values["temp"]}/>
                     <EnviromentBox measurement="Light" value={values["light"]}/>
                     <EnviromentBox measurement="Noise" value={values["noise"]}/>

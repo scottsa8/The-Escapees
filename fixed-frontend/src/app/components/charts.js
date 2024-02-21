@@ -12,7 +12,8 @@ export default function Chart() {
 
 
   useEffect(() => {
-    fetch(`http://${network.ip}:${network.port}/getRooms`)
+    fetch(`http://${network.ip}:${network.port}/getRooms`,
+    {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
       .then(response => response.json())
       .then(data => {
         const roomNames = data.rooms.data
@@ -25,7 +26,8 @@ export default function Chart() {
   
 
   const getEnvData = async () => {
-    const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedRoom}`)        
+    const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedRoom}`,
+    {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
     const data = await response.json();
     let data2 = data['environment'];
     let data3 = data2['data'];

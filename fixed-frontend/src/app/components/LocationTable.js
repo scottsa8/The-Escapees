@@ -19,7 +19,8 @@ const theme = useTheme(mantineTheme);
   
   useEffect(() => {
     const getLocations = async () => {
-      const response = await fetch(`http://${network.ip}:${network.port}/listAll`);
+      const response = await fetch(`http://${network.ip}:${network.port}/listAll`,
+      {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}});
       const data = await response.json();
   
       let data2 = data['locations'];

@@ -46,7 +46,8 @@ export default function Login() {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch(`http://${network.ip}:${network.port}/checkLog?user=${username}&pass=${password}`)
+      const response = await fetch(`http://${network.ip}:${network.port}/checkLog?user=${username}&pass=${password}`,
+      {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
       const data = await response.json();
       if (data == true) {
         return true;
