@@ -232,9 +232,9 @@ public class ServerApplication {
 		try {
 			// Fetch all users and their latest location from the database
 			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT u.username, r.room_name " +
+					"SELECT u.username, r.room_name, ro.entry_timestamp " +
 							"FROM users u " +
-							"JOIN roomOccupants ro ON u.user_id = ro.user_id " +
+							"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
 							"JOIN rooms r ON ro.room_id = r.room_id"
 			);
 
@@ -244,8 +244,10 @@ public class ServerApplication {
 			while (rs.next()) {
 				String username = rs.getString("username");
 				String roomName = rs.getString("room_name");
+				Timestamp timestamp = rs.getTimestamp("entry_timestamp");
+
 				//output.append("Location: ").append(roomName).append("!");
-				output.append("{\"user\": \""+username+"\", \"Location\": \""+roomName+"\"}");
+				output.append("{\"user\": \""+username+"\", \"Location\": \""+roomName+"\", \"Timestamp\": \""+timestamp.toString()+"\"}");
 				if(!rs.isLast()){
 					output.append(",");
 				}
