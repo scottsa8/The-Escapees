@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
 import Dial from "./dial";
-import { sendNotification } from "./notifications";
 import { getCookie } from "./cookies"
 import { get } from "http";
 import LocationCountBox from "./locationNumber";
@@ -18,6 +17,7 @@ export default function EnviromentContainer(){
         noise: "0"
       });
     let timeout=0;
+    const dialSize = 170;
     const debug=false;
     const handleRoomClick = (roomName) => {
         if(debug){console.log(`Room clicked: ${roomName}`);}
@@ -169,9 +169,9 @@ export default function EnviromentContainer(){
                     </Listbox>
                 </div> */}
                 <div className="w-full flex flex-col sm:flex-row justify-center bg-transparent dark:text-blue-100">
-                    <EnvironmentBox measurement="Temp" value={values["temp"]}/>
-                    <EnvironmentBox measurement="Light" value={values["light"]}/>
-                    <EnvironmentBox measurement="Noise" value={values["noise"]}/>
+                    <EnvironmentBox size={dialSize} measurement="Temp" value={values["temp"]}/>
+                    <EnvironmentBox size={dialSize} measurement="Light" value={values["light"]}/>
+                    <EnvironmentBox size={dialSize} measurement="Noise" value={values["noise"]}/>
                 </div>
             </div>
         <LocationCountBox onRoomClick={handleRoomClick} />
