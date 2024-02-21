@@ -9,6 +9,7 @@ import Settings from "../components/settings"
 import Chart from "../components/charts"
 import {getCookie} from "../components/cookies"
 import {HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon} from "../components/heroIcons"
+import { network } from "../layout";
 
 // Lists the pages for the navigation bar on the dashboard
 const views = {
@@ -75,6 +76,14 @@ const Dashboard = () => {
         {/* Where the screen contents are shown */}
         <div className="card-container p-4">
           {currentView.page}
+          <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600"
+            onClick={() => {
+              fetch(`http://${network.ip}:${network.port}/panic`)
+              .catch((error) => {
+                console.error('Error:', error);
+              });
+            }}
+          >Panic</button>
         </div>
       </body>
    );
