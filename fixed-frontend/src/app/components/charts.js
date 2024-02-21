@@ -30,7 +30,7 @@ export default function Chart() {
         let realData = data3[x]; //index of the data you want from array 0 = most recent
         out.push({
           "timestamp": new Date(realData['Timestamp']),
-          "name":{selectedRoom},
+          "name":selectedRoom,
           "temp":realData['Temperature'],
           "noise":realData['NoiseLevel'],
           "light":realData['LightLevel']
