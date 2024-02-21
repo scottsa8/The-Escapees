@@ -25,9 +25,13 @@ const theme = useTheme(mantineTheme);
   
       let data2 = data['locations'];
       let realData = data2['data'];
+     
       let newNodes = [];
+      
       for(let i=0; i < realData.length; i++) {
         let entry = realData[i];
+        console.log(entry)
+        console.log((new Date(entry['Timestamp'])))
         newNodes.push({name:entry['user'],loc:entry['Location']});
       }
   

@@ -82,10 +82,11 @@ export default function Chart() {
 
   return (
     <div className="card-container">
-      <div className="flex justify-end mb-5">
+      <div className="flex mb-5">
         <RoomSelector onLocationChange={handleLocationChange} />
       </div>
-      <ResponsiveContainer aspect={3} width={isMobile?"100%":"55%"}>
+      <div className="flex flex-wrap flex-row">
+      <ResponsiveContainer aspect={3} width="45%">
         <LineChart data={filteredData} key={data.length}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>
@@ -96,7 +97,7 @@ export default function Chart() {
         </LineChart>
       </ResponsiveContainer>
 
-      <ResponsiveContainer aspect={3} width={isMobile?"100%":"55%"}>
+      <ResponsiveContainer aspect={3} width="45%">
         <LineChart data={filteredData} key={data.length}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>
@@ -107,7 +108,7 @@ export default function Chart() {
         </LineChart>
       </ResponsiveContainer>
 
-      <ResponsiveContainer aspect={3} width={isMobile?"100%":"55%"}>
+      <ResponsiveContainer aspect={3} width="45%">
         <LineChart data={filteredData} key={data.length}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>
@@ -117,6 +118,7 @@ export default function Chart() {
           <Line dataKey="light" name="Light" stroke="#FFA500" />
         </LineChart>
       </ResponsiveContainer>
+      </div>
       <div className="flex justify-center mt-4">
         <button
           onClick={() => handleTimeRangeChange('24h')}

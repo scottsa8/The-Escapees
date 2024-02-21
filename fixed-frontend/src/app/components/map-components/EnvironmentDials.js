@@ -4,7 +4,7 @@ import { network } from "../../layout";
 import { getCookie } from "../cookies";
 
 const EnvironmentDials = ({roomName}) => {
-
+    let timeout;
     const dialSize = 80;
     const dialClassName = "map-dial-container"
     const [values, setValues] = useState({
@@ -74,7 +74,7 @@ const EnvironmentDials = ({roomName}) => {
         let d= new Date();
         let timeoutTime= d.toTimeString().split(" ")[0]
         try{    
-            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${roomName}`,
+            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${roomName}&order=DESC`,
             {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
             const data = await response.json();
             let data2 = data['environment'];
@@ -94,9 +94,9 @@ const EnvironmentDials = ({roomName}) => {
                 }else{
                     timeout=0;
                     let newValues = {
-                        temp: realData['Temperature'],
-                        noise: realData['NoiseLevel'],
-                        light: realData['LightLevel']
+                        temp: realData['Temperature'].split(".")[0],
+                        noise: realData['NoiseLevel'].split(".")[0],
+                        light: realData['LightLevel'].split(".")[0]
                     };
                     setValues(newValues);         
                 }

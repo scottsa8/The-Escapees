@@ -11,6 +11,9 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.net.MalformedURLException;
 
 
 @EnableScheduling
@@ -40,37 +43,39 @@ public class ServerApplication {
 		"history_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, head_count INT NOT NULL, change_timestamp TIMESTAMP NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(room_id)"
 	};	
 	
-	static {
+	public static void main(String[] args) throws Exception {
+		SpringApplication.run(ServerApplication.class, args);
+		ServerApplication serverApp = new ServerApplication();
+		serverApp.initialize();
+		serverApp.startSerialMonitor();
+	}
+	private void initialize() {
 		try {
-			connection = DriverManager.getConnection(URL,USER,PASSWORD);
+			connection = DriverManager.getConnection(URL, USER, PASSWORD);
 			Statement createDBStmt = connection.createStatement();
 			createDBStmt.execute("CREATE DATABASE IF NOT EXISTS prisondb");
 			URL = "jdbc:mysql://localhost:3306/prisondb?useSSL=FALSE&allowPublicKeyRetrieval=True";
-			connection = DriverManager.getConnection(URL,USER,PASSWORD);
-
+			connection = DriverManager.getConnection(URL, USER, PASSWORD);
+			
 			for (int i = 0; i < tableNames.length; i++) {
 				String make = "CREATE TABLE IF NOT EXISTS " + tableNames[i] + "(" + tableQuery[i] + ")";
 				PreparedStatement createTableStmt = connection.prepareStatement(make);
 				createTableStmt.executeUpdate();
 			}
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 	}
-
-	public static void main(String[] args) throws Exception {
-		SpringApplication.run(ServerApplication.class, args);
-
+	private void startSerialMonitor() throws MalformedURLException {
 		monitor = new SerialMonitor(connection);
-		Thread.sleep(1000);
-
-		try{
+		try {
 			monitor.start();
 		} catch (Exception e) {
 			System.out.println("no Microbit detected");
 		}
 	}
-
+	
 	@Scheduled(cron = "0 */2 * ? * *")
 	private void cleanup(){
 		System.out.println("cleaning up");
@@ -84,9 +89,12 @@ public class ServerApplication {
 		}
 	}
 	@GetMapping("/panic")
-	private void panic(@RequestParam(value="alarmed")boolean alarmed){
-		if(alarmed){
-			//set off alarm
+		private String triggerPanic() {
+		if (monitor != null) {
+			monitor.panic();
+			return "Panic function triggered successfully";
+		} else {
+			return "Microbit not available";
 		}
 	}
 	@GetMapping("/getAllNames")
@@ -232,9 +240,9 @@ public class ServerApplication {
 		try {
 			// Fetch all users and their latest location from the database
 			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT u.username, r.room_name " +
+					"SELECT u.username, r.room_name, ro.entry_timestamp " +
 							"FROM users u " +
-							"JOIN roomOccupants ro ON u.user_id = ro.user_id " +
+							"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
 							"JOIN rooms r ON ro.room_id = r.room_id"
 			);
 
@@ -244,8 +252,10 @@ public class ServerApplication {
 			while (rs.next()) {
 				String username = rs.getString("username");
 				String roomName = rs.getString("room_name");
+				Timestamp timestamp = rs.getTimestamp("entry_timestamp");
+
 				//output.append("Location: ").append(roomName).append("!");
-				output.append("{\"user\": \""+username+"\", \"Location\": \""+roomName+"\"}");
+				output.append("{\"user\": \""+username+"\", \"Location\": \""+roomName+"\", \"Timestamp\": \""+timestamp.toString()+"\"}");
 				if(!rs.isLast()){
 					output.append(",");
 				}
@@ -353,20 +363,105 @@ public class ServerApplication {
 		return output.toString();
 	}
 
-	@GetMapping("/transmitMessage")
-	private String transmitMessage(@RequestParam(value = "message") String message) {
+		@GetMapping("/transmitMessage")
+	private String transmitMessage(
+			@RequestParam(value = "personId") int personId,
+			@RequestParam(value = "alertLevel", defaultValue = "1") int alertLevel,
+			@RequestParam(value = "message") String message) {
+
 		try {
-			// Transmit the message to the microbit over serial
-			if (monitor != null) {
-				monitor.sendMessage(message);
-				return "Message transmitted successfully";
+			// Retrieve the microbit linked to the person from the database
+			String microbitName = getMicrobitForPerson(personId);
+
+			if (microbitName != null) {
+				// Transmit the message to the microbit over serial with alert level
+				// Will remove "/EOM/" and commas from the message and then append "/EOM/"" at the end of the message
+				// To signify the end of packet transfer
+				String sanitizedMessage = message.replace("/EOM/", "").replace(",", "");
+				sanitizedMessage += "/EOM/";
+
+				if (monitor != null) {
+					String fullMessage = alertLevel + "," + microbitName + "," + sanitizedMessage;
+					monitor.sendMessage(fullMessage);
+					return "Message transmitted successfully";
+				} else {
+					return "Microbit not available";
+				}
 			} else {
-				return "Microbit not available";
+				return "Microbit not found for person ID: " + personId;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "Failed to transmit message";
 		}
+	}
+	    	@GetMapping("/transmitMessageBatch")
+	private String transmitMessageBatch(
+			@RequestParam(value = "userType") String userType,
+			@RequestParam(value = "message") String message) {
+
+		try {
+			// Retrieve the microbits linked to users of the specified user type from the database
+			List<String> microbitNames = getMicrobitsForUserType(userType);
+
+			if (!microbitNames.isEmpty()) {
+				// Construct the message with user type at the start and send to each microbit
+				if (monitor != null) {
+					for (String microbitName : microbitNames) {
+						String fullMessage = userType + ":" + microbitName + "," + message;
+						monitor.sendMessage(fullMessage);
+					}
+					return "Messages transmitted successfully";
+				} else {
+					return "Microbit not available";
+				}
+			} else {
+				return "No microbits found for user type: " + userType;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Failed to transmit messages";
+		}
+	}
+
+	private String getMicrobitForPerson(int personId) throws SQLException {
+		// Retrieve the microbit linked to the person from the database
+		String microbitName = null;
+		try {
+			PreparedStatement selectMicrobitStatement = connection.prepareStatement(
+					"SELECT user_microbit FROM users WHERE user_id = ?"
+			);
+			selectMicrobitStatement.setInt(1, personId);
+			ResultSet microbitResult = selectMicrobitStatement.executeQuery();
+
+			if (microbitResult.next()) {
+				microbitName = microbitResult.getString("user_microbit");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return microbitName;
+	}
+
+	private List<String> getMicrobitsForUserType(String userType) throws SQLException {
+		// Retrieve the microbits linked to users of the specified user type from the database
+		List<String> microbitNames = new ArrayList<>();
+		try {
+			PreparedStatement selectMicrobitsStatement = connection.prepareStatement(
+					"SELECT user_microbit FROM users WHERE user_type = ?"
+			);
+			selectMicrobitsStatement.setString(1, userType);
+			ResultSet microbitResult = selectMicrobitsStatement.executeQuery();
+
+			while (microbitResult.next()) {
+				microbitNames.add(microbitResult.getString("user_microbit"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return microbitNames;
 	}
 
 	public static String hashPassword(String plainPassword) {
