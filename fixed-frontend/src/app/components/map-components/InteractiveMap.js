@@ -169,11 +169,11 @@ const InteractiveMap = () => {
 
             </MapContainer>
             
-            {showDataBox && <div style={{
+            {showDataBox && <div className="dark:bg-slate-800 dark:text-sky-500 bg-white" style={{
                 position: "absolute",
-                top: "200px",
-                left: "100px",
-                backgroundColor: "white",
+                top: "150px",
+                left: "70px",
+                //backgroundColor: "white",
                 padding: "10px",
                 borderRadius: "5px",
                 zIndex: "1000"
