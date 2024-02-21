@@ -173,11 +173,6 @@ export default function EnviromentContainer(){
                     <EnviromentBox size={dialSize} measurement="Temp" value={values["temp"]} max="25"/>
                     <EnviromentBox size={dialSize} measurement="Light" value={values["light"]} max="30"/>
                     <EnviromentBox size={dialSize} measurement="Noise" value={values["noise"]} max="50"/>
-                <div className="w-full flex flex-col sm:flex-row justify-center bg-transparent dark:text-blue-100">
-                    <EnvironmentBox measurement="Temp" value={values["temp"]} max="25"/>
-                    <EnvironmentBox measurement="Light" value={values["light"]} max="30"/>
-                    <EnvironmentBox measurement="Noise" value={values["noise"]} max="50"/>
-                </div>
             </div>
         <LocationCountBox onRoomClick={handleRoomClick} />
         </div>
