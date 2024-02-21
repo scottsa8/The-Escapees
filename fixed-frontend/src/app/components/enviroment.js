@@ -177,7 +177,7 @@ export default function EnviromentContainer(){
                         </div>
                     </Listbox>
                 </div> */}
-                <div className="w-full flex flex-col sm:flex-row justify-center bg-transparent dark:text-blue-100">
+                <div className="w-full flex flex-row flex-wrap justify-center bg-transparent dark:text-blue-100">
                     <EnviromentBox measurement="Temp" value={values["temp"]}/>
                     <EnviromentBox measurement="Light" value={values["light"]}/>
                     <EnviromentBox measurement="Noise" value={values["noise"]}/>

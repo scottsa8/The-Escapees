@@ -85,7 +85,8 @@ export default function Login() {
     const isLoggedIn = await login(username, password);
     if (isLoggedIn) {
       setCookie("username",username);
-      const response2 = await fetch(`http://${network.ip}:${network.port}/getUserType?user=${username}`);
+      const response2 = await fetch(`http://${network.ip}:${network.port}/getUserType?user=${username}`,
+      {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}});
       const userType = await response2.text(); //DO SOMETHING WITH IT?
       console.log(userType); 
       router.push('/dashboard');
