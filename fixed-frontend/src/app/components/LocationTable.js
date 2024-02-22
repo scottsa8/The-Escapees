@@ -14,7 +14,8 @@ const LocationTable = () => {
   const theme = useTheme(mantineTheme);
   const [nodes, setNodes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [showPopup, setShowPopup] = useState(false);
+  const [locations, setLocations] = useState([]);
   const removeDuplicates = async (arr) => {
     arr.sort((x, y) => new Date(y.Timestamp) - new Date(x.Timestamp));
     let map = new Map();
@@ -46,7 +47,11 @@ const LocationTable = () => {
   const getAllLocations = async (user) => {
     let data = await getLocations();
     let userLocations = data.filter(entry => entry['user'] === user);
-    return userLocations.map(entry => ({ name: entry['user'], loc: entry['Location'], Timestamp: entry['Timestamp'] }));
+    return userLocations.map(entry => {
+      let timestamp = new Date(entry['Timestamp']);
+      let timeString = timestamp.toLocaleTimeString();
+      return { name: entry['user'], loc: entry['Location'], time: timeString };
+    });
   };
     
 
@@ -80,15 +85,16 @@ const LocationTable = () => {
               <HeaderCell>Location</HeaderCell>
               </HeaderRow>
           </Header>
-
           <Body>
           {tableList
             .filter(item => item.name.includes(searchTerm) || item.loc.includes(searchTerm))
             .map((item) => (
-              <Row key={item.name} item={item}>
-                <Cell onClick={async () => {
-                  let locations = await getAllLocations(item.name);
-                  alert(JSON.stringify(locations));}}>
+              <Row key={item.name} item={item}   onClick={async () => {
+                let locations = await getAllLocations(item.name);
+                setLocations(locations);
+                setShowPopup(true);
+              }}>
+                <Cell>
                 {item.name}</Cell>
                 <Cell>{item.loc}</Cell>
               </Row>
@@ -97,6 +103,18 @@ const LocationTable = () => {
           </>
         )}
       </Table>
+      {showPopup && (
+        <div className="absolute bottom-10 rounded-lg shadow-lg left-20 p-4 z-20 bg-sky-500 ">
+          <ul>
+            {locations.map((location, index) => (
+              <li key={index}>
+                {location.loc} -- {location.time}
+              </li>
+            ))}
+          </ul>
+        {/* <button onClick={() => setShowPopup(false)}>Close</button> */}
+      </div>
+      )}
     </div> 
   );
 }

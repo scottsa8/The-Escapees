@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 body {
   font-family: 'Roboto', sans-serif;
   background-color: #EAEAEB;
@@ -25,6 +27,11 @@ body {
 
 .dark .title{
   color: rgb(219 234 254);
+}
+
+.interactive-map {
+  margin-left: 2vw;
+  z-index: 0;
 }
 
 .dial-container {
@@ -65,10 +72,10 @@ body {
   .sidebar {
     Z-index: 1500;
     background-color: #D9D9D9;
-    width: 120px;
+    width: 160px;
     height: 100vh;
     position: fixed;
-    left: -80px;
+    left: -110px;
     display: flex;
     flex-direction: column;
     align-items: right;
@@ -89,7 +96,7 @@ body {
     }
   
     .dark .topbar{
-      background: linear-gradient(to right, #2b3040, #1b2030);
+      background: linear-gradient(to right, #1b2030, #1f2535);
       color: #DBE9FE;
     }
 }
@@ -106,6 +113,7 @@ body {
     padding-bottom: 10px;
     justify-content: end;
     text-indent: -999px;
+    font-size: 20px;
   }
 
   .topbar-button svg {

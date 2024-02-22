@@ -22,7 +22,7 @@ const UserButton = ({ username }) => {
         <UserIcon className="w-6 h-6" />
       </div>
       {isPopupOpen && (
-        <div className="absolute z-10 right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
+        <div className="absolute z-50 right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
           <button className="block px-4 py-2 text-sm text-gray-700 hover:no-underline rounded-md transition shadow-lg hover:bg-gray-100 w-full text-left" onClick={handleLogout}>
             <LogoutIcon className="w-4 h-4 inline-block mr-2" />Logout
           </button>
