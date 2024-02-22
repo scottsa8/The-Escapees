@@ -6,10 +6,10 @@ const EnvironmentBox = ({size, dialClassName, measurement, value, max}) => {
     return ( 
     <div className="flex flex-col items-center p-4 bg-transparent">
         <Dial className={dialClassName} size={size} value={value} min={0} max={max} onMaxValue={() => {
-            sendNotification('Max Value Reached', 'Measurement: ${measurement}, Value: ${value}');
+            sendNotification('Max Value Reached', `Measurement: ${measurement}, Value: ${value}`);
         }}/>
         <span className="text-lg font-medium mt-2">{measurement}</span>
-    <NotificationComponent />
+    <NotificationComponent className="bottom-1" />
     </div> 
     );
 }
