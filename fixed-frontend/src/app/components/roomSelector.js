@@ -15,7 +15,6 @@ export default function RoomSelector({onLocationChange}){
         .map(roomObj => roomObj.room)
         .filter(roomName => !roomName.includes('gate'));
         setLocations(roomNames);
-        setSelectedRoom(roomNames[3]);
       });
   }, []);
 

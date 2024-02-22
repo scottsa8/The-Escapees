@@ -12,7 +12,8 @@ const RoomInfoPopup = ({polygonClicked}) => {
 
     const [roomName, setRoomName] = useState("");
     const [nameAdded, setNameAdded] = useState(false);
-
+    const [selectedRoom, setSelectedRoom] = useState("");
+    
     // Searches in local storage for the polygon
     function getPolyName(){
         //Get all key names from local storage
@@ -51,11 +52,15 @@ const RoomInfoPopup = ({polygonClicked}) => {
         }
     }
 
-    const handleLocationChange = (newLocation) => {
-        console.log(newLocation+" selected");
-        setRoomName(newLocation);
+    const handleSubmit = (event) => {
+        console.log(selectedRoom +" selected");
+        setRoomName(selectedRoom);
         setNameAdded(true);
-        savePolygon(newLocation);
+        savePolygon(selectedRoom);
+      };
+
+    const handleLocationChange = (newLocation) => {
+        setSelectedRoom(newLocation);
     };
 
     //Ran ons 1st load
@@ -78,7 +83,10 @@ const RoomInfoPopup = ({polygonClicked}) => {
                     savePolygon(newName);
 
                 }}>Enter</button> */}
-                <RoomSelector onLocationChange={handleLocationChange}></RoomSelector>
+                <form onSubmit={handleSubmit}>
+                    <RoomSelector onLocationChange={handleLocationChange}></RoomSelector>
+                    <input type="submit" value="Submit" />
+                </form>
                 
             </label>}
 
