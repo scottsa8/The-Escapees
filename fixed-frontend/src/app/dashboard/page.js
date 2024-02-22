@@ -1,15 +1,15 @@
 'use client'
 import { useState, useEffect } from "react";
-import { useRouter } from 'next/router';
 import LocationTable from "../components/LocationTable";
 import UserButton from "../components/UserButton";
 import HomePage from "./HomePage";
 import InteractiveMap from "../components/map-components";
 import Settings from "../components/settings"
 import Chart from "../components/charts"
-import {getCookie} from "../components/cookies"
-import {HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon} from "../components/heroIcons"
+import { getCookie } from "../components/cookies"
+import { HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon } from "../components/heroIcons"
 import { network } from "../layout";
+import { useNotification } from "../components/notifications";
 
 // Lists the pages for the navigation bar on the dashboard
 const views = {
@@ -19,27 +19,7 @@ const views = {
   settings: {page: <Settings/>, pageTitle: "Settings"},
   charts: {page: <Chart/>, pageTitle: "Charts"}
 }
-  
-export function sendNotification(title, options){
-  //Check browser support 
-  if (!("Notification" in window)) {
-    alert("This browser does not support desktop notification");
-  }
 
-  // Check for permission
-  else if (Notification.permission === "granted") {
-    new Notification(title, options);
-  }
-
-  // Request permission
-  else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then(function (permission) {
-      if (permission === "granted") {
-        new Notification(title, options);
-      }
-    });
-  }
-}
 
 //Used by the user to navigate through pages
 //It's the constant border around the main page
@@ -47,6 +27,8 @@ const Dashboard = () => {
 
   const[currentView,setView] = useState(views.homePage);
   const [username, setUsername] = useState('');
+  const { sendNotification, NotificationComponent } = useNotification();
+
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
@@ -84,8 +66,10 @@ const Dashboard = () => {
               .catch((error) => {
                 console.error('Error:', error);
               });
+              sendNotification("Panic Button Pressed", "A panic button has been pressed in the prison system")
             }}
           >Panic</button>
+          <NotificationComponent />
         </div>
       </body>
     </>

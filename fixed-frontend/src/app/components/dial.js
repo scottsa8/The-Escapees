@@ -11,10 +11,10 @@ function Dial({className, value, min, max, onMaxValue, size = 170 }) {
     const offset = circumference - (value - min) / (max - min) * circumference;
 
     useEffect(() => {
-        if (value >= max && typeof onMaxValue === 'function') {
+        if (value >= max) {
             onMaxValue();
         }
-    }, [value, max, onMaxValue]);
+    }, [value]);
     
 
     return (

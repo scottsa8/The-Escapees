@@ -12,8 +12,6 @@ const EnvironmentDials = ({roomName}) => {
         light: "0",
         noise: "0"
     });
-    const [locations, setLocations] = useState([{name:""}]);
-    const [selectedLocation, setSelectedLocation] = useState(locations[0])
 
     useEffect(() => {
         const fetchUpdateDelay = () => {
@@ -30,44 +28,6 @@ const EnvironmentDials = ({roomName}) => {
         return () => clearInterval(interval);
     }, []);
 
-    //afte the popup loads?
-    // const handleRoomClick = (roomName) => {
-    //     if(debug){console.log(`Room clicked: ${roomName}`);}
-    //     const room = locations.find(location => location.room === roomName);
-    //     setSelectedLocation(room ? room : null);
-    // };
-
-    //fetches the locations
-    const getLocations = async () => {
-        let allRooms =[];
-        try{
-            const response = await fetch(`http://${network.ip}:${network.port}/getRooms`,
-            {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
-            const data = await response.json();
-            let data2 = data['rooms'];
-            let data3 = data2['data'];
-            
-            for (let i = 0; i < data3.length; i++) {
-                let realdata=data3[i]
-                if(realdata['room']==="gate1" || realdata['room']==="gate2"){
-                }else{
-                    allRooms.push(data3[i])
-                }
-               
-            }
-            return allRooms;
-        }catch(error){
-            if(debug){console.error("no rooms, server running?")}
-            let newValues = {
-                temp: "0",
-                noise: "0",
-                light: "0"
-            };
-            setValues(newValues);
-            return allRooms;
-        }
-       
-    };
 
     //gets the data
     const getEnvData = async () => {
