@@ -27,16 +27,23 @@ export default function Chart() {
     let data2 = data['environment'];
     let data3 = data2['data'];
     let out =[]
-      for(let x=0;x<data3.length;x++){
-        let realData = data3[x]; //index of the data you want from array 0 = most recent
+    let lastMinute = null;
+
+    for(let x=0;x<data3.length;x++){
+      let realData = data3[x]; //index of the data you want from array 0 = most recent
+      let currentMinute = new Date(realData['Timestamp']).getMinutes();
+
+      if (lastMinute === null || lastMinute !== currentMinute){
         out.push({
           "timestamp": new Date(realData['Timestamp']),
           "name":selectedRoom,
           "temp":realData['Temperature'],
           "noise":realData['NoiseLevel'],
           "light":realData['LightLevel']
-        });  
+        });
+        lastMinute = currentMinute;
       }
+    }
     return out;   
   };
 
@@ -86,7 +93,7 @@ export default function Chart() {
         <RoomSelector onLocationChange={handleLocationChange} />
       </div>
       <div className="flex flex-wrap flex-row">
-      <ResponsiveContainer aspect={3} width={isMobile?"100%":"45%"}>
+      <ResponsiveContainer aspect={3} width={isMobile?"100%":"50%"}>
         <LineChart data={filteredData} key={data.length}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>
@@ -97,7 +104,7 @@ export default function Chart() {
         </LineChart>
       </ResponsiveContainer>
 
-      <ResponsiveContainer aspect={3} width={isMobile?"100%":"45%"}>
+      <ResponsiveContainer aspect={3} width={isMobile?"100%":"50%"}>
         <LineChart data={filteredData} key={data.length}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>
@@ -108,7 +115,7 @@ export default function Chart() {
         </LineChart>
       </ResponsiveContainer>
 
-      <ResponsiveContainer aspect={3} width={isMobile?"100%":"45%"}>
+      <ResponsiveContainer aspect={3} width={isMobile?"100%":"50%"}>
         <LineChart data={filteredData} key={data.length}>
           <CartesianGrid stroke="#ccc" />
           <XAxis dataKey="timestamp"/>
@@ -122,31 +129,31 @@ export default function Chart() {
       <div className="flex justify-center mt-4">
         <button
           onClick={() => handleTimeRangeChange('24h')}
-          className={`mr-2 hover:no-underline hover:text-cyan-600 ${selectedTimeRange === '24h' ? 'text-white' : 'text-blue-700'}`}
+          className={`mr-2 hover:no-underline hover:text-cyan-600 ${selectedTimeRange === '24h' ? 'text-white' : 'text-blue-700 dark:text-blue-200'}`}
         >
           24h
         </button >
         <button
           onClick={() => handleTimeRangeChange('7d')}
-          className={`mr-2 hover:no-underline hover:text-cyan-600 ${selectedTimeRange === '7d' ? 'text-white' : 'text-blue-700'}`}
+          className={`mr-2 hover:no-underline hover:text-cyan-600 ${selectedTimeRange === '7d' ? 'text-white' : 'text-blue-700 dark:text-blue-200'}`}
         >
           7d
         </button>
         <button
           onClick={() => handleTimeRangeChange('30d')}
-          className={`mr-2 hover:no-underline hover:text-cyan-600 ${selectedTimeRange === '30d' ? 'text-white' : 'text-blue-700'}`}
+          className={`mr-2 hover:no-underline hover:text-cyan-600 ${selectedTimeRange === '30d' ? 'text-white' : 'text-blue-700 dark:text-blue-200'}`}
         >
           30d
         </button>
         <button
           onClick={() => handleTimeRangeChange('90d')}
-          className={`mr-2 hover:no-underline hover:text-cyan-600 ${selectedTimeRange === '90d' ? 'text-white' : 'text-blue-700'}`}
+          className={`mr-2 hover:no-underline hover:text-cyan-600 ${selectedTimeRange === '90d' ? 'text-white' : 'text-blue-700 dark:text-blue-200'}`}
         >
           90d
         </button>
         <button
           onClick={() => handleTimeRangeChange('1Y')}
-          className={`mr-2 hover:no-underline hover:text-cyan-600  ${selectedTimeRange === '1Y' ? 'text-white' : 'text-blue-700'}`}
+          className={`mr-2 hover:no-underline hover:text-cyan-600  ${selectedTimeRange === '1Y' ? 'text-white' : 'text-blue-700 dark:text-blue-200'}`}
         >
           1Y
         </button>
