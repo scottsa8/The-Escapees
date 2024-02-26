@@ -1,12 +1,8 @@
 import React, {useEffect, useState} from "react";
-import { Listbox } from "@headlessui/react";
 import { network } from "../layout";
-import Dial from "./dial";
-import { getCookie } from "./cookies"
-import { get } from "http";
+import { fetchUpdateDelay } from "./cookies"
 import LocationCountBox from "./locationNumber";
 import EnvironmentBox from "./EnvironmentBox";
-
 
 export default function EnviromentContainer(){
     const [locations, setLocations] = useState([{name:""}]);
@@ -20,12 +16,23 @@ export default function EnviromentContainer(){
     const dialSize = 170;
     const dialClassName="dial-container";
     const debug=false;
+
+    /**
+     * Handles the click event on a room.
+     * 
+     * @param {string} roomName - The name of the room that was clicked.
+     */
     const handleRoomClick = (roomName) => {
         if(debug){console.log(`Room clicked: ${roomName}`);}
         const room = locations.find(location => location.room === roomName);
         setSelectedLocation(room ? room : null);
     };
 
+    /**
+     * Retrieves the locations from the server.
+     * Wait for promise to reslove before using the data.
+     * @returns {Promise<Array>} An arraoy f room objects.
+     */
     const getLocations = async () => {
         let allRooms =[];
         try{
@@ -58,7 +65,11 @@ export default function EnviromentContainer(){
     };
 
 
-     const getEnvData = async () => {
+    /**
+     * Retrieves environment data from a specified location.
+     * Env data is stored in the state variable `values`.
+    */
+    const getEnvData = async () => {
         let d= new Date();
         let timeoutTime= d.toTimeString().split(" ")[0]
         try{    
@@ -100,13 +111,15 @@ export default function EnviromentContainer(){
             setValues(newValues);
             return;
         }
-     };
-        
+    };
 
-    function handleLocationChange(value){
-        setSelectedLocation(value);
-    }
-    
+    const fetchLocations = () => {
+        getLocations().then(newLocations => {
+            setLocations(newLocations);
+            getEnvData();
+        });
+    };
+
     useEffect(() => {
         getLocations().then(newLocations => {
             setLocations(newLocations);
@@ -117,20 +130,8 @@ export default function EnviromentContainer(){
     }, []);
 
     useEffect(() => {
-        const fetchUpdateDelay = () => {
-            const delay = getCookie('updateDelay');
-            return delay ? parseInt(delay, 10) * 1000 : 10000;
-        };
-
-        const fetchLocations = () => {
-            getLocations().then(newLocations => {
-                setLocations(newLocations);
-                getEnvData();
-            });
-        };
         if(debug){console.log("Updating....");}
         fetchLocations();
-
         const interval = setInterval(() => {
             fetchLocations();
         }, fetchUpdateDelay());
@@ -151,25 +152,6 @@ export default function EnviromentContainer(){
     return (
         <div>
             <div className="flex flex-col items-center p-2 bg-transparent">
-                {/* <div className="w-full flex justify-center p-3 bg-transparent">
-                    <Listbox value={selectedLocation} onChange={handleLocationChange}>
-                        <div className="flex flex-col justify-center w-24">
-                            <Listbox.Label className="block text-lg text-center font-xl leading-6 text-neutral-900 dark:text-blue-100">Location:</Listbox.Label>
-                            <Listbox.Button className="rounded hover:underline text-xl w-24 h-11 grow text-center text-white bg-neutral-600 dark:bg-sky-800 dark:text-blue-100">{getSelectedRoom}</Listbox.Button>
-                            <Listbox.Options className="flex flex-col self-center dark:text-blue-100">
-                                {locations.map((location, index) => (
-                                    <Listbox.Option
-                                        key={index}
-                                        value={location}
-                                        className="text-xl rounded text-center hover:bg-neutral-400 hover:cursor-pointer h-11 w-24 p-2"
-                                    >
-                                        {location.room}
-                                    </Listbox.Option>
-                                ))}
-                            </Listbox.Options>
-                        </div>
-                    </Listbox>
-                </div> */}
                 <div className="w-full flex flex-row flex-wrap justify-center bg-transparent dark:text-blue-100">
                     <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Temp" value={values["temp"]} max="50"/>
                     <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Light" value={values["light"]} max="100"/>

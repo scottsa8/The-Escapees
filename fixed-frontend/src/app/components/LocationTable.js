@@ -34,6 +34,11 @@ const LocationTable = () => {
     return responseJson['locations']['data'];
   }
   
+  /**
+   * Retrieves the current locations from the server.
+   * wait for promise to resolve before using the data.
+   * @returns {Promise<Array<{name: string, loc: string, Timestamp: string}>>}
+   */
   const getCurrentLocations = async () => {
     let newNodes = [];
     let data = await getLocations();
