@@ -2,6 +2,8 @@ package com.monitor.server;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
@@ -78,15 +80,16 @@ public class ServerApplication {
 	
 	@Scheduled(cron = "0 */2 * ? * *")
 	private void cleanup(){
+		System.gc();
 		System.out.println("cleaning up");
-		monitor.stop();
-		monitor=null;
-		try{
-			monitor= new SerialMonitor(connection);
-			monitor.start();
-		} catch (Exception e) {
-			//e.printStackTrace();
-		}
+//		monitor.stop();
+//		monitor=null;
+//		try{
+//			monitor= new SerialMonitor(connection);
+//			monitor.start();
+//		} catch (Exception e) {
+//			//e.printStackTrace();
+//		}
 	}
 	@GetMapping("/panic")
 		private String triggerPanic() {
