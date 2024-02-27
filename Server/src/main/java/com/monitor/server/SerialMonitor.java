@@ -174,12 +174,22 @@ public class SerialMonitor {
                         // Check if a room with the specified microbitName exists
                         if (roomResult.next()) {
                             int roomID = roomResult.getInt("room_id");
-                
+                            int scaledNoiseLevel;
+                            int scaledLightLevel;
                             // Scale noise level to the range [0, 100]
-                            int scaledNoiseLevel = (int) ((Double.parseDouble(noiseLevel) / 100) * 100);
-                
+                            if(Double.parseDouble(noiseLevel)>100){
+                                scaledNoiseLevel  = 100;
+                            }else{
+                                scaledNoiseLevel = (int) ((Double.parseDouble(noiseLevel) / 100) * 100);
+                            }
+                           //
+                            if(( lightLevel.doubleValue())>100){
+                                scaledLightLevel  = 100;
+                            }else{
+                                scaledLightLevel = (int) ((lightLevel.doubleValue() / 1000) * 100);
+                            }
                             // Scale light level to the range [0, 100]
-                            int scaledLightLevel = (int) ((lightLevel.doubleValue() / 1000) * 100);
+                             //
                 
                             // Insert data into the database
                             PreparedStatement insertStatement = connection.prepareStatement(
@@ -252,7 +262,11 @@ public class SerialMonitor {
                         e.printStackTrace();
                     }
                 }
-                                               
+                else{
+                    System.out.println("someone elses shit");
+                    data="";
+                    return;
+                }
             }
         });
     }
