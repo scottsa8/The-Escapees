@@ -68,6 +68,8 @@ public class ServerApplication {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		Runnable r = new pdfWriter(connection);
+		new Thread(r).start();
 	}
 	private void startSerialMonitor() throws MalformedURLException {
 		monitor = new SerialMonitor(connection);
