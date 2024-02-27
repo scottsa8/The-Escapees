@@ -51,7 +51,6 @@ export default function Chart() {
   useEffect(() => {
     getEnvData().then(data => {
       setData(data);
-      console.log(data);
     });
   }, [selectedRoom]);
   

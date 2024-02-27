@@ -1,6 +1,24 @@
 import React from "react";
 import { useState, useEffect } from "react";
 
+/**
+ * Dial Component
+ * 
+ * This is a circular dial component that visually represents a value within a range.
+ * 
+ * @component
+ * @param {string} className - The CSS class to apply to the component's outer div.
+ * @param {number} value - The current value to be represented by the dial.
+ * @param {number} min - The minimum value in the range.
+ * @param {number} max - The maximum value in the range.
+ * @param {function} onMaxValue - The function to be called when the value reaches or exceeds the max value.
+ * @param {number} [size=170] - The size of the dial in pixels. Default is 170.
+ * 
+ * @example
+ * <Dial className="myDial" value={50} min={0} max={100} onMaxValue={() => console.log("Max value reached")} size={200} />
+ * 
+ * @returns {React.Component} The Dial component
+ */
 function Dial({className, value, min, max, onMaxValue, size = 170 }) {
 
     const strokeWidth = 5; 
