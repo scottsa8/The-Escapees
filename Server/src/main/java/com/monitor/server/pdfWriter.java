@@ -28,7 +28,9 @@ import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.chart.ui.HorizontalAlignment;
 import org.jfree.chart.ui.RectangleAnchor;
 import org.jfree.chart.ui.TextAnchor;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.Dataset;
 import org.jfree.data.xy.DefaultXYDataset;
 
 
@@ -105,56 +107,11 @@ public class pdfWriter implements Runnable {
         main.add(subEnv);
         addEmptyLine(main, 1);
         //peak temperatures for each room
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        try{
-            PreparedStatement selectStatement = con.prepareStatement(
-                    "SELECT ANY_VALUE(timestamp) as time,room_name,MAX(temperature) as temp FROM roomEnvironment env " +
-                            "JOIN rooms r ON env.room_id=r.room_id GROUP BY room_name"
-            );
-            ResultSet rs = selectStatement.executeQuery();
-            while(rs.next()){
-                //get all the values and format time
-                int temp = rs.getInt("temp");
-                Time t= rs.getTime("time");
-                String time  = new SimpleDateFormat("HH:mm").format(t);
-                String name = rs.getString("room_name")+"\n"+time;
-                //add to dataset for the graph
-                dataset.addValue(temp,name,name);
-            }
-        }catch (Exception e){e.printStackTrace();}
 
-        //create chart and size title//
-        JFreeChart chart = ChartFactory.createStackedBarChart("Peak Temperature","","Temperature °C",dataset, PlotOrientation.VERTICAL,false,false,false);
-        chart.getTitle().setHorizontalAlignment(HorizontalAlignment.CENTER);
-        chart.getTitle().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 15));
-        //if more than 4 datasets then change text to be verticle and size correctly
-        if(dataset.getRowCount()>4){
-            chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
-            chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 9));
-            chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(3);
-        }else{//otherwise size correctly horizontal
-            chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.STANDARD);
-            chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 11));
-            chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(2);
-        }
-        //setup text inside of bar chart
-        CategoryPlot plot = chart.getCategoryPlot();
-        CategoryItemRenderer renderer = plot.getRenderer();
-        CategoryItemLabelGenerator generator = new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getInstance());
-        //size and format correctly
-        renderer.setDefaultItemLabelGenerator(generator);
-        renderer.setDefaultItemLabelFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12));
-        renderer.setDefaultItemLabelsVisible(true);
-        renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, - 0 / 2));
-
-        //create image
-        BufferedImage bufferedImage = chart.createBufferedImage(500,200);
-        try{
-            //add image to document
-            Image image = Image.getInstance(writer,bufferedImage,1.0f);
-            main.add(image);
-
-        }catch (Exception e){e.printStackTrace();}
+        //add graphs to main page
+        main.add(createGraph("Temperature"));
+        main.add(createGraph("Noise_level"));
+        main.add(createGraph("Light_level"));
 
         //add location subheading
         addEmptyLine(main,10);
@@ -166,6 +123,70 @@ public class pdfWriter implements Runnable {
 
 
         document.add(main);
+    }
+    private static Image createGraph(String type){
+        try{
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+            //get the peak values for the type of graph wanted
+            PreparedStatement selectStatement = con.prepareStatement(
+                    "SELECT ANY_VALUE(timestamp) as time,room_name,MAX("+type+") as value FROM roomEnvironment env " +
+                            "JOIN rooms r ON env.room_id=r.room_id GROUP BY room_name"
+            );
+            ResultSet rs = selectStatement.executeQuery();
+            while(rs.next()){
+                //get all the values and format time
+                int value = (int) rs.getDouble("value");
+
+                Time t= rs.getTime("time");
+                String time  = new SimpleDateFormat("HH:mm").format(t);
+                String name = rs.getString("room_name")+"\n"+time;
+                //add to dataset for the graph
+                dataset.addValue(value,name,name);
+            }
+
+            //create chart and size title//
+            JFreeChart chart = null;
+            if(type.equals("Temperature")){
+                chart = ChartFactory.createStackedBarChart("Peak Temperature","","Temperature °C",dataset, PlotOrientation.VERTICAL,false,false,false);
+
+            } else if (type.equals("Noise_level")) {
+                chart = ChartFactory.createStackedBarChart("Peak Noise Level","","Noise Level",dataset, PlotOrientation.VERTICAL,false,false,false);
+
+            } else if (type.equals("Light_level")) {
+                chart = ChartFactory.createStackedBarChart("Peak Light level","","Light Level",dataset, PlotOrientation.VERTICAL,false,false,false);
+            }
+            chart.getTitle().setHorizontalAlignment(HorizontalAlignment.CENTER);
+            chart.getTitle().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 15));
+            //if more than 4 datasets then change text to be verticle and size correctly
+            if(dataset.getRowCount()>4){
+                chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
+                chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 9));
+                chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(3);
+            }else{//otherwise size correctly horizontal
+                chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.STANDARD);
+                chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 11));
+                chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(2);
+            }
+            //setup text inside of bar chart
+            CategoryPlot plot = chart.getCategoryPlot();
+            CategoryItemRenderer renderer = plot.getRenderer();
+            CategoryItemLabelGenerator generator = new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getInstance());
+            //size and format correctly
+            renderer.setDefaultItemLabelGenerator(generator);
+            renderer.setDefaultItemLabelFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12));
+            renderer.setDefaultItemLabelsVisible(true);
+            renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, - 0 / 2));
+
+            //create image
+            BufferedImage bufferedImage = chart.createBufferedImage(500,200);
+                //add image to document
+                Image image = Image.getInstance(writer,bufferedImage,1.0f);
+               return image;
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static void addContent(Document document) throws DocumentException {
