@@ -34,7 +34,7 @@ const EnvironmentDials = ({roomName}) => {
         let d= new Date();
         let timeoutTime= d.toTimeString().split(" ")[0]
         try{    
-            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${roomName}&order=DESC`,
+            const response = await fetch(`https://${network.ip}:${network.port}/getEnv?loc=${roomName}&order=DESC`,
             {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
             const data = await response.json();
             let data2 = data['environment'];
