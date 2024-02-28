@@ -8,7 +8,7 @@ export default function RoomSelector({onLocationChange}){
 
 
   useEffect(() => {
-    fetch(`http://${network.ip}:${network.port}/getRooms`,
+    fetch(`https://${network.ip}:${network.port}/getRooms`,
     {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
       .then(response => response.json())
       .then(data => {

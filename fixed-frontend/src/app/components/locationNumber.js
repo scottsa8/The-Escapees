@@ -7,7 +7,7 @@ export default function LocationCountBox({onRoomClick}){
     const [selectedRoom, setSelectedRoom] = useState("Room1");
 
     useEffect(() => {
-      fetch(`http://${network.ip}:${network.port}/getRooms`,
+      fetch(`https://${network.ip}:${network.port}/getRooms`,
       {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
         .then(response => response.json())
         .then(data => {
