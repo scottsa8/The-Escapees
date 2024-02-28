@@ -13,7 +13,7 @@ const RoomCanvas = () => {
     const communalAreaCoords = [[],[],[],[]];
     const holdingCellCoords = [[],[],[],[]];
 
-    const rooms = [officeCoords, kitchenCoords, communalAreaCoords, holdingCellCoords];
+    const rooms = [{name: "Office", coords: officeCoords}, {name: "Kitchen", coords: kitchenCoords}];
 
     const drawRooms = () =>{
 
@@ -23,16 +23,16 @@ const RoomCanvas = () => {
             contextRef.current.beginPath();
 
             //move to starting coord
-            contextRef.current.moveTo(rooms[j][0][0], rooms[j][0][1]);
+            contextRef.current.moveTo(rooms[j].coords[0][0], rooms[j].coords[0][1]);
 
-            for(let i=0; i<rooms[j].length; i++){
+            for(let i=0; i<rooms[j].coords.length; i++){
                 
-                if(i+1 < rooms[0].length){
+                if(i+1 < rooms[0].coords.length){
                     //draw to next coordinate
-                    contextRef.current.lineTo(rooms[j][i+1][0],rooms[j][i+1][1]);
+                    contextRef.current.lineTo(rooms[j].coords[i+1][0],rooms[j].coords[i+1][1]);
                 }else{
                     //draw back to the first coordinate to complete polygon
-                    contextRef.current.lineTo(rooms[j][0][0], rooms[j][0][1]);
+                    contextRef.current.lineTo(rooms[j].coords[0][0], rooms[j].coords[0][1]);
                 }
             
         }
@@ -51,27 +51,29 @@ const RoomCanvas = () => {
         const userY = event.clientY - event.target.offsetTop;
         
         let roomFound = false;
+        let roomName = undefined;
 
         //for a room with 4 sides
         for(let i=0; i<rooms.length; i++){
-            let lowXBound = rooms[i][0][0]
-            let upXBound = rooms[i][1][0]
-            let lowYBound = rooms[i][1][1]
-            let upYBound = rooms[i][2][1]
+            let lowXBound = rooms[i].coords[0][0]
+            let upXBound = rooms[i].coords[1][0]
+            let lowYBound = rooms[i].coords[1][1]
+            let upYBound = rooms[i].coords[2][1]
 
             //check if the user has clicked within the bounds of one of the drawn rooms
-            if((rooms[i].length == 4) && (roomFound == false)){
+            if((rooms[i].coords.length == 4) && (roomFound == false)){
                 if((userX > lowXBound && userX < upXBound) && (userY > lowYBound && userY < upYBound)){
                     roomFound = true;
+                    roomName = rooms[i].name;
                     break;
                 }  
             }
         }
 
         if(roomFound){
-            console.log("In room");
+            console.log("In "+roomName);
         }else{
-            console.log("Out room");
+            console.log("No room");
         }
 
     }
