@@ -1,45 +1,76 @@
 import { useEffect, useRef } from "react";
 
 const RoomCanvas = () => {
+
     const CANVAS_WIDTH = 500
     const CANVAS_HEIGHT = 600
 
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
 
-    //coordinates for rooms (in order around)
-    const officeCoords = [[30,20],[150,20],[150,140],[30,140]];
-    const kitchenCoords = [[220,20],[380,20],[380,140],[220,140]];
-    const communalAreaCoords = [[],[],[],[]];
-    const holdingCellCoords = [[],[],[],[]];
+    //creating static objects for now
+    const officeObj = {
+        name: "Office", 
+        coords: [[30,20],[150,20],[150,140],[30,140]],//points to draw to in order
+        centerPoint:[90,80],
+        upperBound_x: 150,
+        lowerBound_x: 30,
+        upperBound_y: 140,
+        lowerBound_y: 20
+    };
 
-    const rooms = [{name: "Office", coords: officeCoords}, {name: "Kitchen", coords: kitchenCoords}];
+    const kitchenObj = {
+        name: "Kitchen", 
+        coords: [[220,20],[380,20],[380,140],[220,140]], 
+        centerPoint:[300,80], 
+        upperBound_x: 380,
+        lowerBound_x: 220,
+        upperBound_y: 140,
+        lowerBound_y: 20
+    };
 
-    const drawRooms = () =>{
+    const rooms = [officeObj, kitchenObj];
 
-        contextRef.current.fillStyle = "#D8E0E6";//light grey
+    function drawRoom(room, fillColour, borderColour){
 
-        for(let j=0; j<rooms.length; j++){
-            contextRef.current.beginPath();
+        //setting up the colours
+        contextRef.current.fillStyle = fillColour;
+        contextRef.strokeStyle = borderColour;
+        
+        contextRef.current.beginPath();
 
-            //move to starting coord
-            contextRef.current.moveTo(rooms[j].coords[0][0], rooms[j].coords[0][1]);
+        //move to starting coord
+        contextRef.current.moveTo(room.coords[0][0], room.coords[0][1]);
 
-            for(let i=0; i<rooms[j].coords.length; i++){
-                
-                if(i+1 < rooms[0].coords.length){
-                    //draw to next coordinate
-                    contextRef.current.lineTo(rooms[j].coords[i+1][0],rooms[j].coords[i+1][1]);
-                }else{
-                    //draw back to the first coordinate to complete polygon
-                    contextRef.current.lineTo(rooms[j].coords[0][0], rooms[j].coords[0][1]);
-                }
-            
+        for(let i=0; i<room.coords.length; i++){
+
+            if(i+1 < room.coords.length){
+                //draw to next coordinate
+                contextRef.current.lineTo(room.coords[i+1][0],room.coords[i+1][1]);
+            }else{
+                //draw back to the first coordinate to complete polygon
+                contextRef.current.lineTo(room.coords[0][0], room.coords[0][1]);
+            }
         }
+
         //draw the shape
         contextRef.current.closePath();
         contextRef.current.fill();
-        contextRef.current.stroke();    
+        contextRef.current.stroke();   
+        
+        //drawing text
+        contextRef.current.fillStyle = "Black";
+        contextRef.current.font = "30px Arial";
+        contextRef.current.textAlign = "center";
+        contextRef.current.fillText(room.name, room.centerPoint[0], room.centerPoint[1])
+
+    }
+
+    //draw every room to the canvas
+    const drawRooms = () =>{
+
+        for(let j=0; j<rooms.length; j++){
+            drawRoom(rooms[j],"#D8E0E6","black")
         }
 
     }
@@ -50,30 +81,24 @@ const RoomCanvas = () => {
         const userX = event.clientX - event.target.offsetLeft;
         const userY = event.clientY - event.target.offsetTop;
         
-        let roomFound = false;
-        let roomName = undefined;
+        let roomFound = undefined;
 
         //for a room with 4 sides
         for(let i=0; i<rooms.length; i++){
-            let lowXBound = rooms[i].coords[0][0]
-            let upXBound = rooms[i].coords[1][0]
-            let lowYBound = rooms[i].coords[1][1]
-            let upYBound = rooms[i].coords[2][1]
 
             //check if the user has clicked within the bounds of one of the drawn rooms
-            if((rooms[i].coords.length == 4) && (roomFound == false)){
-                if((userX > lowXBound && userX < upXBound) && (userY > lowYBound && userY < upYBound)){
-                    roomFound = true;
-                    roomName = rooms[i].name;
+            if((rooms[i].coords.length == 4) && (roomFound == undefined)){
+                if((userX > rooms[i].lowerBound_x && userX < rooms[i].upperBound_x) && (userY > rooms[i].lowerBound_y && userY < rooms[i].upperBound_y)){
+                    roomFound = rooms[i];
                     break;
                 }  
             }
         }
 
-        if(roomFound){
-            console.log("In "+roomName);
-        }else{
-            console.log("No room");
+        //if a room has been clicked, change its colour
+        if(roomFound != undefined){
+            console.log("Clicked "+roomFound.name);
+            drawRoom(roomFound, "#EABBBB", "black");
         }
 
     }
@@ -90,12 +115,11 @@ const RoomCanvas = () => {
 
     return ( 
         <canvas
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT}
-        ref={canvasRef}
-        onClick={handleClick}
-
-        ></canvas>
+            width={CANVAS_WIDTH}
+            height={CANVAS_HEIGHT}
+            ref={canvasRef}
+            onClick={handleClick}
+        />
      );
 }
  
