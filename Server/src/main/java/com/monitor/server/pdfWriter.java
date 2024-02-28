@@ -136,19 +136,16 @@ public class pdfWriter implements Runnable {
             while(rs.next()){
                 //get all the values and format time
                 int value = (int) rs.getDouble("value");
-
                 Time t= rs.getTime("time");
                 String time  = new SimpleDateFormat("HH:mm").format(t);
                 String name = rs.getString("room_name")+"\n"+time;
                 //add to dataset for the graph
                 dataset.addValue(value,name,name);
             }
-
             //create chart and size title//
             JFreeChart chart = null;
             if(type.equals("Temperature")){
                 chart = ChartFactory.createStackedBarChart("Peak Temperature","","Temperature °C",dataset, PlotOrientation.VERTICAL,false,false,false);
-
             } else if (type.equals("Noise_level")) {
                 chart = ChartFactory.createStackedBarChart("Peak Noise Level","","Noise Level",dataset, PlotOrientation.VERTICAL,false,false,false);
 
@@ -176,13 +173,10 @@ public class pdfWriter implements Runnable {
             renderer.setDefaultItemLabelFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12));
             renderer.setDefaultItemLabelsVisible(true);
             renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, - 0 / 2));
-
             //create image
             BufferedImage bufferedImage = chart.createBufferedImage(500,200);
-                //add image to document
-                Image image = Image.getInstance(writer,bufferedImage,1.0f);
-               return image;
-
+                //return created image
+            return Image.getInstance(writer,bufferedImage,1.0f);
         }catch (Exception e){
             e.printStackTrace();
         }
