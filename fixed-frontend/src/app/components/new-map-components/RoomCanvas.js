@@ -8,35 +8,55 @@ const RoomCanvas = () => {
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
 
-    //creating static objects for now
-    const officeObj = {
-        name: "Office", 
-        coords: [[30,20],[150,20],[150,140],[30,140]],//points to draw to in order
-        centerPoint:[90,80],
-        upperBound_x: 150,
-        lowerBound_x: 30,
-        upperBound_y: 140,
-        lowerBound_y: 20
-    };
+    class Room {
 
-    const kitchenObj = {
-        name: "Kitchen", 
-        coords: [[220,20],[380,20],[380,140],[220,140]], 
-        centerPoint:[300,80], 
-        upperBound_x: 380,
-        lowerBound_x: 220,
-        upperBound_y: 140,
-        lowerBound_y: 20
-    };
+        //sets the bounds used to detect a user click
+        #setBounds(coordinates){
+            //search through coordinates and find smallest and largest x and y vals
+            for(let i=0; i<coordinates.length; i++){
 
-    const rooms = [officeObj, kitchenObj];
+                if(coordinates[i][0] < minX){
+                    this.lowerBound_x = coordinates[i][0];
+                }
+                if(coordinates[i][0] > maxX){
+                    this.upperBound_x = coordinates[i][0];
+                }
+                if(coordinates[i][1] < minY){
+                    this.lowerBound_y = coordinates[i][1];
+                }
+                if(coordinates[i][1] > maxY){
+                    this.upperBound_y = coordinates[i][1];
+                }
+            }
+        }
+
+        //finds the center point between bounds
+        #setCenterPoint(){
+            this.centerPoint[0] = ((this.upperBound_x - this.lowerBound_x)/2) + this.lowerBound_x;
+            this.centerPoint[1] = ((this.upperBound_y - this.lowerBound_y)/2) + this.lowerBound_y;
+        }
+
+        constructor(name, coordinates){
+            this.name = name;
+            this.coords = coordinates;
+            this.centerPoint = [];
+
+            this.#setBounds(coordinates);
+            this.#setCenterPoint()
+        }
+    }
+
+    const rooms = [
+        new Room("Office", [[30,20],[150,20],[150,140],[30,140]]), 
+        new Room("Kitchen", [[220,20],[380,20],[380,140],[220,140]])
+    ];
 
     function drawRoom(room, fillColour, borderColour){
 
-        //setting up the colours
+        //defining colours used
         contextRef.current.fillStyle = fillColour;
-        contextRef.strokeStyle = borderColour;
-        
+        contextRef.current.strokeStyle = borderColour;
+
         contextRef.current.beginPath();
 
         //move to starting coord
@@ -59,7 +79,7 @@ const RoomCanvas = () => {
         contextRef.current.stroke();   
         
         //drawing text
-        contextRef.current.fillStyle = "Black";
+        contextRef.current.fillStyle = "black";
         contextRef.current.font = "30px Arial";
         contextRef.current.textAlign = "center";
         contextRef.current.fillText(room.name, room.centerPoint[0], room.centerPoint[1])
@@ -75,6 +95,12 @@ const RoomCanvas = () => {
 
     }
 
+    //clears and redraws the rooms
+    function refreshCanvas(){
+        contextRef.current.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
+        drawRooms();
+    }
+
     const handleClick = (event) => {
 
         //gets coordinates of where the client has clicked on the canvas
@@ -82,6 +108,8 @@ const RoomCanvas = () => {
         const userY = event.clientY - event.target.offsetTop;
         
         let roomFound = undefined;
+
+        refreshCanvas();//reset any existing colours
 
         //for a room with 4 sides
         for(let i=0; i<rooms.length; i++){
@@ -98,7 +126,7 @@ const RoomCanvas = () => {
         //if a room has been clicked, change its colour
         if(roomFound != undefined){
             console.log("Clicked "+roomFound.name);
-            drawRoom(roomFound, "#EABBBB", "black");
+            drawRoom(roomFound, "#EABBBB", "Black");
         }
 
     }
