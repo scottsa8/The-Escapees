@@ -28,7 +28,7 @@ const LocationTable = () => {
   }
 
   const getLocations = async () =>{
-    const response = await fetch(`http://${network.ip}:${network.port}/listAll`,
+    const response = await fetch(`https://${network.ip}:${network.port}/listAll`,
     {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}});
     const responseJson = await response.json();
     return responseJson['locations']['data'];

@@ -18,7 +18,7 @@ import "./globals.css";
 
 export const network = {
   ip: "localhost",
-  port: "8080"
+  port: "8443"
 }
 
 export default function RootLayout({ children }) {

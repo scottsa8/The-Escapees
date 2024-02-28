@@ -36,7 +36,7 @@ export default function EnviromentContainer(){
     const getLocations = async () => {
         let allRooms =[];
         try{
-            const response = await fetch(`http://${network.ip}:${network.port}/getRooms`,
+            const response = await fetch(`https://${network.ip}:${network.port}/getRooms`,
             {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
             const data = await response.json();
             let data2 = data['rooms'];
@@ -74,7 +74,7 @@ export default function EnviromentContainer(){
         let timeoutTime= d.toTimeString().split(" ")[0]
         try{    
             //console.log("selectedLocation.room:"+selectedLocation.room)
-            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}&order=DESC`,
+            const response = await fetch(`https://${network.ip}:${network.port}/getEnv?loc=${selectedLocation.room}&order=DESC`,
             {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
             const data = await response.json();
             console.log(data)
