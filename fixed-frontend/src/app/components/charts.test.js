@@ -47,3 +47,4 @@ describe('Settings', () => {
     render(<Settings />);
   });
 });
+

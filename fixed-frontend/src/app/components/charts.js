@@ -20,6 +20,10 @@ export default function Chart() {
 
   
 
+  /**
+   * Retrieves environment data from a specified location in ascending order.
+   * @returns {Promise<Array<Object>>} An array of environment data objects.
+   */
   const getEnvData = async () => {
     const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${selectedRoom}&order=ASC`,
     {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
