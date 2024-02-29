@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { network } from "../layout";
 
+
 /**
  * Fetches data from the specified API endpoint.
  *
@@ -11,7 +12,10 @@ export const fetchApi = async (endpoint) => {
     try {
         const response = await axios({
             method: 'GET',
-            url: `http://${network.ip}:${network.port}/${endpoint}`
+            url: `http://${network.ip}:${network.port}/${endpoint}`,
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
         });
         return response.data;
     } catch (error) {
