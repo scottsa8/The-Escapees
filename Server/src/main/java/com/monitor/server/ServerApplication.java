@@ -2,6 +2,8 @@ package com.monitor.server;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
@@ -66,6 +68,8 @@ public class ServerApplication {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		Runnable r = new pdfWriter(connection);
+		new Thread(r).start();
 	}
 	private void startSerialMonitor() throws MalformedURLException {
 		monitor = new SerialMonitor(connection);
@@ -78,15 +82,16 @@ public class ServerApplication {
 	
 	@Scheduled(cron = "0 */2 * ? * *")
 	private void cleanup(){
+		System.gc();
 		System.out.println("cleaning up");
-		monitor.stop();
-		monitor=null;
-		try{
-			monitor= new SerialMonitor(connection);
-			monitor.start();
-		} catch (Exception e) {
-			//e.printStackTrace();
-		}
+//		monitor.stop();
+//		monitor=null;
+//		try{
+//			monitor= new SerialMonitor(connection);
+//			monitor.start();
+//		} catch (Exception e) {
+//			//e.printStackTrace();
+//		}
 	}
 	@GetMapping("/panic")
 		private String triggerPanic() {
@@ -337,33 +342,56 @@ public class ServerApplication {
 		return type;
 	}
 	@GetMapping("/setup")
-	private boolean setup(@RequestParam(value="user") String user){return false;}
-
-	@GetMapping("/saveMap")
-	private void saveMap(@RequestParam(value="map")String map){
-		//string = json
-		JsonParser parser = JsonParserFactory.getJsonParser();
-		Map<String, Object> jsonMap = parser.parseMap(map);
-
+	private boolean setup(@RequestParam(value="type") String type,@RequestParam(value="name") String name,
+		@RequestParam(value="microbit") String mbName,@RequestParam(value="overwrite", defaultValue = "false") boolean overwrite) {
+		try {
+			String storedName = "";
+			if (type.equals("room")) {
+				PreparedStatement selectStatement = connection.prepareStatement(
+						"SELECT room_microbit FROM rooms WHERE room_name = ?"
+				);
+				selectStatement.setString(1, name);
+				ResultSet rs = selectStatement.executeQuery();
+				if(rs.next()){
+					storedName = rs.getString("room_microbit");
+				}
+				if(storedName.equals("") || overwrite) {
+					PreparedStatement insertStatement = connection.prepareStatement(
+							"UPDATE rooms SET room_microbit = ? WHERE room_name = ?"
+					);
+					insertStatement.setString(1, mbName);
+					insertStatement.setString(2, name);
+					insertStatement.executeUpdate();
+					return true;
+				}else{
+					return false;
+				}
+			} else if (type.equals("user")) {
+				PreparedStatement selectStatement = connection.prepareStatement(
+						"SELECT user_microbit FROM users WHERE username = ?"
+				);
+				selectStatement.setString(1, name);
+				ResultSet rs = selectStatement.executeQuery();
+				if(rs.next()){
+					storedName = rs.getString("user_microbit");
+				}
+				if(storedName.equals("") || overwrite) {
+					PreparedStatement insertStatement = connection.prepareStatement(
+							"UPDATE users SET user_microbit = ? WHERE username = ?"
+					);
+					insertStatement.setString(1, mbName);
+					insertStatement.setString(2,name);
+					insertStatement.executeUpdate();
+					return true;
+				}else{
+					return false;
+				}
+			}
+		}catch(Exception e){e.printStackTrace();}
+		return false;
 	}
-	@GetMapping("/getMap")
-	private String getMap(){
-		StringBuilder output = new StringBuilder();
-		output.append("{\"map\":{"+
-				"\"data\":[");
 
-		//SQL STATEMENT
-		//output.append("{\"user\": \""+username+"\", \"Location\": \""+roomName+"\"}");
-//		if(!rs.isLast()){
-//			output.append(",");
-//		}
-		//^^EXAMPLE^^
-
-		output.append("]}}");
-		return output.toString();
-	}
-
-		@GetMapping("/transmitMessage")
+	@GetMapping("/transmitMessage")
 	private String transmitMessage(
 			@RequestParam(value = "personId") int personId,
 			@RequestParam(value = "alertLevel", defaultValue = "1") int alertLevel,
@@ -395,7 +423,7 @@ public class ServerApplication {
 			return "Failed to transmit message";
 		}
 	}
-	    	@GetMapping("/transmitMessageBatch")
+	@GetMapping("/transmitMessageBatch")
 	private String transmitMessageBatch(
 			@RequestParam(value = "userType") String userType,
 			@RequestParam(value = "message") String message) {
