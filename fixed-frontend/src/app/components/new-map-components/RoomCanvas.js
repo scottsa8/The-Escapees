@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
+import {getEnvData} from "../apiFetcher";
 
 const RoomCanvas = () => {
 
-    const CANVAS_WIDTH = 500
-    const CANVAS_HEIGHT = 600
+    const CANVAS_WIDTH = 1000;
+    const CANVAS_HEIGHT = 1000;
+    const SECOND = 1000;
 
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
@@ -24,7 +26,7 @@ const RoomCanvas = () => {
             this.location = location;//the center point for the box representing the door
             this.size = 50;//50pixels in height and width
             this.#setCoords(this.size, location);
-            this.closed = true;
+            this.doorLocked = true;
         }
 
         //draws the room
@@ -54,6 +56,19 @@ const RoomCanvas = () => {
             contextRef.current.fill();
             contextRef.current.stroke();
         }
+
+        //sets true if the door is locked
+        setDoorLocked(status){
+            this.doorLocked = status;
+
+            if(this.doorLocked){
+                //Change colour to green
+                this.draw("#C7FAC4", "black");
+            }else{
+                //set to red for "unlocked"
+                this.draw("#EABBBB", "black");
+            }
+        }
     }
 
     class Room {
@@ -64,7 +79,7 @@ const RoomCanvas = () => {
             let minX = coordinates[0][0];
             let minY = coordinates[0][1];
             let maxX = coordinates[0][0];
-            let maxY = coordinates[0][1];;
+            let maxY = coordinates[0][1];
 
             for(let i=0; i<coordinates.length; i++){
 
@@ -97,6 +112,10 @@ const RoomCanvas = () => {
             this.coords = coordinates;
             this.centerPoint = [];
             this.doors = doors;
+            this.temp = 0;
+            this.noise = 0;
+            this.light = 0;
+            this.user = false;//if the current user is in the room or not
 
             this.#setBounds(coordinates);
             this.#setCenterPoint()
@@ -115,7 +134,7 @@ const RoomCanvas = () => {
             return roomFound;
         }
 
-        #drawDoors(fillColour, borderColour){
+        drawDoors(fillColour, borderColour){
             if(this.doors == null){
                 return;
             }
@@ -150,29 +169,53 @@ const RoomCanvas = () => {
             contextRef.current.fill();
             contextRef.current.stroke();   
 
-            //draw the doors
-            this.#drawDoors(fillColour, borderColour);
-
             //drawing text
             contextRef.current.fillStyle = "black";
             contextRef.current.font = "30px Arial";
             contextRef.current.textAlign = "center";
-            contextRef.current.fillText(this.name, this.centerPoint[0], this.centerPoint[1])
+            contextRef.current.fillText(this.name, this.centerPoint[0], this.lowerBound_y + 40);
+        }
+
+        //sets the current environmental data of the room
+        setEnvironmentalData(temp, noise, light){
+            this.temp = temp;
+            this.noise = noise;
+            this.light = light;
+        }
+
+        //sets if the current user is in this room or not
+        toggleUser(status){
+            this.user = status;
+
+            if(this.user){
+                //show icon
+            }else{
+                //hide icon
+            }
+        }
+
+        //sets the room colour to red
+        alarm(){
+            refreshCanvas();
+            this.draw("#EABBBB", "Black");
+            this.drawDoors("#D8E0E6","black");
         }
 
     }
 
-    const doorA = new Door("Office Main", [150, 50]);
+    const doorA = new Door("Office Side", [400, 110]);
+    const doorB = new Door("Office Main", [285, 200]);
 
     const rooms = [
-        new Room("Office", [[30,20],[150,20],[150,140],[30,140]],[doorA]), 
-        new Room("Kitchen", [[220,20],[380,20],[380,140],[220,140]],null)
+        new Room("Office", [[30,20],[400,20],[400,200],[30,200]],[doorA, doorB]), 
+        new Room("Kitchen", [[500,20],[870,20],[870,200],[500,200]],null)
     ];
 
     //draw every room to the canvas
     const drawRooms = () =>{
         for(let j=0; j<rooms.length; j++){
             rooms[j].draw("#D8E0E6","black")
+            rooms[j].drawDoors("#D8E0E6","black")
         }
     }
 
@@ -180,6 +223,19 @@ const RoomCanvas = () => {
     function refreshCanvas(){
         contextRef.current.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
         drawRooms();
+    }
+
+    //needs to be tested with data
+    function setAllRoomData(){
+        for(let i=0; i<rooms.length; i++){
+            //gets and sets the current environmental data
+            let envData = getEnvData(rooms[i].name,"ASC", false);
+            rooms[i].setEnvironmentalData(envData.temp, envData.noise, envData.light);
+
+            //gets and sets the current location data
+
+            //gets and sets the current door data???
+        }
     }
 
     const handleClick = (event) => {
@@ -190,7 +246,7 @@ const RoomCanvas = () => {
     
         let roomFound = undefined;
 
-        refreshCanvas();//reset any existing colours
+        refreshCanvas();
 
         //for a room with 4 sides
         for(let i=0; i<rooms.length; i++){
@@ -203,7 +259,7 @@ const RoomCanvas = () => {
         //if a room has been clicked, change its colour
         if(roomFound != undefined){
             console.log("Clicked "+roomFound.name);
-            roomFound.draw("#EABBBB", "Black");
+            roomFound.alarm();
         }
     }
 
@@ -214,17 +270,26 @@ const RoomCanvas = () => {
         const context = canvas.getContext("2d");//the drawing object
         contextRef.current = context;
 
+        //will fetch the data periodically from the server
+        const dataFetch = setInterval(() => {
+            setAllRoomData();
+        }, SECOND);
+
         drawRooms();
+
     },[])
 
     return ( 
+        <>
         <canvas
             width={CANVAS_WIDTH}
             height={CANVAS_HEIGHT}
             ref={canvasRef}
             onClick={handleClick}
-        />
-     );
+        >
+        </canvas>
+        </>
+    );
 }
  
 export default RoomCanvas;

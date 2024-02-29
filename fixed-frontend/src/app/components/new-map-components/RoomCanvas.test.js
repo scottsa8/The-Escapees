@@ -1,5 +1,6 @@
 import React from 'react';
 import RoomCanvas from './RoomCanvas';
+import { render, act, renderHook, fireEvent } from '@testing-library/react';
 
 test('renders without crashing', async () => {
     let container;
@@ -8,5 +9,4 @@ test('renders without crashing', async () => {
       container = result.container;
     });
     expect(container).toBeTruthy();
-  });
-
+});
