@@ -8,12 +8,18 @@ export function useNotification() {
     useEffect(() => {
         if (showNotification) {
             const timer = setTimeout(() => {
+                const existingNotifications = JSON.parse(localStorage.getItem('notifications')) || [];
+                existingNotifications.push({ title: notificationTitle, options: notificationOptions });
+                localStorage.setItem('notifications', JSON.stringify(existingNotifications));
+    
                 setShowNotification(false);
             }, 3000);
-
-            return () => clearTimeout(timer);
+    
+            return () => {
+                clearTimeout(timer);
+            };
         }
-    }, [showNotification]);
+    }, [showNotification, notificationTitle, notificationOptions]);
 
     const sendNotification = (title, options) => {
         setNotificationTitle(title);

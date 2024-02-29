@@ -2,7 +2,7 @@ import React from 'react';
 import { render, act, renderHook, fireEvent } from '@testing-library/react';
 import Chart from './charts';
 import {getCookie, setCookie} from './cookies';
-import { useNotification, NotificationComponent } from './notifications';
+import { useNotification } from './notifications';
 import Settings from './settings';
 
 test('renders without crashing', async () => {
@@ -39,6 +39,16 @@ describe('useNotification', () => {
     const { queryByText } = render(<NotificationComponent />);
     expect(queryByText(/./)).toBeNull();
   });
+  test('sendNotification sends a notification', () => {
+    const { result } = renderHook(() => useNotification());
+    const { sendNotification } = result.current;
+    act(() => {
+      sendNotification('Title', 'Options');
+    });
+    const { NotificationComponent } = result.current;
+    const { queryByText } = render(<NotificationComponent />);
+    expect(queryByText(/Title/)).toBeTruthy();
+  });
 });
 
 
@@ -47,3 +57,4 @@ describe('Settings', () => {
     render(<Settings />);
   });
 });
+
