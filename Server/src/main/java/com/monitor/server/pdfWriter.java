@@ -172,7 +172,7 @@ public class pdfWriter implements Runnable {
         }
         return main;
     }
-    private Image createGraph(String type,boolean peak,String roomName, Date date) {
+    private Image createGraph(String type,boolean peak,String roomName) {
         JFreeChart chart = null;
         try {
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -203,7 +203,7 @@ public class pdfWriter implements Runnable {
                 if(peak){
                     dataset.addValue(value, name, name);
                 }else{
-                    if(d.getTime()==date.getTime()){
+                    if(d.getTime()==day.getTime()){
                         xySeries.add(new Second(t),value);
                     }
                 }
@@ -268,17 +268,20 @@ public class pdfWriter implements Runnable {
         return null;
     }
     private void addRoomPage(Document document,String room) throws DocumentException{
-        Paragraph main = new Paragraph();
-        Paragraph subEnv = new Paragraph(room, catFont);
-        subEnv.setAlignment(Element.ALIGN_CENTER);
-        main.add(subEnv);
-        addEmptyLine(main, 1);
-        main.add(createGraph("Temperature",false,room, day));
-        main.add(createGraph("Noise_level",false,room, day));
-        main.add(createGraph("Light_level",false,room, day));
+        Paragraph graphs = new Paragraph();
 
+        Paragraph title = new Paragraph(room, catFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+        addEmptyLine(graphs, 1);
 
-        document.add(main);
+        graphs.add(createGraph("Temperature",false,room));
+        graphs.add(createGraph("Noise_level",false,room));
+        graphs.add(createGraph("Light_level",false,room));
+        document.add(graphs);
+        document.newPage();
+        document.add(createLocation(room));
+
         document.newPage();
     }
     private void addContent(Document document) throws DocumentException {
@@ -290,19 +293,20 @@ public class pdfWriter implements Runnable {
 
         addEmptyLine(main, 1);
         //add peak graphs for each room
-        main.add(createGraph("Temperature",true,"", day));
-        main.add(createGraph("Noise_level",true,"", day));
-        main.add(createGraph("Light_level",true,"", day));
+        main.add(createGraph("Temperature",true,""));
+        main.add(createGraph("Noise_level",true,""));
+        main.add(createGraph("Light_level",true,""));
+        document.add(main);
 
+        document.newPage();
         //add location subheading
-        addEmptyLine(main,10);
+
+        /*
+          addEmptyLine(main,10);
         Paragraph subLoc = new Paragraph("Location recap", catFont);
         subLoc.setAlignment(Element.ALIGN_RIGHT);
         main.add(subLoc);
         addEmptyLine(main, 1);
-
-        Paragraph tilte = new Paragraph();
-        tilte.add(new Paragraph("Environmental recap", catFont));
 
         // Second parameter is the number of the chapter
         Chapter catPart = new Chapter(tilte, 1);
@@ -310,56 +314,75 @@ public class pdfWriter implements Runnable {
         Section subCatPart = catPart.addSection(new Paragraph(),0);
         // add a table
         createTable(subCatPart);
-        document.add(main);
+
         // now add all this to the document
         document.add(catPart);
 
         // now add all this to the document
-        document.add(catPart);
+        document.add(catPart);*/
 
     }
 
-    private static void createTable(Section subCatPart)
-            throws BadElementException {
-        PdfPTable table = new PdfPTable(3);
+    private static Paragraph createLocation(String roomName){
+        Paragraph main = new Paragraph();
 
-        // t.setBorderColor(BaseColor.GRAY);
-        // t.setPadding(4);
-        // t.setSpacing(4);
-        // t.setBorderWidth(1);
+        Paragraph title = new Paragraph("Location History", catFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        main.add(title);
 
-        PdfPCell c1 = new PdfPCell(new Phrase("Table Header 1"));
-        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(c1);
+        addEmptyLine(main,1);
 
-        c1 = new PdfPCell(new Phrase("Table Header 2"));
-        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(c1);
+        PdfPTable table = new PdfPTable(2);
+        table.getDefaultCell();
 
-        c1 = new PdfPCell(new Phrase("Table Header 3"));
-        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(c1);
+        PdfPCell username = new PdfPCell(new Phrase("Username"));
+        username.setHorizontalAlignment(Element.ALIGN_CENTER);
+        username.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        table.addCell(username);
+
+        PdfPCell time = new PdfPCell(new Phrase("Entry Time"));
+        time.setHorizontalAlignment(Element.ALIGN_CENTER);
+        time.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        table.addCell(time);
+
         table.setHeaderRows(1);
 
-        table.addCell("1.0");
-        table.addCell("1.1");
-        table.addCell("1.2");
-        table.addCell("2.1");
-        table.addCell("2.2");
-        table.addCell("2.3");
+        PreparedStatement selectStatement = null;
+        ResultSet rs = null;
+        try{
+        selectStatement = con.prepareStatement(
+                "SELECT u.username, r.room_name, ro.entry_timestamp " +
+                        "FROM users u "+
+                        "JOIN roomoccupants ro ON u.user_id = ro.user_id " +
+                        "JOIN rooms r ON ro.room_id = r.room_id "+
+                        "WHERE r.room_name = \"" +roomName+"\""
+        );
+        rs = selectStatement.executeQuery();
+            String prevName="";
+            if(rs.next()){
+                table.getDefaultCell().setBorderWidth(2);
+                while(rs.next()) {
+                    String name = rs.getString("username");
+                    Timestamp t = rs.getTimestamp("entry_timestamp");
+                    if(name.equals(prevName)){
+                        table.addCell("");
+                        table.addCell(t.toString());
+                    }else{
+                        table.addCell(name);
+                        table.addCell(t.toString());
+                    }
+                    prevName=name;
+                }
+                table.getDefaultCell().setBorderWidth(0);
+            }else{
+                table.addCell("");
+                table.addCell("");
+            }
+        }catch (Exception e){e.printStackTrace();}
 
-        subCatPart.add(table);
-
+       main.add(table);
+      return main;
     }
-
-    private static void createList(Section subCatPart) {
-        List list = new List(true, false, 10);
-        list.add(new ListItem("First point"));
-        list.add(new ListItem("Second point"));
-        list.add(new ListItem("Third point"));
-        subCatPart.add(list);
-    }
-
     private static void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Paragraph(" "));
