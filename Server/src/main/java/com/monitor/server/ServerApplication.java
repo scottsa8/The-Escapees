@@ -12,6 +12,9 @@ import org.springframework.http.MediaType;
 import org.mindrot.jbcrypt.BCrypt;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,8 +71,13 @@ public class ServerApplication {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
-		Runnable r = new pdfWriter(connection);
-		new Thread(r).start();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		try{
+			Runnable r = new pdfWriter(connection, new Date(formatter.parse("2024-02-22").getTime()));
+			new Thread(r).start();
+		}catch (Exception e){}
+
+
 	}
 	private void startSerialMonitor() throws MalformedURLException {
 		monitor = new SerialMonitor(connection);

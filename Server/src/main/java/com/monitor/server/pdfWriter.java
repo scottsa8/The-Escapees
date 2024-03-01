@@ -1,4 +1,5 @@
 package com.monitor.server;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -7,7 +8,10 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,13 +23,18 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryLabelPosition;
 import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.CategoryItemLabelGenerator;
 import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.chart.ui.HorizontalAlignment;
 import org.jfree.chart.ui.RectangleAnchor;
@@ -33,7 +42,8 @@ import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.Dataset;
-import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.data.time.*;
+import org.jfree.data.xy.*;
 
 import javax.print.Doc;
 
@@ -51,8 +61,10 @@ public class pdfWriter implements Runnable {
     private static Connection con;
     private static PdfWriter writer;
     private static PdfReader reader;
-    public pdfWriter(Connection con) {
+    private static Date day;
+    public pdfWriter(Connection con, Date day) {
         this.con = con;
+        this.day = day;
     }
     private ArrayList<String> roomNames = new ArrayList<>();
     private ArrayList<Integer> roomNumbers = new ArrayList<>();
@@ -160,78 +172,97 @@ public class pdfWriter implements Runnable {
         }
         return main;
     }
-    private Image createGraph(String type,boolean peak,String roomName){
-        try{
+    private Image createGraph(String type,boolean peak,String roomName, Date date) {
+        JFreeChart chart = null;
+        try {
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+            TimePeriodValuesCollection xyDataset = new TimePeriodValuesCollection();
+            TimePeriodValues xySeries = new TimePeriodValues(type);
             PreparedStatement selectStatement;
-            if(peak){ //get the peak values for the type of graph wanted
+            if (peak) { //get the peak values for the type of graph wanted
                 selectStatement = con.prepareStatement(
-                        "SELECT ANY_VALUE(timestamp) as time,room_name,MAX("+type+") as value FROM roomEnvironment env " +
+                        "SELECT ANY_VALUE(timestamp) as time,room_name,MAX(" + type + ") as value FROM roomEnvironment env " +
                                 "JOIN rooms r ON env.room_id=r.room_id WHERE timestamp >= now() - INTERVAL 1 DAY GROUP BY room_name "
                 );
-            }else{ //if not a peak graph
+            } else { //if not a peak graph
                 selectStatement = con.prepareStatement(
-                        "SELECT ANY_VALUE(timestamp) as time,room_name,"+type+" as value FROM roomEnvironment env " +
-                                "JOIN rooms r ON env.room_id=r.room_id WHERE r.room_name= \""+roomName+"\""
+                        "SELECT ANY_VALUE(timestamp) as time,room_name," + type + " as value FROM roomEnvironment env " +
+                                "JOIN rooms r ON env.room_id=r.room_id WHERE r.room_name= \"" + roomName + "\""
                 );
             }
             ResultSet rs = selectStatement.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 //get all the values and format time
                 int value = (int) rs.getDouble("value");
-                Time t= rs.getTime("time");
-                String time  = new SimpleDateFormat("HH:mm").format(t);
-                String name = rs.getString("room_name")+"\n"+time;
+                Time t = rs.getTime("time");
+                Date d = rs.getDate("time");
+
+                String time = new SimpleDateFormat("HH:mm").format(t);
+                String name = rs.getString("room_name") + "\n" + time;
                 //add to dataset for the graph
-                dataset.addValue(value,name,name);
+                if(peak){
+                    dataset.addValue(value, name, name);
+                }else{
+                    if(d.getTime()==date.getTime()){
+                        xySeries.add(new Second(t),value);
+                    }
+                }
             }
+            xyDataset.addSeries(xySeries);
             //create chart and size title//
-            JFreeChart chart = null;
-            if(type.equals("Temperature")){
-                if(peak){
-                    chart = ChartFactory.createStackedBarChart("Peak Temperature","","Temperature °C",dataset, PlotOrientation.VERTICAL,false,false,false);
-                }else{
-                    chart = ChartFactory.createStackedBarChart("Temperature","","Temperature °C",dataset, PlotOrientation.VERTICAL,false,false,false);
+            if(peak) {
+                if (type.equals("Temperature")) {
+                    chart = ChartFactory.createStackedBarChart("Peak Temperature", "", "Temperature °C", dataset, PlotOrientation.VERTICAL, false, false, false);
+                } else if (type.equals("Noise_level")) {
+                    chart = ChartFactory.createStackedBarChart("Peak Noise Level", "", "Noise Level", dataset, PlotOrientation.VERTICAL, false, false, false);
+                } else if (type.equals("Light_level")) {
+                    chart = ChartFactory.createStackedBarChart("Peak Light level", "", "Light Level", dataset, PlotOrientation.VERTICAL, false, false, false);
                 }
-            } else if (type.equals("Noise_level")) {
-                if(peak){
-                    chart = ChartFactory.createStackedBarChart("Peak Noise Level","","Noise Level",dataset, PlotOrientation.VERTICAL,false,false,false);
-                }else{
-                    chart = ChartFactory.createStackedBarChart("Noise Level","","Noise Level",dataset, PlotOrientation.VERTICAL,false,false,false);
+                chart.getTitle().setHorizontalAlignment(HorizontalAlignment.CENTER);
+                chart.getTitle().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 15));
+                //if more than 4 datasets then change text to be verticle and size correctly
+                if(dataset.getRowCount()>4){
+                    chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
+                    chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 9));
+                    chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(3);
+                }else{//otherwise size correctly horizontal
+                    chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.STANDARD);
+                    chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 11));
+                    chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(2);
                 }
-            } else if (type.equals("Light_level")) {
-                if(peak){
-                    chart = ChartFactory.createStackedBarChart("Peak Light level","","Light Level",dataset, PlotOrientation.VERTICAL,false,false,false);
-                }else{
-                    chart = ChartFactory.createStackedBarChart("Light level","","Light Level",dataset, PlotOrientation.VERTICAL,false,false,false);
+                //setup text inside of bar chart
+                CategoryPlot plot = chart.getCategoryPlot();
+                CategoryItemRenderer renderer = plot.getRenderer();
+                CategoryItemLabelGenerator generator = new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getInstance());
+                //size and format correctly
+                renderer.setDefaultItemLabelGenerator(generator);
+                renderer.setDefaultItemLabelFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12));
+                renderer.setDefaultItemLabelsVisible(true);
+                renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, - 0 / 2));
+            }else {
+                if (type.equals("Temperature")) {
+                    chart = ChartFactory.createTimeSeriesChart("Temperature", "", "Temperature °C", xyDataset, false, false, false);
+                   // chart = chart.getXYPlot().getChart();
+                } else if (type.equals("Noise_level")) {
+                    chart = ChartFactory.createTimeSeriesChart("Noise Level", "", "Noise Level", xyDataset, false, false, false);
+                    //chart = chart.getXYPlot().getChart();
+                } else if (type.equals("Light_level")) {
+                    chart = ChartFactory.createTimeSeriesChart("Light level", "", "Light Level", xyDataset, false, false, false);
+                   // chart = chart.getXYPlot().getChart();
+
                 }
+                assert chart != null;
+                ((NumberAxis)chart.getXYPlot().getRangeAxis()).setAutoRangeIncludesZero(true);
+                XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) chart.getXYPlot().getRenderer();
+                renderer.setDefaultShape( new Ellipse2D.Double(-1d, -1d, 3d, 3d));
+                renderer.setSeriesShape(0, new Ellipse2D.Double(-1d, -1d, 3d, 3d));
+                renderer.setDefaultShapesVisible(true);
             }
-            chart.getTitle().setHorizontalAlignment(HorizontalAlignment.CENTER);
-            chart.getTitle().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 15));
-            //if more than 4 datasets then change text to be verticle and size correctly
-            if(dataset.getRowCount()>4){
-                chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
-                chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 9));
-                chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(3);
-            }else{//otherwise size correctly horizontal
-                chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.STANDARD);
-                chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 11));
-                chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(2);
-            }
-            //setup text inside of bar chart
-            CategoryPlot plot = chart.getCategoryPlot();
-            CategoryItemRenderer renderer = plot.getRenderer();
-            CategoryItemLabelGenerator generator = new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getInstance());
-            //size and format correctly
-            renderer.setDefaultItemLabelGenerator(generator);
-            renderer.setDefaultItemLabelFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12));
-            renderer.setDefaultItemLabelsVisible(true);
-            renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, - 0 / 2));
             //create image
             BufferedImage bufferedImage = chart.createBufferedImage(500,200);
             //return created image
             return Image.getInstance(writer,bufferedImage,1.0f);
-        }catch (Exception e){
+    }catch (Exception e){
             e.printStackTrace();
         }
         return null;
@@ -242,9 +273,9 @@ public class pdfWriter implements Runnable {
         subEnv.setAlignment(Element.ALIGN_CENTER);
         main.add(subEnv);
         addEmptyLine(main, 1);
-        main.add(createGraph("Temperature",false,room));
-        main.add(createGraph("Noise_level",false,room));
-        main.add(createGraph("Light_level",false,room));
+        main.add(createGraph("Temperature",false,room, day));
+        main.add(createGraph("Noise_level",false,room, day));
+        main.add(createGraph("Light_level",false,room, day));
 
 
         document.add(main);
@@ -259,9 +290,9 @@ public class pdfWriter implements Runnable {
 
         addEmptyLine(main, 1);
         //add peak graphs for each room
-        main.add(createGraph("Temperature",true,""));
-        main.add(createGraph("Noise_level",true,""));
-        main.add(createGraph("Light_level",true,""));
+        main.add(createGraph("Temperature",true,"", day));
+        main.add(createGraph("Noise_level",true,"", day));
+        main.add(createGraph("Light_level",true,"", day));
 
         //add location subheading
         addEmptyLine(main,10);
