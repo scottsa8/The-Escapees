@@ -36,6 +36,9 @@ public class pdfWriter implements Runnable {
     private final ArrayList<String> roomNames = new ArrayList<>();
     private final ArrayList<Integer> roomNumbers = new ArrayList<>();
     private final ArrayList<Integer> order = new ArrayList<>();
+    private final static Font titles = new Font();
+    private final static Font text = new Font();
+
 
     public void run() {
         //pad first index out for title page
@@ -92,13 +95,30 @@ public class pdfWriter implements Runnable {
         main.add(title);
         addEmptyLine(main, 1);
 
+        //create table for options
+        PdfPTable options = new PdfPTable(1);
+        options.setHorizontalAlignment(Element.ALIGN_CENTER);
+        options.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        options.getDefaultCell().setVerticalAlignment(Element.ALIGN_CENTER);
+        //format table
+        options.getDefaultCell().setBackgroundColor(BaseColor.LIGHT_GRAY);
+        options.getDefaultCell().setFixedHeight(25);
+        options.getDefaultCell().setBorderWidth(2);
         //setup peak hyperlink
         PdfAction page2 = PdfAction.gotoLocalPage(1,new PdfDestination(1),writer);
         Chunk peak = new Chunk("Peak over the last 24 hours");
         peak.setAction(page2);
-        main.add(peak);
-        //add the rest of the hyperlinks
-        main.add(addHyperLinks());
+        addEmptyLine(main,3);
+        //wrap chunk in paragraph and add to table
+        Paragraph center = new Paragraph();
+        center.add(peak);
+        center.setAlignment(Element.ALIGN_CENTER);
+        options.addCell(center);
+
+        //add all the hyperlinks
+        addEmptyLine(main,10);
+        main.add(options);
+        addHyperLinks(options);
         document.add(main);
         //add title page
         document.newPage();
@@ -120,19 +140,34 @@ public class pdfWriter implements Runnable {
             e.printStackTrace();
         }
     }
-    private Paragraph addHyperLinks() {
-        Paragraph main = new Paragraph();
+    private void addHyperLinks(PdfPTable table) {
         //loop through the amount of rooms
         for(int i =1;i< roomNumbers.size();i++){
+            Paragraph main = new Paragraph();
             //add a hyperlink text to the corresponding page
-            PdfAction page = PdfAction.gotoLocalPage(roomNumbers.get(i),new PdfDestination(roomNumbers.get(i)),writer);
+            PdfAction page = PdfAction.gotoLocalPage(roomNumbers.get(i)-1,new PdfDestination(roomNumbers.get(i)-1),writer);
             Chunk chunk = new Chunk(roomNames.get(i));
             chunk.setAction(page);
             main.add(chunk);
-            addEmptyLine(main,1);
-            //add the text and return it once done
+            //add the text to the table
+            table.addCell(main);
         }
-        return main;
+    }
+    private void home(){
+        Paragraph main = new Paragraph();
+        //add hyper link text
+        PdfAction page = PdfAction.gotoLocalPage(16,new PdfDestination(16),writer);
+        Chunk chunk = new Chunk("Back to top");
+        chunk.setAction(page);
+        main.add(chunk);
+        //put it in table
+        PdfPTable footerTbl = new PdfPTable(1);
+        footerTbl.setTotalWidth(300);
+        PdfPCell cell = new PdfPCell(main);
+        cell.setBorder(0);
+        //force add it to the bottom right of page
+        footerTbl.addCell(cell);
+        footerTbl.writeSelectedRows(0, -1, writer.getPageSize().getWidth()-75, 30,writer.getDirectContent());
     }
     private Image createGraph(String type,boolean peak,String roomName) {
         //creates bar and line graphs for environmental data
@@ -238,16 +273,19 @@ public class pdfWriter implements Runnable {
         Paragraph title = new Paragraph(room);
         title.setAlignment(Element.ALIGN_CENTER);
         document.add(title);
+
         addEmptyLine(graphs, 1);
         //add one of each graph
         graphs.add(createGraph("Temperature",false,room));
         graphs.add(createGraph("Noise_level",false,room));
         graphs.add(createGraph("Light_level",false,room));
         document.add(graphs);
+        home();
         //new page
         document.newPage();
         //add location table
         document.add(createLocation(room));
+        home();
         document.newPage();
     }
     private void addPeaks(Document document) throws DocumentException {
@@ -263,7 +301,7 @@ public class pdfWriter implements Runnable {
         main.add(createGraph("Noise_level",true,""));
         main.add(createGraph("Light_level",true,""));
         document.add(main);
-
+        home();
         document.newPage();
     }
 
