@@ -195,18 +195,20 @@ public class ServerApplication {
 
 	@GetMapping("/genReport")
 	private ResponseEntity<InputStreamResource> getReport(@RequestParam (value="day") String day){
+		//format date correctly
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		try{
+			//create a new thread to generate the report
 			Runnable r = new pdfWriter(connection, new Date(formatter.parse(day).getTime()));
-			System.out.println(day);
 			Thread thread = new Thread(r);
 			thread.start();
-			while(thread.isAlive()){
+			while(thread.isAlive()){ //wait for report to be generated
 				try{
 					thread.join();
 				}catch (Exception e){wait(100);}
 			}
 			try{
+				//turn the pdf into a response entity to be returned through HTTP request
 				FileInputStream fileInputStream = new FileInputStream("src/main/resources/report.pdf");
 				InputStreamResource inputStreamResource = new InputStreamResource(fileInputStream);
 				HttpHeaders headers = new HttpHeaders();
