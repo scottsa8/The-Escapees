@@ -1,12 +1,19 @@
 package com.monitor.server;
+import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import com.itextpdf.text.*;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -22,25 +29,26 @@ import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.ui.HorizontalAlignment;
 import org.jfree.chart.ui.TextAnchor;
-import org.jfree.data.RangeType;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.*;
+
+import javax.print.Doc;
 
 public class pdfWriter implements Runnable {
     private static Connection con;
     private static PdfWriter writer;
     private static Date day;
+    private final ArrayList<String> roomNames = new ArrayList<>();
+    private final ArrayList<Integer> roomNumbers = new ArrayList<>();
+    private final ArrayList<Integer> order = new ArrayList<>();
+    private final static Font titles = new Font(Font.FontFamily.HELVETICA,25,Font.BOLD);
+    private final static Font text = new Font(Font.FontFamily.HELVETICA,12,Font.NORMAL);
+    private final static Color backColor = new Color(211,211,211);
+
     public pdfWriter(Connection con, Date day) {
         pdfWriter.con = con;
         pdfWriter.day = day;
     }
-    private final ArrayList<String> roomNames = new ArrayList<>();
-    private final ArrayList<Integer> roomNumbers = new ArrayList<>();
-    private final ArrayList<Integer> order = new ArrayList<>();
-    private final static Font titles = new Font(Font.FontFamily.HELVETICA,20,Font.BOLD);
-    private final static Font text = new Font();
-
-
     public void run() {
         //pad first index out for title page
         roomNames.add("ignore");
@@ -85,13 +93,22 @@ public class pdfWriter implements Runnable {
         document.addAuthor("");
         document.addCreator("");
     }
-
+    private Rectangle addBack(){
+        Rectangle background = new Rectangle(writer.getPageSize());
+        background.setBackgroundColor(new BaseColor(backColor.getRGB()));
+        return background;
+    }
     private void addTitlePage(Document document) throws DocumentException {
         //main page to add content
         Paragraph main = new Paragraph();
+        document.add(addBack());
         addEmptyLine(main, 1);
+        //add domain
+        Paragraph domain = new Paragraph(ServerApplication.getDomain()+" Report",new Font(titles.getFamily(),30,titles.getStyle()));
+        domain.setAlignment(Element.ALIGN_CENTER);
+        main.add(domain);
         //add title
-        Paragraph title = new Paragraph("Click a heading to view it!",titles);
+        Paragraph title = new Paragraph("Click a Room to view it!",titles);
         title.setAlignment(Element.ALIGN_CENTER);
         main.add(title);
         addEmptyLine(main, 1);
@@ -99,17 +116,17 @@ public class pdfWriter implements Runnable {
         //create table for options
         PdfPTable options = new PdfPTable(1);
         options.setHorizontalAlignment(Element.ALIGN_CENTER);
-        options.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         options.getDefaultCell().setVerticalAlignment(Element.ALIGN_CENTER);
+        options.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         //format table
         options.getDefaultCell().setBackgroundColor(BaseColor.LIGHT_GRAY);
         options.getDefaultCell().setFixedHeight(25);
         options.getDefaultCell().setBorderWidth(2);
         //setup peak hyperlink
         PdfAction page2 = PdfAction.gotoLocalPage(1,new PdfDestination(1),writer);
-        Chunk peak = new Chunk("Peak over the last 24 hours");
+        Chunk peak = new Chunk("Peak over the last 24 hours",text);
         peak.setAction(page2);
-        addEmptyLine(main,3);
+        addEmptyLine(main,2);
         //wrap chunk in paragraph and add to table
         Paragraph center = new Paragraph();
         center.add(peak);
@@ -117,10 +134,20 @@ public class pdfWriter implements Runnable {
         options.addCell(center);
 
         //add all the hyperlinks
-        addEmptyLine(main,10);
+        addEmptyLine(main,4);
         main.add(options);
         addHyperLinks(options);
+        addEmptyLine(main,4);
+        //add info text
+        Paragraph info = new Paragraph("Report generated for: "+ServerApplication.getDomain()+"\nDay generated for: "+
+                day.toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) +"\nTime generated: "
+                + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + " at "
+                + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")),text);
+        info.setAlignment(Element.ALIGN_BOTTOM);
+        info.setAlignment(Element.ALIGN_LEFT);
+        main.add(info);
         document.add(main);
+
         //add title page
         document.newPage();
     }
@@ -147,7 +174,7 @@ public class pdfWriter implements Runnable {
             Paragraph main = new Paragraph();
             //add a hyperlink text to the corresponding page
             PdfAction page = PdfAction.gotoLocalPage(roomNumbers.get(i)-1,new PdfDestination(roomNumbers.get(i)-1),writer);
-            Chunk chunk = new Chunk(roomNames.get(i));
+            Chunk chunk = new Chunk(roomNames.get(i),text);
             chunk.setAction(page);
             main.add(chunk);
             //add the text to the table
@@ -158,17 +185,18 @@ public class pdfWriter implements Runnable {
         Paragraph main = new Paragraph();
         //add hyper link text
         PdfAction page = PdfAction.gotoLocalPage(16,new PdfDestination(16),writer);
-        Chunk chunk = new Chunk("Back to top");
+        Chunk chunk = new Chunk("Back to top",new Font(Font.FontFamily.HELVETICA,15,Font.BOLD));
         chunk.setAction(page);
         main.add(chunk);
         //put it in table
         PdfPTable footerTbl = new PdfPTable(1);
         footerTbl.setTotalWidth(300);
         PdfPCell cell = new PdfPCell(main);
+
         cell.setBorder(0);
         //force add it to the bottom right of page
         footerTbl.addCell(cell);
-        footerTbl.writeSelectedRows(0, -1, writer.getPageSize().getWidth()-75, 30,writer.getDirectContent());
+        footerTbl.writeSelectedRows(0, -1, writer.getPageSize().getWidth()-100, 30,writer.getDirectContent());
     }
     private Image createGraph(String type,boolean peak,String roomName) {
         //creates bar and line graphs for environmental data
@@ -215,13 +243,15 @@ public class pdfWriter implements Runnable {
 
                 }else{
                     //if the day requested is the current day retrieved add the data
-                    if(d.getTime()==day.getTime()){
+                    if(d.getTime()==day.getTime()){;
                         xySeries.add(new Second(t),value);
                     }
                 }
             }
             //add series to dataset once all data is added
-            xyDataset.addSeries(xySeries);
+            if(!xySeries.isEmpty()){
+                xyDataset.addSeries(xySeries);
+            }
             //create chart and size title//
             if(peak) {
                 switch (type) { //create peak graph depending on type requested
@@ -233,8 +263,6 @@ public class pdfWriter implements Runnable {
                             chart = ChartFactory.createStackedBarChart("Peak Light level", "", "Light Level", dataset, PlotOrientation.VERTICAL, false, false, false);
                 }
                 assert chart != null;
-                chart.getTitle().setHorizontalAlignment(HorizontalAlignment.CENTER);
-                chart.getTitle().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 15));
                 //if more than 4 datasets then change text to be vertical and size correctly
                 if(dataset.getRowCount()>4){
                     chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
@@ -255,7 +283,7 @@ public class pdfWriter implements Runnable {
                 CategoryItemLabelGenerator generator = new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getInstance());
                 //size and format correctly
                 renderer.setDefaultItemLabelGenerator(generator);
-                renderer.setDefaultItemLabelFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12));
+                renderer.setDefaultItemLabelFont(new java.awt.Font(text.getFamilyname(), java.awt.Font.PLAIN, 12));
                 renderer.setDefaultItemLabelsVisible(true);
                 renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, 0.0));
             }else {
@@ -275,7 +303,12 @@ public class pdfWriter implements Runnable {
                 renderer.setDefaultShape( new Ellipse2D.Double(-1d, -1d, 3d, 3d));
                 renderer.setSeriesShape(0, new Ellipse2D.Double(-1d, -1d, 3d, 3d));
                 renderer.setDefaultShapesVisible(true);
+                chart.getXYPlot().getRenderer().setDefaultItemLabelFont(new java.awt.Font(text.getFamilyname(), java.awt.Font.PLAIN, 12));
             }
+            //style charts
+            chart.setBackgroundPaint(backColor);
+            chart.getTitle().setHorizontalAlignment(HorizontalAlignment.CENTER);
+            chart.getTitle().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 15));
             //create image
             BufferedImage bufferedImage = chart.createBufferedImage(500,200);
             //return created image
@@ -285,6 +318,7 @@ public class pdfWriter implements Runnable {
     }
     private void addRoomPage(Document document,String room) throws DocumentException{
         Paragraph graphs = new Paragraph();
+        document.add(addBack());
         //add room name title
         Paragraph title = new Paragraph(room,titles);
         title.setAlignment(Element.ALIGN_CENTER);
@@ -300,18 +334,22 @@ public class pdfWriter implements Runnable {
         //new page
         document.newPage();
         //add location table
+        document.add(addBack());
         document.add(createLocation(room));
         home();
         document.newPage();
     }
     private void addPeaks(Document document) throws DocumentException {
         Paragraph main = new Paragraph();
+        document.add(addBack());
         //add title
-        Paragraph title = new Paragraph("Peak Environmental data in the last 24hours",titles);
+        Paragraph title = new Paragraph("Peak Environmental data in the last 24hours",new Font(titles.getFamily(),22,titles.getStyle()));
         title.setAlignment(Element.ALIGN_CENTER);
         main.add(title);
-
-        addEmptyLine(main, 1);
+        Paragraph disc = new Paragraph("(note: peak data will only show the last 24hours from current day)",new Font(text.getFamily(),text.getSize(),Font.ITALIC));
+        disc.setAlignment(Element.ALIGN_CENTER);
+        main.add(disc);
+        addEmptyLine(main,1);
         //add one of each peak graph
         main.add(createGraph("Temperature",true,""));
         main.add(createGraph("Noise_level",true,""));
@@ -323,6 +361,7 @@ public class pdfWriter implements Runnable {
 
     private static Paragraph createLocation(String roomName){
         Paragraph main = new Paragraph();
+
         //add a title
         Paragraph title = new Paragraph("Location History",titles);
         title.setAlignment(Element.ALIGN_CENTER);
@@ -331,12 +370,12 @@ public class pdfWriter implements Runnable {
         addEmptyLine(main,1);
         PdfPTable table = new PdfPTable(2);
         //add headings
-        PdfPCell username = new PdfPCell(new Phrase("Username"));
+        PdfPCell username = new PdfPCell(new Phrase("Username",text));
         username.setHorizontalAlignment(Element.ALIGN_CENTER);
         username.setBackgroundColor(BaseColor.LIGHT_GRAY);
         table.addCell(username);
 
-        PdfPCell time = new PdfPCell(new Phrase("Entry Time"));
+        PdfPCell time = new PdfPCell(new Phrase("Entry Time",text));
         time.setHorizontalAlignment(Element.ALIGN_CENTER);
         time.setBackgroundColor(BaseColor.LIGHT_GRAY);
         table.addCell(time);
