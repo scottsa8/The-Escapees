@@ -346,6 +346,12 @@ public class pdfWriter implements Runnable {
                 while(rs.next()) {
                     String name = rs.getString("username");
                     Timestamp t = rs.getTimestamp("entry_timestamp");
+                    Date d = rs.getDate("entry_timestamp");
+                    if(d.getTime()!=day.getTime()){
+                        table.addCell("");
+                        table.addCell("");
+                        continue;
+                    }
                     if(name.equals(prevName)){ //if the same name but new timestamp
                         table.addCell("");
                         table.addCell(t.toString()); //add timestamp, blank name
