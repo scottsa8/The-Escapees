@@ -216,7 +216,7 @@ public class ServerApplication {
 				headers.setContentType(MediaType.APPLICATION_PDF);
 				return new ResponseEntity<>(inputStreamResource,headers, HttpStatus.OK);
 			}catch (Exception e){e.printStackTrace();}
-		}catch (Exception e){}
+		}catch (Exception e){System.out.println("failed to generate report");}
 				return null;
 	}
 	@GetMapping("/getPeople")

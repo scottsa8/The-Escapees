@@ -22,6 +22,7 @@ import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.ui.HorizontalAlignment;
 import org.jfree.chart.ui.TextAnchor;
+import org.jfree.data.RangeType;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.*;
 
@@ -36,7 +37,7 @@ public class pdfWriter implements Runnable {
     private final ArrayList<String> roomNames = new ArrayList<>();
     private final ArrayList<Integer> roomNumbers = new ArrayList<>();
     private final ArrayList<Integer> order = new ArrayList<>();
-    private final static Font titles = new Font();
+    private final static Font titles = new Font(Font.FontFamily.HELVETICA,20,Font.BOLD);
     private final static Font text = new Font();
 
 
@@ -90,7 +91,7 @@ public class pdfWriter implements Runnable {
         Paragraph main = new Paragraph();
         addEmptyLine(main, 1);
         //add title
-        Paragraph title = new Paragraph("Click a heading to view it!");
+        Paragraph title = new Paragraph("Click a heading to view it!",titles);
         title.setAlignment(Element.ALIGN_CENTER);
         main.add(title);
         addEmptyLine(main, 1);
@@ -177,7 +178,16 @@ public class pdfWriter implements Runnable {
             TimePeriodValuesCollection xyDataset = new TimePeriodValuesCollection();
             TimePeriodValues xySeries = new TimePeriodValues(type);
             PreparedStatement selectStatement;
+
             if (peak) { //get the peak values for the type of graph wanted
+                //default the barchart to 0 for each room
+                selectStatement = con.prepareStatement(
+                        "SELECT room_name FROM rooms WHERE room_name<>'gate1' AND room_name<>'gate2'"
+                );
+                ResultSet rs2 = selectStatement.executeQuery();
+                while(rs2.next()){
+                    dataset.addValue(0,rs2.getString("room_name"),rs2.getString("room_name"));
+                }
                 selectStatement = con.prepareStatement(
                         "SELECT ANY_VALUE(timestamp) as time,room_name,MAX(" + type + ") as value FROM roomEnvironment env " +
                                 "JOIN rooms r ON env.room_id=r.room_id WHERE timestamp >= now() - INTERVAL 1 DAY GROUP BY room_name "
@@ -199,8 +209,10 @@ public class pdfWriter implements Runnable {
                 String name = rs.getString("room_name") + "\n" + time;
 
                 if(peak){
-                    //add to dataset for the graph
-                    dataset.addValue(value, name, name);
+                    System.out.println(rs.getString("room_name"));
+                    //update room with data if there is any
+                    dataset.setValue(value, name, name);
+
                 }else{
                     //if the day requested is the current day retrieved add the data
                     if(d.getTime()==day.getTime()){
@@ -233,6 +245,10 @@ public class pdfWriter implements Runnable {
                     chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 11));
                     chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(2);
                 }
+                //sets rooms with no data to be displayed correctly
+                ((NumberAxis)chart.getCategoryPlot().getRangeAxis()).setAutoRangeIncludesZero(true);
+                chart.getCategoryPlot().getRangeAxis().setFixedAutoRange(100);
+                chart.getCategoryPlot().getRangeAxis().setLowerBound(0);
                 //setup text inside of bar chart
                 CategoryPlot plot = chart.getCategoryPlot();
                 CategoryItemRenderer renderer = plot.getRenderer();
@@ -270,7 +286,7 @@ public class pdfWriter implements Runnable {
     private void addRoomPage(Document document,String room) throws DocumentException{
         Paragraph graphs = new Paragraph();
         //add room name title
-        Paragraph title = new Paragraph(room);
+        Paragraph title = new Paragraph(room,titles);
         title.setAlignment(Element.ALIGN_CENTER);
         document.add(title);
 
@@ -291,7 +307,7 @@ public class pdfWriter implements Runnable {
     private void addPeaks(Document document) throws DocumentException {
         Paragraph main = new Paragraph();
         //add title
-        Paragraph title = new Paragraph("Peak Environmental data in the last 24hours");
+        Paragraph title = new Paragraph("Peak Environmental data in the last 24hours",titles);
         title.setAlignment(Element.ALIGN_CENTER);
         main.add(title);
 
@@ -308,7 +324,7 @@ public class pdfWriter implements Runnable {
     private static Paragraph createLocation(String roomName){
         Paragraph main = new Paragraph();
         //add a title
-        Paragraph title = new Paragraph("Location History");
+        Paragraph title = new Paragraph("Location History",titles);
         title.setAlignment(Element.ALIGN_CENTER);
         main.add(title);
         //create a table
