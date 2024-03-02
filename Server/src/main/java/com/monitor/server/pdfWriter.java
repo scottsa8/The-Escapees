@@ -44,6 +44,7 @@ public class pdfWriter implements Runnable {
     private final static Font titles = new Font(Font.FontFamily.HELVETICA,25,Font.BOLD);
     private final static Font text = new Font(Font.FontFamily.HELVETICA,12,Font.NORMAL);
     private final static Color backColor = new Color(211,211,211);
+    private static int titlePage =1;
 
     public pdfWriter(Connection con, Date day) {
         pdfWriter.con = con;
@@ -72,6 +73,7 @@ public class pdfWriter implements Runnable {
             addTitlePage(document);
             //get last page and reorder to put title first
             int total = writer.getPageNumber()-1;
+            titlePage=total;
             order.add(0,total);
             for(int i=1;i<total;i++){
                 order.add(i,i);
@@ -165,7 +167,7 @@ public class pdfWriter implements Runnable {
                 roomNumbers.add(writer.getCurrentPageNumber()-1);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println("no rooms");
         }
     }
     private void addHyperLinks(PdfPTable table) {
@@ -184,7 +186,7 @@ public class pdfWriter implements Runnable {
     private void home(){
         Paragraph main = new Paragraph();
         //add hyper link text
-        PdfAction page = PdfAction.gotoLocalPage(16,new PdfDestination(16),writer);
+        PdfAction page = PdfAction.gotoLocalPage(titlePage,new PdfDestination(titlePage),writer);
         Chunk chunk = new Chunk("Back to top",new Font(Font.FontFamily.HELVETICA,15,Font.BOLD));
         chunk.setAction(page);
         main.add(chunk);
