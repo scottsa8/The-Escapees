@@ -4,14 +4,23 @@ import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.MediaType;
 import org.mindrot.jbcrypt.BCrypt;
+
+import javax.print.attribute.standard.Media;
+import java.io.FileInputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +37,7 @@ public class ServerApplication {
 	private static final String USER = "java";
 	private static Connection connection;
 	private static SerialMonitor monitor;
+	private static String domain = "Prison";
 
 	private static final String[] tableNames = {
 		"users",
@@ -68,8 +78,9 @@ public class ServerApplication {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
-		Runnable r = new pdfWriter(connection);
-		new Thread(r).start();
+	}
+	public static String getDomain(){
+		return domain;
 	}
 	private void startSerialMonitor() throws MalformedURLException {
 		monitor = new SerialMonitor(connection);
@@ -186,6 +197,32 @@ public class ServerApplication {
 		return output.toString();
 	}
 
+	@GetMapping("/genReport")
+	private ResponseEntity<InputStreamResource> getReport(@RequestParam (value="day") String day){
+		//format date correctly
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		try{
+			//create a new thread to generate the report
+			Runnable r = new pdfWriter(connection, new Date(formatter.parse(day).getTime()));
+			Thread thread = new Thread(r);
+			thread.start();
+			while(thread.isAlive()){ //wait for report to be generated
+				try{
+					thread.join();
+				}catch (Exception e){wait(100);}
+			}
+			try{
+				//turn the pdf into a response entity to be returned through HTTP request
+				FileInputStream fileInputStream = new FileInputStream("src/main/resources/report.pdf");
+				InputStreamResource inputStreamResource = new InputStreamResource(fileInputStream);
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentLength(Files.size(Paths.get("src/main/resources/report.pdf")));
+				headers.setContentType(MediaType.APPLICATION_PDF);
+				return new ResponseEntity<>(inputStreamResource,headers, HttpStatus.OK);
+			}catch (Exception e){e.printStackTrace();}
+		}catch (Exception e){System.out.println("failed to generate report");}
+				return null;
+	}
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value="loc") String loc, @RequestParam(value="type", required=false, defaultValue="inmate") String type) {
 		int total = 0;

@@ -4,6 +4,7 @@ import LocationTable from "../components/LocationTable";
 import UserButton from "../components/UserButton";
 import HomePage from "./HomePage";
 import InteractiveMap from "../components/map-components";
+import MapPage from "../components/new-map-components/MapPage"
 import Settings from "../components/settings"
 import Chart from "../components/charts"
 import { getCookie } from "../components/cookies"
@@ -15,7 +16,7 @@ import { useNotification } from "../components/notifications";
 const views = {
   individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
   homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
-  interactiveMap: {page: <InteractiveMap/>, pageTitle: "Interactive Map"},
+  interactiveMap: {page: <MapPage/>, pageTitle: "Interactive Map"},
   settings: {page: <Settings/>, pageTitle: "Settings"},
   charts: {page: <Chart/>, pageTitle: "Charts"}
 }
