@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { network } from "../layout";
 
-
 /**
  * Fetches data from the specified API endpoint.
  *
@@ -56,7 +55,7 @@ const filterData = (data, filtered) => {
    * @return {Promise<any>} The filtered environment data.
    */
   export const getEnvData = async (selectedRoom, order = "ASC", filtered = true) => {
-    const response = await axios.get(`http://${network.ip}:${network.port}/getEnv`, {
+    const response = await axios.get(`http://${network.ip}:${network.port}/getEnv?loc=${selectedRoom}&order=${order}`, {
       params: {
         loc: selectedRoom,
         order: order
