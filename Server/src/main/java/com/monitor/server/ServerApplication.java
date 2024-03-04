@@ -275,18 +275,29 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/listAll")
-	private String listAll() {
+	private String listAll(@RequestParam (value="user",defaultValue = "all") String user) {
 		StringBuilder output = new StringBuilder();
 		output.append("{\"locations\":{"+
 				"\"data\":[");
 		try {
+			PreparedStatement selectStatement;
+			if(user.equals("all")){
+				selectStatement = connection.prepareStatement(
+						"SELECT u.username, r.room_name, ro.entry_timestamp " +
+								"FROM users u " +
+								"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
+								"JOIN rooms r ON ro.room_id = r.room_id"
+				);
+			}else{
+				selectStatement = connection.prepareStatement(
+						"SELECT u.username, r.room_name, ro.entry_timestamp " +
+								"FROM users u " +
+								"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
+								"JOIN rooms r ON ro.room_id = r.room_id "+
+								"WHERE u.username = \""+user+"\""
+				);
+			}
 			// Fetch all users and their latest location from the database
-			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT u.username, r.room_name, ro.entry_timestamp " +
-							"FROM users u " +
-							"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
-							"JOIN rooms r ON ro.room_id = r.room_id"
-			);
 
 			ResultSet rs = selectStatement.executeQuery();
 
