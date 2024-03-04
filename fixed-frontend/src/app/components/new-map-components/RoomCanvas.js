@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {getEnvData} from "../apiFetcher";
 
 const RoomCanvas = () => {
@@ -18,6 +18,12 @@ const RoomCanvas = () => {
     let tempIcon;
     let lightIcon;
     let noiseIcon;
+
+    const [maxValues, setMaxValues] = useState({
+        maxTemp: 100,
+        maxLight: 100,
+        maxNoise: 100
+    });
 
     class Door{
 
@@ -131,6 +137,7 @@ const RoomCanvas = () => {
             this.noise = 0;
             this.light = 0;
             this.user = false;//if the current user is in the room or not
+            this.toShow = [];//environmental icons to show
 
             this.#setBounds(coordinates);
             this.#setCenterPoint()
@@ -192,17 +199,58 @@ const RoomCanvas = () => {
 
             //if there is a user in the room, draw it
             if(this.user == true){
-                contextRef.current.drawImage(userIcon, this.centerPoint[0]-ICON_SIZE/2, this.centerPoint[1]-ICON_SIZE/2, ICON_SIZE, ICON_SIZE);
+                contextRef.current.drawImage(userIcon, this.centerPoint[0]-ICON_SIZE/2, this.centerPoint[1]-ICON_SIZE, ICON_SIZE, ICON_SIZE);
                 console.log("Drawing user");
+            }
+
+            //Display any additional icons
+            if(this.toShow.length > 0){
+
+                //Arrange environmental icons dependent on how many there are
+                let startPoint;
+                switch(this.toShow.length){
+                    case 1:
+                        startPoint = [(this.centerPoint[0]-(ICON_SIZE/2)),(this.centerPoint[1]+(ICON_SIZE/2))];
+                        break;
+                    case 2:
+                        startPoint = [(this.centerPoint[0]-(ICON_SIZE*1.25)),(this.centerPoint[1]+(ICON_SIZE/2))];
+                        break;
+                    case 3:
+                        startPoint = [(this.centerPoint[0]-(ICON_SIZE*2)),(this.centerPoint[1]+(ICON_SIZE/2))];
+                        break;
+                    default:
+                        startPoint = [(this.centerPoint[0]-(ICON_SIZE/2)),(this.centerPoint[1]+(ICON_SIZE/2))]
+                        break;
+                }
+
+                for(let i=0; i<this.toShow.length; i++){
+                    contextRef.current.drawImage(this.toShow[i], startPoint[0], startPoint[1], ICON_SIZE, ICON_SIZE);
+                    startPoint = [(startPoint[0]+(ICON_SIZE*1.5)),(startPoint[1])];
+                }
+
             }
 
         }
 
         //sets the current environmental data of the room
-        setEnvironmentalData(temp, noise, light){
+        setAndCheckEnvironmentalData(temp, noise, light){
             this.temp = temp;
             this.noise = noise;
             this.light = light;
+
+            this.toShow = [];
+
+            if(this.temp > maxValues.temp){
+                toShow.push(tempIcon);
+            }
+            if(this.light > maxValues.light){
+                toShow.push(lightIcon)
+            }
+            if(this.noise > maxValues.noise){
+                toShow.push(noiseIcon)
+            }
+
+
         }
 
         //sets the room colour to red
@@ -241,7 +289,7 @@ const RoomCanvas = () => {
         for(let i=0; i<rooms.length; i++){
             //gets and sets the current environmental data
             let envData = getEnvData(rooms[i].name,"ASC", false);
-            rooms[i].setEnvironmentalData(envData.temp, envData.noise, envData.light);
+            rooms[i].setAndCheckEnvironmentalData(envData.temp, envData.noise, envData.light);
 
             //gets and sets the current location data
             
@@ -279,6 +327,9 @@ const RoomCanvas = () => {
             }catch(e){
 
             }
+
+            roomFound.toShow = [tempIcon, lightIcon];
+
             refreshCanvas();         
         }
     }
