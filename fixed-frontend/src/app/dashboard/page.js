@@ -3,14 +3,13 @@ import { useState, useEffect } from "react";
 import LocationTable from "../components/LocationTable";
 import UserButton from "../components/UserButton";
 import HomePage from "./HomePage";
-import InteractiveMap from "../components/map-components";
 import MapPage from "../components/new-map-components/MapPage"
 import Settings from "../components/settings"
 import Chart from "../components/charts"
 import { getCookie } from "../components/cookies"
 import { HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon } from "../components/heroIcons"
-import { network } from "../layout";
 import { useNotification } from "../components/notifications";
+import { fetchApi } from "../components/apiFetcher";
 
 // Lists the pages for the navigation bar on the dashboard
 const views = {
@@ -66,14 +65,14 @@ const Dashboard = () => {
         <div className="card-container p-4">
           {currentView.page}
           <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600"
-            onClick={() => {
-              fetch(`http://${network.ip}:${network.port}/panic`,
-              {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
-              .catch((error) => {
-                console.error('Error:', error);
-              });
-              sendNotification("Panic Button Pressed", "A panic button has been pressed in the prison system")
-            }}
+          onClick={async () => {
+            try {
+              await fetchApi('panic');
+              sendNotification("Panic Button Pressed", "A panic button has been pressed in the prison system");
+            } catch (error) {
+              console.error('Error:', error);
+            }
+          }}
           >Panic</button>
           <NotificationComponent />
         </div>

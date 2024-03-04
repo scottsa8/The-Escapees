@@ -37,6 +37,7 @@ public class ServerApplication {
 	private static final String USER = "java";
 	private static Connection connection;
 	private static SerialMonitor monitor;
+	private static String domain = "Prison";
 
 	private static final String[] tableNames = {
 		"users",
@@ -77,6 +78,9 @@ public class ServerApplication {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	public static String getDomain(){
+		return domain;
 	}
 	private void startSerialMonitor() throws MalformedURLException {
 		monitor = new SerialMonitor(connection);
