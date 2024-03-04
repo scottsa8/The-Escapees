@@ -233,8 +233,9 @@ const RoomCanvas = () => {
             rooms[i].setEnvironmentalData(envData.temp, envData.noise, envData.light);
 
             //gets and sets the current location data
-
+            
             //gets and sets the current door data???
+            
         }
     }
 
@@ -276,6 +277,14 @@ const RoomCanvas = () => {
         }, SECOND);
 
         drawRooms();
+
+        //get a user icon
+        let icon  = new Image();
+        icon.onload = function () {
+            contextRef.current.drawImage(icon, 500, 500, 30,30);
+
+        }
+        icon.src="/userSolid.png";
 
     },[])
 
