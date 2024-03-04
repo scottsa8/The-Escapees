@@ -225,7 +225,7 @@ const RoomCanvas = () => {
     //draw every room to the canvas
     const drawRooms = () =>{
         for(let j=0; j<rooms.length; j++){
-            rooms[j].draw("#D8E0E6","black")
+            rooms[j].draw("#D8E0E6","black");
             rooms[j].drawDoors("#D8E0E6","black")
         }
     }
@@ -279,12 +279,11 @@ const RoomCanvas = () => {
             }catch(e){
 
             }
-
-
             refreshCanvas();         
         }
     }
 
+    //Initialise the images to be used
     function setIcons() {
         userIcon  = new Image();
         openLockIcon = new Image();
@@ -293,17 +292,26 @@ const RoomCanvas = () => {
         lightIcon = new Image();
         noiseIcon = new Image();
 
+        //adding the image paths
         userIcon.src="/userSolid.png";
         openLockIcon.src = "/lock-open-solid.png";
         closedLockIcon.src = "/lock-solid.png";
         tempIcon.src = "/temperature-high-solid.png"
         noiseIcon.src = "/volume-high-solid.png";
         lightIcon.src = "/sun-solid.png";
+
+        //loading the image can take longer than drawing the icon to the screen
+        userIcon.onload = () => {refreshCanvas()};
+        openLockIcon.onload = () => {refreshCanvas()};
+        closedLockIcon.onload = () => {refreshCanvas()};
+        tempIcon.onload = () => {refreshCanvas()};
+        lightIcon.onload = () => {refreshCanvas()};
+        noiseIcon.onload = () => {refreshCanvas()};
     }
 
     useEffect(() => {
         console.log("Generating canvas");
-
+        setIcons();
         const canvas = canvasRef.current;//finds canvas element
         const context = canvas.getContext("2d");//the drawing object
         contextRef.current = context;
@@ -312,8 +320,7 @@ const RoomCanvas = () => {
         const dataFetch = setInterval(() => {
             setAllRoomData();
         }, SECOND);
-
-        setIcons();
+        
         drawRooms();
 
     },[])
