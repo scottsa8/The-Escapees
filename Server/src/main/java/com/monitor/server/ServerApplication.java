@@ -104,6 +104,16 @@ public class ServerApplication {
 //			//e.printStackTrace();
 //		}
 	}
+	@GetMapping("/setupMap")
+	private boolean setupMap(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
+		//insert into db
+		return false;
+	}
+	@GetMapping("/getMap")
+	private String getMap(@RequestParam(value="roomName") String roomName){
+		//get from db
+		return "";
+	}
 	@GetMapping("/panic")
 		private String triggerPanic() {
 		if (monitor != null) {
