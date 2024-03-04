@@ -56,10 +56,6 @@ const filterData = (data, filtered) => {
    */
   export const getEnvData = async (selectedRoom, order = "ASC", filtered = true) => {
     const response = await axios.get(`http://${network.ip}:${network.port}/getEnv?loc=${selectedRoom}&order=${order}`, {
-      params: {
-        loc: selectedRoom,
-        order: order
-      },
       headers: {
         'Access-Control-Allow-Origin': '*'
       }
