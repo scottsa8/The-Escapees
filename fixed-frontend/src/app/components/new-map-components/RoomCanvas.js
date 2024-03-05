@@ -1,4 +1,4 @@
-import { useEffect, useRef} from "react";
+import { useEffect, useRef, useState} from "react";
 import {getEnvData} from "../apiFetcher";
 import Room from "./Room";
 import Door from "./Door";
@@ -13,6 +13,8 @@ const RoomCanvas = () => {
     const contextRef = useRef(null);
 
     const ICON_SIZE = 20;
+
+    const [trackedName, setTrackedName] = useState(undefined);
 
     // const doorA = new Door("Office Side", [400, 110]);
     // const doorB = new Door("Office Main", [285, 200]);
@@ -65,16 +67,42 @@ const RoomCanvas = () => {
 
     //needs to be tested with data
     function setAllRoomData(){
+
+        let userLocationName = undefined;
+
+        // TODO get the location of the current selected user
+        if(trackedName != undefined){
+            // e.g userLocationName = getLocation(trackedName)
+            
+        }
+
         for(let i=0; i<rooms.length; i++){
             //gets and sets the current environmental data
             let envData = getEnvData(rooms[i].name,"ASC", false);
             rooms[i].setAndCheckEnvironmentalData(envData.temp, envData.noise, envData.light);
 
-            //gets and sets the current location data
-            
+            //if this room is the one the tracked user is in, show the icon
+            if(userLocationName != undefined && trackedName != undefined){
+                if(userLocationName == rooms[i].name){
+                    rooms[i].user = true;
+                }else{
+                    rooms[i].user = false;
+                }
+            }
+
             //gets and sets the current door data???
+            if(rooms[i].doors != null){
+                for(let j=0; j<rooms[i].doors.length; j++){
+                    //Assuming return is boolean
+                    //this.rooms[i].doors[j].doorLocked = api.getDoorStatus(name);
+                }
+            }
+
+
 
         }
+
+
     }
 
     const handleClick = (event) => {
@@ -83,31 +111,31 @@ const RoomCanvas = () => {
         const userX = event.clientX - event.target.offsetLeft;
         const userY = event.clientY - event.target.offsetTop;
     
-        let roomFound = undefined;
-        refreshCanvas();
+        // let roomFound = undefined;
+        // refreshCanvas();
 
-        //for a room with 4 sides
-        for(let i=0; i<rooms.length; i++){
-            //check if the user has clicked within the bounds of one of the drawn rooms
-            roomFound = rooms[i].checkClick(userX, userY);
-            if(roomFound){
-                break;
-            }
-        }
-        //if a room has been clicked
-        if(roomFound != undefined){
-            console.log("Clicked "+roomFound.name);
-            roomFound.user = true;
+        // //for a room with 4 sides
+        // for(let i=0; i<rooms.length; i++){
+        //     //check if the user has clicked within the bounds of one of the drawn rooms
+        //     roomFound = rooms[i].checkClick(userX, userY);
+        //     if(roomFound){
+        //         break;
+        //     }
+        // }
+        // //if a room has been clicked
+        // if(roomFound != undefined){
+        //     console.log("Clicked "+roomFound.name);
+        //     roomFound.user = true;
             
-            try{
-                roomFound.doors[0].doorLocked = false;
-                roomFound.doors[1].doorLocked = false;
-            }catch(e){
+        //     try{
+        //         roomFound.doors[0].doorLocked = false;
+        //         roomFound.doors[1].doorLocked = false;
+        //     }catch(e){
 
-            }
+        //     }
 
-            refreshCanvas();         
-        }
+        //     refreshCanvas();         
+        // }
     }
 
     //Initialise the images to be used
@@ -145,6 +173,7 @@ const RoomCanvas = () => {
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
             setAllRoomData();
+            refreshCanvas();
         }, SECOND);
         
         //Load room data
@@ -156,7 +185,7 @@ const RoomCanvas = () => {
 
         drawRooms();
         refreshCanvas();
-
+        return () => clearInterval(dataFetch);
     },[])
 
     return ( 
