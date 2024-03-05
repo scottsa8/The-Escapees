@@ -126,6 +126,11 @@ public class ServerApplication {
 		//get from db
 		return "";
 	}
+	@GetMapping("/isLocked")
+	private boolean isLocked(@RequestParam(value="roomName") String roomName, @RequestParam(value="doorName") String doorName){
+		//get from db
+		return false;
+	}
 	@GetMapping("/panic")
 		private String triggerPanic() {
 		if (monitor != null) {
