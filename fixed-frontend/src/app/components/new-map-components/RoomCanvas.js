@@ -98,8 +98,6 @@ const RoomCanvas = () => {
                 }
             }
 
-
-
         }
 
 
@@ -190,7 +188,7 @@ const RoomCanvas = () => {
 
     return ( 
         <>
-        <canvas
+        <canvas id="main-canvas"
             width={CANVAS_WIDTH}
             height={CANVAS_HEIGHT}
             ref={canvasRef}

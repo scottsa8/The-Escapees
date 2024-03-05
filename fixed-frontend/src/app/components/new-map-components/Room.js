@@ -68,13 +68,14 @@ class Room {
     //checks if the user has clicked this box
     checkClick(x, y){
         let roomFound = undefined;
-        if((this.coords.length == 4) && (roomFound == undefined)){
-            //if it is within the bounds
-            if((x > this.lowerBound_x && x < this.upperBound_x) && (y > this.lowerBound_y && y < this.upperBound_y)){
-                roomFound = this;
-            }  
-        }
-        
+        if(this.coords != undefined && this.coords != null){
+            if((this.coords.length == 4) && (roomFound == undefined)){
+                //if it is within the bounds
+                if((x > this.lowerBound_x && x < this.upperBound_x) && (y > this.lowerBound_y && y < this.upperBound_y)){
+                    roomFound = this;
+                }  
+            }
+        }        
         return roomFound;
     }
 
