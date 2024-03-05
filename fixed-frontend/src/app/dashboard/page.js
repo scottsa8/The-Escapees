@@ -25,7 +25,7 @@ const views = {
 //It's the constant border around the main page
 const Dashboard = () => {
 
-  const[currentView,setView] = useState(views.homePage);
+  const [currentView,setView] = useState(views.homePage);
   const [username, setUsername] = useState('');
   const { sendNotification, NotificationComponent } = useNotification();
 

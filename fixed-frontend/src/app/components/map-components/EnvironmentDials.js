@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import EnvironmentBox from "../EnvironmentBox";
 import { network } from "../../layout";
 import { getCookie } from "../cookies";
+import { getEnvData as fetchEnvData } from "../apiFetcher";
 
 const EnvironmentDials = ({roomName}) => {
     let timeout;
@@ -34,13 +35,9 @@ const EnvironmentDials = ({roomName}) => {
         let d= new Date();
         let timeoutTime= d.toTimeString().split(" ")[0]
         try{    
-            const response = await fetch(`http://${network.ip}:${network.port}/getEnv?loc=${roomName}&order=DESC`,
-            {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})        
-            const data = await response.json();
-            let data2 = data['environment'];
-            let data3 = data2['data'];
-            let realData = data3['0']; //index of the data you want from array 0 = most recent
-            let inTime = realData['Timestamp'].split(" ")[1].split(".")[0]
+            const data = await fetchEnvData(roomName, 'DESC', false);
+            let realData = data[0]; //index of the data you want from array 0 = most recent
+            let inTime = realData['timestamp'].split(" ")[1].split(".")[0]
             if(inTime!=timeoutTime){
                 timeout=timeout+1;
                 if(timeout>=3){
@@ -54,9 +51,9 @@ const EnvironmentDials = ({roomName}) => {
                 }else{
                     timeout=0;
                     let newValues = {
-                        temp: realData['Temperature'].split(".")[0],
-                        noise: realData['NoiseLevel'].split(".")[0],
-                        light: realData['LightLevel'].split(".")[0]
+                        temp: realData['temp'].split(".")[0],
+                        noise: realData['noise'].split(".")[0],
+                        light: realData['light'].split(".")[0]
                     };
                     setValues(newValues);         
                 }

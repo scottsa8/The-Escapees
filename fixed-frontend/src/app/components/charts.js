@@ -29,7 +29,7 @@ export default function Chart() {
     '1Y': 365 * 24 * 60 * 60 * 1000
   };
   const filteredData = data.filter(item => Date.now() - item.timestamp <= timeRangeMs[selectedTimeRange]);
-  
+  const getMaxValue = (data, key) => Math.max(...data.map(item => item[key]));
   return (
     <div className="card-container">
       <div className="flex mb-5">
@@ -42,7 +42,7 @@ export default function Chart() {
           <LineChart data={filteredData} key={data.length}>
             <CartesianGrid stroke="#ccc" />
             <XAxis dataKey="timestamp"/>
-            <YAxis/>
+            <YAxis domain={[0, getMaxValue(filteredData, 'noise')]}/>
             <Tooltip contentStyle={{ backgroundColor: '#435585', color: '#F5E8C7' }} />
             <Legend />
             <Line dataKey="noise" name="Noise" stroke="#82ca9d" />
@@ -53,7 +53,7 @@ export default function Chart() {
           <LineChart data={filteredData} key={data.length}>
             <CartesianGrid stroke="#ccc" />
             <XAxis dataKey="timestamp"/>
-            <YAxis/>
+            <YAxis domain={[0, getMaxValue(filteredData, 'temp')]} />
             <Tooltip contentStyle={{ backgroundColor: '#435585', color: '#F5E8C7' }} />
             <Legend />
             <Line dataKey="temp" name="Temperature" stroke="#8884d8" />
@@ -64,7 +64,7 @@ export default function Chart() {
           <LineChart data={filteredData} key={data.length}>
             <CartesianGrid stroke="#ccc" />
             <XAxis dataKey="timestamp"/>
-            <YAxis/>
+            <YAxis domain={[0, getMaxValue(filteredData, 'light')]}/>
             <Tooltip contentStyle={{ backgroundColor: '#435585', color: '#F5E8C7' }} />
             <Legend />
             <Line dataKey="light" name="Light" stroke="#FFA500" />

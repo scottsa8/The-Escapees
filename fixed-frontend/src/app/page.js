@@ -7,7 +7,6 @@ import Image from "next/image";
 import "./main.css"
 import { network } from './layout';
 import {setCookie} from './components/cookies'
-import { useQuery } from 'react-query';
 import { fetchApi } from './components/apiFetcher';
 // import { ReactComponentElement as SettingsImage } from '../../public/settings-cog.svg';
 // import settingsimage from '/public/settings-cog.svg';
@@ -34,16 +33,11 @@ export default function Login() {
     setSettingsOpen(!isSettingsOpen)
   }
 
-  const { data, isError, refetch } = useQuery(['checkLog', username, password], () =>
-    fetchApi(`checkLog?user=${username}&pass=${password}`), { enabled: false }
-  );
-
   const handleSubmit = async (event) => {
     event.preventDefault();
   
     try {
       const data = await fetchApi(`checkLog?user=${username}&pass=${password}`);
-  
       if (data === true) {
         setCookie("username",username);
         const userType = await fetchApi(`getUserType?user=${username}`);
