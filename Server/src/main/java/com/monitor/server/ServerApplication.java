@@ -105,8 +105,18 @@ public class ServerApplication {
 //		}
 	}
 	@GetMapping("/setDomain")
-	public void setDomain(@RequestParam(value="domain") String d){
-		domain=d;
+	public boolean setDomain(@RequestParam(value="domain") String d){
+		String temp = domain;
+		try{
+			domain=d;
+			initialize();
+			return true;
+		}catch (Exception e){
+			domain=temp;
+			return false;
+		}
+
+
 	}
 	@GetMapping("/setupMap")
 	private boolean setupMap(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
