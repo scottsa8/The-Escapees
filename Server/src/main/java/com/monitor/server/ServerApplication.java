@@ -65,8 +65,8 @@ public class ServerApplication {
 		try {
 			connection = DriverManager.getConnection(URL, USER, PASSWORD);
 			Statement createDBStmt = connection.createStatement();
-			createDBStmt.execute("CREATE DATABASE IF NOT EXISTS prisondb");
-			URL = "jdbc:mysql://localhost:3306/prisondb?useSSL=FALSE&allowPublicKeyRetrieval=True";
+			createDBStmt.execute("CREATE DATABASE IF NOT EXISTS "+domain+"db");
+			URL = "jdbc:mysql://localhost:3306/"+domain+"db?useSSL=FALSE&allowPublicKeyRetrieval=True";
 			connection = DriverManager.getConnection(URL, USER, PASSWORD);
 			
 			for (int i = 0; i < tableNames.length; i++) {
@@ -103,6 +103,10 @@ public class ServerApplication {
 //		} catch (Exception e) {
 //			//e.printStackTrace();
 //		}
+	}
+	@GetMapping("/setDomain")
+	public void setDomain(@RequestParam(value="domain") String d){
+		domain=d;
 	}
 	@GetMapping("/setupMap")
 	private boolean setupMap(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
@@ -159,7 +163,7 @@ public class ServerApplication {
 	private String getEnv(@RequestParam(value = "loc") String loc,@RequestParam(value="order")String order){
 		StringBuilder output = new StringBuilder();
 		output.append("{\"environment\":{\"data\":[");
-
+		System.out.println(URL);
 		try {
 			// Get room_id from rooms table using the room name (loc)
 			PreparedStatement roomIdStatement = connection.prepareStatement(
