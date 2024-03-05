@@ -37,7 +37,7 @@ public class ServerApplication {
 	private static final String USER = "java";
 	private static Connection connection;
 	private static SerialMonitor monitor;
-	private static String domain = "Prison";
+	private static String domain = "Prison"; //default domain
 
 	private static final String[] tableNames = {
 		"users",
@@ -115,8 +115,6 @@ public class ServerApplication {
 			domain=temp;
 			return false;
 		}
-
-
 	}
 	@GetMapping("/setupMap")
 	private boolean setupMap(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
