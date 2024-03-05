@@ -1,12 +1,11 @@
 // TODO: Style popups
 
 import React, { useEffect, useState } from "react";
-import { network } from "../layout";
 import { Table, Header, HeaderRow, Body, Row, HeaderCell, Cell, } from '@table-library/react-table-library/table';
 import { useTheme } from '@table-library/react-table-library/theme';
 import { DEFAULT_OPTIONS, getTheme } from '@table-library/react-table-library/mantine';
-import { fetchUpdateDelay } from './cookies'
-import { get } from "http";
+import { fetchApi } from "./apiFetcher";
+import { useQuery } from 'react-query';
 
 //Table containing the locations of users
 const LocationTable = () => { 
@@ -16,6 +15,7 @@ const LocationTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [locations, setLocations] = useState([]);
+
   const removeDuplicates = async (arr) => {
     arr.sort((x, y) => new Date(y.Timestamp) - new Date(x.Timestamp));
     let map = new Map();
@@ -27,21 +27,17 @@ const LocationTable = () => {
     return Array.from(map.values());
   }
 
-  const getLocations = async () =>{
-    const response = await fetch(`http://${network.ip}:${network.port}/listAll`,
-    {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}});
-    const responseJson = await response.json();
-    return responseJson['locations']['data'];
-  }
-  
+  const { data: responseData, isLoading, error } = useQuery('locations', () => fetchApi('listAll'));
+  const data = responseData?.locations?.data;
+  console.log(data);
   /**
    * Retrieves the current locations from the server.
    * wait for promise to resolve before using the data.
    * @returns {Promise<Array<{name: string, loc: string, Timestamp: string}>>}
    */
   const getCurrentLocations = async () => {
+    if (!data) return [];
     let newNodes = [];
-    let data = await getLocations();
     for(let i=0; i < data.length; i++) {
       let entry = data[i];
       newNodes.push({name:entry['user'],loc:entry['Location'],Timestamp:entry['Timestamp']});
@@ -50,7 +46,7 @@ const LocationTable = () => {
   };
 
   const getAllLocations = async (user) => {
-    let data = await getLocations();
+    if (!data) return [];
     let userLocations = data.filter(entry => entry['user'] === user);
     return userLocations.map(entry => {
       let timestamp = new Date(entry['Timestamp']);
@@ -61,11 +57,16 @@ const LocationTable = () => {
     
 
   useEffect(() => {
-    getCurrentLocations().then(newNodes => setNodes(newNodes));
-  }, []);
+    const fetchLocations = async () => {
+      const newNodes = await getCurrentLocations();
+      setNodes(newNodes);
+    };
+
+    fetchLocations();
+  }, [data]);
 
   
-  return ( 
+  return (  
     <div className="grow pl-5">
       {/* The table containing location data */}
       <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded relative" role="alert">

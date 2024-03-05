@@ -4,7 +4,6 @@ import LocationCountBox from "./locationNumber";
 import EnvironmentBox from "./EnvironmentBox";
 import { useQuery } from 'react-query';
 import { fetchApi } from './apiFetcher';
-
 export default function EnviromentContainer(){
     const [selectedLocation, setSelectedLocation] = useState("")
     const [values, setValues] = useState({
