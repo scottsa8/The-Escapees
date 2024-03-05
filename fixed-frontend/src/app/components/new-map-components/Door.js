@@ -1,10 +1,10 @@
 class Door{
 
-    static ICON_SIZE = this.ICON_SIZE;
     static closedLockIcon = new Image();
     static openLockIcon = new Image();
 
     static contextRef;
+    static ICON_SIZE;
 
     //sets coords for the corners of the 
     #setCoords(size, location){
@@ -18,9 +18,21 @@ class Door{
     constructor(name, location){
         this.doorName = name;
         this.location = location;//the center point for the box representing the door
-        this.size = 50;//50pixels in height and width
+        this.size = 20;//20pixels in height and width
         this.#setCoords(this.size, location);
         this.doorLocked = true;
+        Door.ICON_SIZE = this.size - 5;
+    }
+
+    #drawIcon(){
+
+        if(this.doorLocked == true){
+            //show a closed padlock icon
+            Door.contextRef.current.drawImage(Door.closedLockIcon, this.location[0]-Door.ICON_SIZE/2, this.location[1]-Door.ICON_SIZE/2, Door.ICON_SIZE, Door.ICON_SIZE);
+        }else{
+            //show an open padlocak icon
+            Door.contextRef.current.drawImage(Door.openLockIcon, this.location[0]-Door.ICON_SIZE/2, this.location[1]-Door.ICON_SIZE/2, Door.ICON_SIZE, Door.ICON_SIZE);
+        }
     }
 
     //draws the room
@@ -50,24 +62,8 @@ class Door{
         Door.contextRef.current.fill();
         Door.contextRef.current.stroke();
 
-        if(this.doorLocked == true){
-            console.log("Drawing door lock");
-            Door.contextRef.current.drawImage(Door.closedLockIcon, this.location[0]-Door.ICON_SIZE/2, this.location[1]-Door.ICON_SIZE/2, Door.ICON_SIZE, Door.ICON_SIZE);
-        }else{
-            Door.contextRef.current.drawImage(Door.openLockIcon, this.location[0]-Door.ICON_SIZE/2, this.location[1]-Door.ICON_SIZE/2, Door.ICON_SIZE, Door.ICON_SIZE);
-        }
-    }
-    //sets true if the door is locked
-    setDoorLocked(status){
-        this.doorLocked = status;
 
-        if(this.doorLocked){
-            //Change colour to green
-            this.draw("#C7FAC4", "black");
-        }else{
-            //set to red for "unlocked"
-            this.draw("#EABBBB", "black");
-        }
+        this.#drawIcon();
     }
 }
 

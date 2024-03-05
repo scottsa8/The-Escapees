@@ -51,7 +51,7 @@ class Room {
     }
 
     constructor(name, coordinates,doors){
-        this.name = name;
+        this.name = name;       
         this.coords = coordinates;
         this.centerPoint = [];
         this.doors = doors;
@@ -68,13 +68,13 @@ class Room {
     //checks if the user has clicked this box
     checkClick(x, y){
         let roomFound = undefined;
-        
         if((this.coords.length == 4) && (roomFound == undefined)){
             //if it is within the bounds
             if((x > this.lowerBound_x && x < this.upperBound_x) && (y > this.lowerBound_y && y < this.upperBound_y)){
                 roomFound = this;
             }  
         }
+        
         return roomFound;
     }
 
@@ -115,7 +115,7 @@ class Room {
 
         //drawing text
         Room.contextRef.current.fillStyle = "black";
-        Room.contextRef.current.font = "30px Arial";
+        Room.contextRef.current.font = "20px Arial";
         Room.contextRef.current.textAlign = "center";
         Room.contextRef.current.fillText(this.name, this.centerPoint[0], this.lowerBound_y + 40);
 
@@ -161,7 +161,7 @@ class Room {
         this.noise = noise;
         this.light = light;
 
-        this.toShow = [];
+        this.toShow = [Room.lightIcon];//to test, empty on run
 
         if(this.temp > Room.maxValues.temp){
             toShow.push(Room.tempIcon);
@@ -172,8 +172,6 @@ class Room {
         if(this.noise > Room.maxValues.noise){
             toShow.push(Room.noiseIcon)
         }
-
-
     }
 
     //sets the room colour to red
