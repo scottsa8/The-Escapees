@@ -114,6 +114,16 @@ public class ServerApplication {
 		//get from db
 		return "";
 	}
+	@GetMapping("/setupDoors")
+	private boolean setupDoors(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
+		//insert into db
+		return false;
+	}
+	@GetMapping("/getDoors")
+	private String getDoors(@RequestParam(value="roomName") String roomName){
+		//get from db
+		return "";
+	}
 	@GetMapping("/panic")
 		private String triggerPanic() {
 		if (monitor != null) {
