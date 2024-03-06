@@ -1,9 +1,5 @@
 package com.monitor.server;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.json.JsonParser;
-import org.springframework.boot.json.JsonParserFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -11,21 +7,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
 import org.springframework.web.bind.annotation.*;
 import org.mindrot.jbcrypt.BCrypt;
-
-import javax.print.attribute.standard.Media;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.net.MalformedURLException;
-
 
 @EnableScheduling
 @SpringBootApplication
@@ -37,7 +27,7 @@ public class ServerApplication {
 	private static final String USER = "java";
 	private static Connection connection;
 	private static SerialMonitor monitor;
-	private static String domain = "Prison";
+	private static String domain = "Prison"; //default domain
 
 	private static final String[] tableNames = {
 		"users",
@@ -70,8 +60,8 @@ public class ServerApplication {
 		try {
 			connection = DriverManager.getConnection(URL, USER, PASSWORD);
 			Statement createDBStmt = connection.createStatement();
-			createDBStmt.execute("CREATE DATABASE IF NOT EXISTS prisondb");
-			URL = "jdbc:mysql://localhost:3306/prisondb?useSSL=FALSE&allowPublicKeyRetrieval=True";
+			createDBStmt.execute("CREATE DATABASE IF NOT EXISTS "+domain+"db");
+			URL = "jdbc:mysql://localhost:3306/"+domain+"db?useSSL=FALSE&allowPublicKeyRetrieval=True";
 			connection = DriverManager.getConnection(URL, USER, PASSWORD);
 			
 			for (int i = 0; i < tableNames.length; i++) {
@@ -113,6 +103,43 @@ public class ServerApplication {
 //			//e.printStackTrace();
 //		}
 	}
+	@GetMapping("/isLocked")
+	private boolean isLocked(@RequestParam(value="roomName") String roomName, @RequestParam(value="doorName") String doorName){
+		//get from db
+		return false;
+	}
+	@GetMapping("/setDomain")
+	public boolean setDomain(@RequestParam(value="domain") String d){
+		String temp = domain;
+		try{
+			domain=d;
+			initialize();
+			return true;
+		}catch (Exception e){
+			domain=temp;
+			return false;
+		}
+	}
+	@GetMapping("/setupMap")
+	private boolean setupMap(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
+		//insert into db
+		return false;
+	}
+	@GetMapping("/getMap")
+	private String getMap(@RequestParam(value="roomName") String roomName){
+		//get from db
+		return "";
+	}
+	@GetMapping("/setupDoors")
+	private boolean setupDoors(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
+		//insert into db
+		return false;
+	}
+	@GetMapping("/getDoors")
+	private String getDoors(@RequestParam(value="roomName") String roomName){
+		//get from db
+		return "";
+	}
 
 	@GetMapping("/panic")
 		private String triggerPanic() {
@@ -150,7 +177,7 @@ public class ServerApplication {
 	private String getEnv(@RequestParam(value = "loc") String loc,@RequestParam(value="order")String order){
 		StringBuilder output = new StringBuilder();
 		output.append("{\"environment\":{\"data\":[");
-
+		System.out.println(URL);
 		try {
 			// Get room_id from rooms table using the room name (loc)
 			PreparedStatement roomIdStatement = connection.prepareStatement(
@@ -284,18 +311,29 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/listAll")
-	private String listAll() {
+	private String listAll(@RequestParam (value="user",defaultValue = "all") String user) {
 		StringBuilder output = new StringBuilder();
 		output.append("{\"locations\":{"+
 				"\"data\":[");
 		try {
+			PreparedStatement selectStatement;
+			if(user.equals("all")){
+				selectStatement = connection.prepareStatement(
+						"SELECT u.username, r.room_name, ro.entry_timestamp " +
+								"FROM users u " +
+								"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
+								"JOIN rooms r ON ro.room_id = r.room_id"
+				);
+			}else{
+				selectStatement = connection.prepareStatement(
+						"SELECT u.username, r.room_name, ro.entry_timestamp " +
+								"FROM users u " +
+								"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
+								"JOIN rooms r ON ro.room_id = r.room_id "+
+								"WHERE u.username = \""+user+"\""
+				);
+			}
 			// Fetch all users and their latest location from the database
-			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT u.username, r.room_name, ro.entry_timestamp " +
-							"FROM users u " +
-							"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
-							"JOIN rooms r ON ro.room_id = r.room_id"
-			);
 
 			ResultSet rs = selectStatement.executeQuery();
 

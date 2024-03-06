@@ -7,7 +7,7 @@ import MapPage from "../components/new-map-components/MapPage"
 import Settings from "../components/settings"
 import Chart from "../components/charts"
 import { getCookie } from "../components/cookies"
-import { HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon } from "../components/heroIcons"
+import { HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon,NotificationIcon } from "../components/heroIcons"
 import { useNotification } from "../components/notifications";
 import { fetchApi } from "../components/apiFetcher";
 
@@ -25,20 +25,17 @@ const views = {
 //It's the constant border around the main page
 const Dashboard = () => {
 
-  const[currentView,setView] = useState(views.homePage);
+  const [currentView,setView] = useState(views.homePage);
   const [username, setUsername] = useState('');
   const { sendNotification, NotificationComponent } = useNotification();
-
-
+  const [ showNotifications, setShowNotifications ] = useState(false);
+  const notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+  console.log(notifications);
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
     setUsername(getCookie("username"));
   }, []);
 
-  const logNotifications = () => {
-    const notifications = JSON.parse(localStorage.getItem('notifications')) || [];
-    console.log(notifications);
-  }
   return (
     <>
       <title>Dashboard - Prison System</title>
@@ -58,7 +55,6 @@ const Dashboard = () => {
           <button className="topbar-button md:sidebar-button" onClick={() => setView(views.interactiveMap)}>Map <MapIcon/></button>
           <button className="topbar-button md:sidebar-button" onClick={() => setView(views.charts)}>Analytics <AnalyticsIcon/></button>
           <button className="topbar-button md:sidebar-button" onClick={() => setView(views.settings)}>Settings <SettingsIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => logNotifications()}>Notifications</button>
         </div>
 
         {/* Where the screen contents are shown */}
@@ -74,6 +70,17 @@ const Dashboard = () => {
             }
           }}
           >Panic</button>
+          <button onClick={() => setShowNotifications(!showNotifications)} className="fixed rounded-md m-4 ml-8 shadow-md bottom-0 flex justify-end p-2 bg-red-600"><NotificationIcon/></button>
+          {showNotifications && (
+            <div>
+              {notifications.map((notification, index) => (
+                <div className="card ml-6 p-4" key={index}>
+                  <h1>{notification.title}</h1>
+                  <p>{notification.options}</p>
+                </div>
+              ))}
+            </div>
+          )}
           <NotificationComponent />
         </div>
       </body>

@@ -7,8 +7,17 @@ const RoomCanvas = () => {
     const CANVAS_HEIGHT = 1000;
     const SECOND = 1000;
 
+
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
+
+    const ICON_SIZE = 30;
+    let userIcon;
+    let openLockIcon;
+    let closedLockIcon;
+    let tempIcon;
+    let lightIcon;
+    let noiseIcon;
 
     class Door{
 
@@ -55,8 +64,14 @@ const RoomCanvas = () => {
             contextRef.current.closePath();
             contextRef.current.fill();
             contextRef.current.stroke();
-        }
 
+            if(this.doorLocked == true){
+                console.log("Drawing door lock");
+                contextRef.current.drawImage(closedLockIcon, this.location[0]-ICON_SIZE/2, this.location[1]-ICON_SIZE/2, ICON_SIZE, ICON_SIZE);
+            }else{
+                contextRef.current.drawImage(openLockIcon, this.location[0]-ICON_SIZE/2, this.location[1]-ICON_SIZE/2, ICON_SIZE, ICON_SIZE);
+            }
+        }
         //sets true if the door is locked
         setDoorLocked(status){
             this.doorLocked = status;
@@ -174,6 +189,13 @@ const RoomCanvas = () => {
             contextRef.current.font = "30px Arial";
             contextRef.current.textAlign = "center";
             contextRef.current.fillText(this.name, this.centerPoint[0], this.lowerBound_y + 40);
+
+            //if there is a user in the room, draw it
+            if(this.user == true){
+                contextRef.current.drawImage(userIcon, this.centerPoint[0]-ICON_SIZE/2, this.centerPoint[1]-ICON_SIZE/2, ICON_SIZE, ICON_SIZE);
+                console.log("Drawing user");
+            }
+
         }
 
         //sets the current environmental data of the room
@@ -181,17 +203,6 @@ const RoomCanvas = () => {
             this.temp = temp;
             this.noise = noise;
             this.light = light;
-        }
-
-        //sets if the current user is in this room or not
-        toggleUser(status){
-            this.user = status;
-
-            if(this.user){
-                //show icon
-            }else{
-                //hide icon
-            }
         }
 
         //sets the room colour to red
@@ -233,8 +244,9 @@ const RoomCanvas = () => {
             rooms[i].setEnvironmentalData(envData.temp, envData.noise, envData.light);
 
             //gets and sets the current location data
-
+            
             //gets and sets the current door data???
+
         }
     }
 
@@ -259,8 +271,34 @@ const RoomCanvas = () => {
         //if a room has been clicked, change its colour
         if(roomFound != undefined){
             console.log("Clicked "+roomFound.name);
-            roomFound.alarm();
+            roomFound.user = true;
+            
+            try{
+                roomFound.doors[0].doorLocked = false;
+                roomFound.doors[1].doorLocked = false;
+            }catch(e){
+
+            }
+
+
+            refreshCanvas();         
         }
+    }
+
+    function setIcons() {
+        userIcon  = new Image();
+        openLockIcon = new Image();
+        closedLockIcon = new Image();
+        tempIcon = new Image();
+        lightIcon = new Image();
+        noiseIcon = new Image();
+
+        userIcon.src="/userSolid.png";
+        openLockIcon.src = "/lock-open-solid.png";
+        closedLockIcon.src = "/lock-solid.png";
+        tempIcon.src = "/temperature-high-solid.png"
+        noiseIcon.src = "/volume-high-solid.png";
+        lightIcon.src = "/sun-solid.png";
     }
 
     useEffect(() => {
@@ -275,6 +313,7 @@ const RoomCanvas = () => {
             setAllRoomData();
         }, SECOND);
 
+        setIcons();
         drawRooms();
 
     },[])
