@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import ToggleSwitch from './toggleSwitch';
 import {SunIcon, MoonIcon} from './heroIcons'
 import {setCookie, getCookie} from './cookies'
 
 export default function Settings() {
-    const [x, setX] = useState(50);
-    const [y, setY] = useState(50);
+    const [temp, setTemp] = useState(30);
+    const [noise, setNoise] = useState(30);
+    const [light, setLight] = useState(30);
     const [updateDelay, setUpdateDelay] = useState(10);
     const [theme, setTheme] = useState('light');
     const [isEnabled, setIsEnabled] = useState(false);
-    
-    const toggleSwitch = () => {
-        setIsEnabled(!isEnabled);
-    };
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -34,11 +31,17 @@ export default function Settings() {
         setUpdateDelay(savedUpdateDelay);
         document.documentElement.classList.toggle('dark', savedTheme === 'dark');
     }, []);
+    
+    useEffect(() => {
+        setCookie('tempNotification', temp);
+        setCookie('noiseNotification', noise);
+        setCookie('lightNotification', light);
+    }, [temp, noise, light]);
 
     return (
         <div className="card-container p-4 dark:text-blue-100">
             <h1 className="text-2xl font-bold mb-4">Settings</h1>
-            <div className="card shadow-md p-4">
+            <div className="card shadow-md m-4 p-4">
                 {/* Update Delay slider */}
                 <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Update Delay</label>
                 <input
@@ -55,6 +58,48 @@ export default function Settings() {
                 <button onClick={toggleTheme} className="rounded-full w-10 p-2">
                     {theme === 'light' ? (<MoonIcon/>) : (<SunIcon/>)}
                 </button>
+            </div>
+            <div className="card shadow-md m-4 p-4">
+                {/* Existing components... */}
+                
+                {/* Temperature slider */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Temperature</label>
+                <input
+                    type="range"
+                    id="temp-slider"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+                    min="0"
+                    max="100"
+                    value={temp}
+                    onChange={(e) => setTemp(e.target.value)}
+                />
+                <div className="text-right text-sm">{temp}</div>
+
+                {/* Noise slider */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Noise</label>
+                <input
+                    type="range"
+                    id="noise-slider"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+                    min="0"
+                    max="100"
+                    value={noise}
+                    onChange={(e) => setNoise(e.target.value)}
+                />
+                <div className="text-right text-sm">{noise}</div>
+
+                {/* Light slider */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Light</label>
+                <input
+                    type="range"
+                    id="light-slider"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+                    min="0"
+                    max="100"
+                    value={light}
+                    onChange={(e) => setLight(e.target.value)}
+                />
+                <div className="text-right text-sm">{light}</div>
             </div>
         </div>
     );

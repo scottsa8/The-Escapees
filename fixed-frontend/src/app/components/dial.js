@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
  * @example
  * <Dial className="myDial" value={50} min={0} max={100} onMaxValue={() => console.log("Max value reached")} size={200} />
  * 
- * @returns {React.Component} The Dial component
+ * @returns {JSX.Element} The Dial component
  */
 function Dial({className, value, min, max, onMaxValue, size = 170 }) {
 

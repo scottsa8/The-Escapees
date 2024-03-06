@@ -93,7 +93,7 @@ const LocationTable = () => {
           </Header>
           <Body>
           {tableList
-            .filter(item => item.name.includes(searchTerm) || item.loc.includes(searchTerm))
+            .filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.loc.toLowerCase().includes(searchTerm.toLowerCase()))
             .map((item) => (
               <Row key={item.name} item={item}   onClick={async () => {
                 let locations = await getAllLocations(item.name);
