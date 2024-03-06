@@ -152,11 +152,7 @@ public class ServerApplication {
 		output.append("]}}");
 		return output.toString();
 	}
-	@GetMapping("/isLocked")
-	private boolean isLocked(@RequestParam(value="roomName") String roomName, @RequestParam(value="doorName") String doorName){
-		//get from db
-		return false;
-	}
+	
 	@GetMapping("/panic")
 		private String triggerPanic() {
 		if (monitor != null) {
@@ -297,6 +293,7 @@ public class ServerApplication {
 		}catch (Exception e){System.out.println("failed to generate report");}
 				return null;
 	}
+
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value="loc") String loc, @RequestParam(value="type", required=false, defaultValue="inmate") String type) {
 		int total = 0;
@@ -523,6 +520,74 @@ public class ServerApplication {
 		return false;
 	}
 
+	@GetMapping("/getRoomCoordinates")
+	private String getRoomCoordinates(@RequestParam(value = "roomName") String roomName) {
+		StringBuilder coordinates = new StringBuilder();
+
+		try {
+			// Fetch all coordinates for the given room from the database
+			PreparedStatement selectCoordinatesStatement = connection.prepareStatement(
+					"SELECT top_left_x, top_left_y, bottom_right_x, bottom_right_y FROM rooms WHERE room_name = ?"
+			);
+			selectCoordinatesStatement.setString(1, roomName);
+			ResultSet rs = selectCoordinatesStatement.executeQuery();
+
+			if (rs.next()) {
+				// Retrieve coordinates and append them to the StringBuilder
+				int topLeftX = rs.getInt("top_left_x");
+				int topLeftY = rs.getInt("top_left_y");
+				int bottomRightX = rs.getInt("bottom_right_x");
+				int bottomRightY = rs.getInt("bottom_right_y");
+
+				coordinates.append(topLeftX).append(",").append(topLeftY).append(",")
+						.append(bottomRightX).append(",").append(topLeftY).append(",")
+						.append(bottomRightX).append(",").append(bottomRightY).append(",")
+						.append(topLeftX).append(",").append(bottomRightY);
+			} else {
+				// Handle the case when the room name is not found
+				coordinates.append("Room not found");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// Handle the SQL exception
+			coordinates.append("An error occurred");
+		}
+
+		return coordinates.toString();
+	}
+
+	@GetMapping("/isDoorLocked")
+	private boolean isDoorLocked(@RequestParam(value = "doorName") String doorName) {
+		try {
+			// Fetch the most recent status for the given door from the database
+			PreparedStatement selectDoorStatusStatement = connection.prepareStatement(
+					"SELECT is_locked FROM doorHistory " +
+							"JOIN doors ON doorHistory.door_id = doors.door_id " +
+							"WHERE doors.door_name = ? " +
+							"ORDER BY change_timestamp DESC " +
+							"LIMIT 1"
+			);
+			// Set the doorName parameter in the SQL query
+			selectDoorStatusStatement.setString(1, doorName);
+			// Execute the query and get the result set
+			ResultSet rs = selectDoorStatusStatement.executeQuery();
+
+			if (rs.next()) {
+				// Retrieve the status from the result set and return it
+				return rs.getBoolean("is_locked");
+			} else {
+				// Handle the case when the door name is not found
+				return false;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// Handle the SQL exception
+			return false;
+		}
+	}
+
 	@GetMapping("/transmitMessage")
 	private String transmitMessage(
 			@RequestParam(value = "personId") int personId,
@@ -555,6 +620,7 @@ public class ServerApplication {
 			return "Failed to transmit message";
 		}
 	}
+
 	@GetMapping("/transmitMessageBatch")
 	private String transmitMessageBatch(
 			@RequestParam(value = "userType") String userType,
