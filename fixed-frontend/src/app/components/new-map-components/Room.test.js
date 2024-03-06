@@ -2,7 +2,6 @@ const { describe } = require("node:test");
 // const Room = require("./Room");
 import Room from "./Room"
 import Door from "./Door"
-import exp from "constants";
 
 //tests on setting the boundries for a room
 describe("Room boundries", () => {

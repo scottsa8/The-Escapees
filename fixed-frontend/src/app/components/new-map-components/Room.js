@@ -173,6 +173,8 @@ class Room {
         if(this.noise > Room.maxValues.noise){
             toShow.push(Room.noiseIcon)
         }
+
+        console.log(this.name +": Temp = "+this.temp+" Noise = "+this.noise+" Light = "+this.light);
     }
 
     //sets the room colour to red

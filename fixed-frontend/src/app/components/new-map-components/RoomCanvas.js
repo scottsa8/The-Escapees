@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState} from "react";
-import {getEnvData} from "../apiFetcher";
+import {fetchApi, getEnvData} from "../apiFetcher";
 import Room from "./Room";
 import Door from "./Door";
+import { getCookie } from "../cookies";
 
 const RoomCanvas = () => {
 
@@ -68,22 +69,30 @@ const RoomCanvas = () => {
     //needs to be tested with data
     function setAllRoomData(){
 
-        let userLocationName = undefined;
+        let currentUserLocation = undefined;
 
-        // TODO get the location of the current selected user
+        // TEST get the location of the current selected user
         if(trackedName != undefined){
-            // e.g userLocationName = getLocation(trackedName)
-            
+            //get the current location of the user
+            currentUserLocation = fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
+            console.log(trackedName+" is in "+currentUserLocation);
         }
 
         for(let i=0; i<rooms.length; i++){
             //gets and sets the current environmental data
             let envData = getEnvData(rooms[i].name,"ASC", false);
+            
+            Room.maxValues.temp = getCookie('tempNotification');
+            Room.maxValues.light = getCookie('lightNoitification');
+            Room.maxValues.noise = getCookie('noiseNotification');
+
+            console.log("Mav vals: temp = "+Room.maxValues.temp+" light = "+Room.maxValues.light+" noise = "+Room.maxValues.noise);
+
             rooms[i].setAndCheckEnvironmentalData(envData.temp, envData.noise, envData.light);
 
             //if this room is the one the tracked user is in, show the icon
-            if(userLocationName != undefined && trackedName != undefined){
-                if(userLocationName == rooms[i].name){
+            if(currentUserLocation != undefined && trackedName != undefined){
+                if(currentUserLocation == rooms[i].name){
                     rooms[i].user = true;
                 }else{
                     rooms[i].user = false;
@@ -93,8 +102,9 @@ const RoomCanvas = () => {
             //gets and sets the current door data???
             if(rooms[i].doors != null){
                 for(let j=0; j<rooms[i].doors.length; j++){
-                    //Assuming return is boolean
-                    //this.rooms[i].doors[j].doorLocked = api.getDoorStatus(name);
+                    //return is boolean
+                    //this.rooms[i].doors[j].doorLocked = fetchApi(doorname);
+                    console.log(rooms[i].doors[j].name+" locked = "+rooms[i].doors[j].doorLocked);
                 }
             }
 
