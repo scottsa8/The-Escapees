@@ -11,7 +11,7 @@ export const fetchApi = async (endpoint) => {
     try {
         const response = await axios({
             method: 'GET',
-            url: `http://${network.ip}:${network.port}/${endpoint}`
+            url: `https://${network.ip}:${network.port}/${endpoint}`
         });
         return response.data;
     } catch (error) {
@@ -52,7 +52,7 @@ const filterData = (data, filtered) => {
    * @return {Promise<any>} The filtered environment data.
    */
   export const getEnvData = async (selectedRoom, order = "ASC", filtered = true) => {
-    const response = await axios.get(`http://${network.ip}:${network.port}/getEnv`, {
+    const response = await axios.get(`https://${network.ip}:${network.port}/getEnv`, {
       params: {
         loc: selectedRoom,
         order: order

@@ -40,6 +40,8 @@ const Dashboard = () => {
     const notifications = JSON.parse(localStorage.getItem('notifications')) || [];
     console.log(notifications);
   }
+
+  console.log("Width of screen: ",window.screen.width)
   return (
     <>
       <title>Dashboard - Prison System</title>
@@ -53,13 +55,13 @@ const Dashboard = () => {
         </div>
 
         {/* Used to navigate pages */}
-        <div className='topbar md:sidebar'>
-          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.homePage)}>Home <HomeIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.individualLocations)}>Locations <LocPin/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.interactiveMap)}>Map <MapIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.charts)}>Analytics <AnalyticsIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => setView(views.settings)}>Settings <SettingsIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => logNotifications()}>Notifications</button>
+        <div className='topbar lg:sidebar'>
+          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.homePage)}>Home <HomeIcon/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.individualLocations)}>Locations <LocPin/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.interactiveMap)}>Map <MapIcon/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.charts)}>Analytics <AnalyticsIcon/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.settings)}>Settings <SettingsIcon/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => logNotifications()}>Notifications</button>
         </div>
 
         {/* Where the screen contents are shown */}
