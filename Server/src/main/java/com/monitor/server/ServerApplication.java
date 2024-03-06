@@ -161,6 +161,27 @@ public class ServerApplication {
 		output.append("]}}");
 		return output.toString();
 	}
+	@GetMapping("/getTracked")
+	private String getTracked(){
+		StringBuilder output = new StringBuilder();
+		output.append("{\"names\":{"+
+				"\"data\":[");
+		try {
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT username,user_microbit FROM users WHERE user_microbit IS NOT NULL");
+			while (rs.next()) {
+				output.append("{\"username\": \""+rs.getString("username")+"\"}");
+				if(!rs.isLast()){
+					output.append(",");
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		output.append("]}}");
+		return output.toString();
+	}
 
 	@RequestMapping(value = "/getEnv", produces = MediaType.APPLICATION_JSON_VALUE)
 	private String getEnv(@RequestParam(value = "loc") String loc,@RequestParam(value="order")String order){
