@@ -1,21 +1,21 @@
 package com.monitor.server;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.*;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.web.bind.annotation.*;
+import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
+import org.springframework.http.*;
 import org.mindrot.jbcrypt.BCrypt;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.MalformedURLException;
+import java.sql.*;
 
 @EnableScheduling
 @SpringBootApplication
@@ -45,7 +45,7 @@ public class ServerApplication {
 		"occupancy_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, user_id INT NOT NULL, entry_timestamp TIMESTAMP, FOREIGN KEY (room_id) REFERENCES rooms(room_id), FOREIGN KEY (user_id) REFERENCES users(user_id)",
 		"data_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, timestamp TIMESTAMP, temperature DECIMAL(5, 2), noise_level DECIMAL(5, 2), light_level DECIMAL(8, 2), FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
 		"history_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, head_count INT NOT NULL, change_timestamp TIMESTAMP NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
-		"door_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, door_name VARCHAR(255) NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
+		"door_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, door_name VARCHAR(255) UNIQUE NOT NULL, x_coordinate INT NOT NULL, y_coordinate INT NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
     	"doorHistory_id INT AUTO_INCREMENT PRIMARY KEY, door_id INT NOT NULL, is_locked BOOLEAN NOT NULL, change_timestamp TIMESTAMP NOT NULL, FOREIGN KEY (door_id) REFERENCES doors(door_id)"
 	};	
 	
@@ -103,11 +103,13 @@ public class ServerApplication {
 //			//e.printStackTrace();
 //		}
 	}
+
 	@GetMapping("/isLocked")
 	private boolean isLocked(@RequestParam(value="roomName") String roomName, @RequestParam(value="doorName") String doorName){
 		//get from db
 		return false;
 	}
+
 	@GetMapping("/setDomain")
 	public boolean setDomain(@RequestParam(value="domain") String d){
 		String temp = domain;
@@ -120,25 +122,45 @@ public class ServerApplication {
 			return false;
 		}
 	}
+
 	@GetMapping("/setupMap")
 	private boolean setupMap(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
 		//insert into db
 		return false;
 	}
-	@GetMapping("/getMap")
-	private String getMap(@RequestParam(value="roomName") String roomName){
-		//get from db
-		return "";
-	}
+
 	@GetMapping("/setupDoors")
 	private boolean setupDoors(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
 		//insert into db
 		return false;
 	}
+
 	@GetMapping("/getDoors")
-	private String getDoors(@RequestParam(value="roomName") String roomName){
-		//get from db
-		return "";
+	private String getDoors(@RequestParam(value = "roomName") String roomName) {
+		StringBuilder output = new StringBuilder();
+		output.append("{\"doors\":{" +
+				"\"data\":[");
+
+		try {
+			// Retrieve all doors for the given room from the database
+			PreparedStatement selectDoorsStatement = connection.prepareStatement(
+					"SELECT door_name FROM doors WHERE room_id = (SELECT room_id FROM rooms WHERE room_name = ?)"
+			);
+			selectDoorsStatement.setString(1, roomName);
+			ResultSet rs = selectDoorsStatement.executeQuery();
+
+			// Iterate over the result set and build the output string
+			while (rs.next()) {
+				output.append("{\"door\": \"" + rs.getString("door_name") + "\"}");
+				if (!rs.isLast()) {
+					output.append(",");
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		output.append("]}}");
+		return output.toString();
 	}
 
 	@GetMapping("/panic")
