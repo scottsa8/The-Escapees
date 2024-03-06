@@ -323,7 +323,7 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/listAll")
-	private String listAll(@RequestParam (value="user",defaultValue = "all") String user,@RequestParam(value="RT") boolean RT) {
+	private String listAll(@RequestParam (value="user",defaultValue = "all") String user,@RequestParam(value="RT", required=false) boolean RT) {
 		StringBuilder output = new StringBuilder();
 		output.append("{\"locations\":{"+
 				"\"data\":[");
