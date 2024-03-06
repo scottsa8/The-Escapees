@@ -323,7 +323,7 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/listAll")
-	private String listAll(@RequestParam (value="user",defaultValue = "all") String user) {
+	private String listAll(@RequestParam (value="user",defaultValue = "all") String user,@RequestParam(value="RT") boolean RT) {
 		StringBuilder output = new StringBuilder();
 		output.append("{\"locations\":{"+
 				"\"data\":[");
@@ -337,13 +337,24 @@ public class ServerApplication {
 								"JOIN rooms r ON ro.room_id = r.room_id"
 				);
 			}else{
-				selectStatement = connection.prepareStatement(
-						"SELECT u.username, r.room_name, ro.entry_timestamp " +
-								"FROM users u " +
-								"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
-								"JOIN rooms r ON ro.room_id = r.room_id "+
-								"WHERE u.username = \""+user+"\""
-				);
+				if(RT){
+					selectStatement = connection.prepareStatement(
+							"SELECT u.username, r.room_name, ro.entry_timestamp " +
+									"FROM users u " +
+									"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
+									"JOIN rooms r ON ro.room_id = r.room_id " +
+									"WHERE u.username = \"" + user + "\" " +
+									"ORDER BY ro.entry_timestamp DESC LIMIT 1"
+					);
+				}else {
+					selectStatement = connection.prepareStatement(
+							"SELECT u.username, r.room_name, ro.entry_timestamp " +
+									"FROM users u " +
+									"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
+									"JOIN rooms r ON ro.room_id = r.room_id " +
+									"WHERE u.username = \"" + user + "\""
+					);
+				}
 			}
 			// Fetch all users and their latest location from the database
 
