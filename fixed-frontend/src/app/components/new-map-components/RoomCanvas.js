@@ -15,7 +15,7 @@ const RoomCanvas = ({trackedUser}) => {
 
     const ICON_SIZE = 20;
 
-    const [trackedName, setTrackedName] = useState(trackedUser);
+    let [trackedName, setTrackedName] = useState(trackedUser);
 
     // const doorA = new Door("Office Side", [400, 110]);
     // const doorB = new Door("Office Main", [285, 200]);
@@ -70,12 +70,13 @@ const RoomCanvas = ({trackedUser}) => {
     async function setAllRoomData(){
 
         let currentUserLocation = undefined;
-
+        trackedName="Scott"
         // TEST get the location of the current selected user
+        console.log(trackedName)
         if(trackedName != undefined){
             //get the current location of the user
-            currentUserLocation = fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
-            console.log(trackedName+" is in "+currentUserLocation);
+            currentUserLocation = await fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
+            console.log(trackedName+" is in "+currentUserLocation.locations.data[0].Location);
         }
 
         for(let i=0; i<rooms.length; i++){
@@ -86,7 +87,7 @@ const RoomCanvas = ({trackedUser}) => {
             Room.maxValues.light = getCookie('lightNotification');
             Room.maxValues.noise = getCookie('noiseNotification');
 
-            console.log("Mav vals: temp = "+Room.maxValues.temp+" light = "+Room.maxValues.light+" noise = "+Room.maxValues.noise);
+            //console.log("Mav vals: temp = "+Room.maxValues.temp+" light = "+Room.maxValues.light+" noise = "+Room.maxValues.noise);
             let temp;
             let noise;
             let light;
