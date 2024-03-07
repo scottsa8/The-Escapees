@@ -7,7 +7,7 @@ const SelectUserBox = ({onUserChange}) => {
 
     const [trackedUsers, setTrackedUsers] = useState([" ", "Hannah"]);//Default values for testing
     const [selectedUser, setSelectedUser] = useState("");
-    const {data, error, refetch} = useQuery('trackedNames', () => fetchApi(''));//TODO
+    const {data, error, refetch} = useQuery('trackedNames', () => fetchApi('/getTracked'));//TODO
 
     const handleUserChange = (e) => {
         setSelectedUser(e.target.value);
@@ -19,7 +19,7 @@ const SelectUserBox = ({onUserChange}) => {
             console.error(error);
             return;
         }
-       
+       consolge.log(data)
         const trackedNames = data//...TODO
 
         setTrackedUsers(trackedNames);
