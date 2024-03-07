@@ -70,13 +70,14 @@ const RoomCanvas = ({trackedUser}) => {
     async function setAllRoomData(){
 
         let currentUserLocation = undefined;
-        trackedName="Scott"
+        trackedName="Ethan"
         // TEST get the location of the current selected user
         console.log(trackedName)
         if(trackedName != undefined){
             //get the current location of the user
             currentUserLocation = await fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
-            console.log(trackedName+" is in "+currentUserLocation.locations.data[0].Location);
+            currentUserLocation = currentUserLocation.locations.data[0].Location;
+            console.log(trackedName+" is in "+currentUserLocation);
         }
 
         for(let i=0; i<rooms.length; i++){
