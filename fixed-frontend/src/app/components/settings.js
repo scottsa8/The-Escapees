@@ -3,6 +3,7 @@ import ToggleSwitch from './toggleSwitch';
 import {SunIcon, MoonIcon} from './heroIcons'
 import {setCookie, getCookie} from './cookies'
 import {PlusIcon,CloseIcon} from './heroIcons'
+import { fetchApi } from './apiFetcher';
 
 export default function Settings() {
     const [temp, setTemp] = useState(30);
@@ -11,6 +12,14 @@ export default function Settings() {
     const [updateDelay, setUpdateDelay] = useState(10);
     const [theme, setTheme] = useState('light');
     const [showAddDomain, setShowAddDomain] = useState(false);
+    const [domains, setDomains] = useState(['Hotel', 'Prison']);
+    const [domainName, setDomainName] = useState('');
+    setDomains(fetchApi("getDomains") || 'Hotel', 'Prison');
+    
+    const addDomain = (domainName) => {
+        setDomains([...domains, domainName]);
+        setShowAddDomain(false);
+    };
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -103,12 +112,11 @@ export default function Settings() {
                 <div className="text-right text-sm">{light}</div>
             </div>
             <div className="domains-container flex flex-row">
-                <div className="card shadow-md m-4 p-4">
-                    <h1 className="font-bold text-sky-500">Prison</h1>
-                </div>
-                <div className="card shadow-md m-4 p-4">
-                    <h1 className="font-bold text-sky-500">Hotel</h1>
-                </div>
+                {domains.map((domain, index) => (
+                    <div key={index} onClick={fetchApi("setDomain?"+domain)}className="card shadow-md m-4 p-4">
+                        <h1 className="font-bold text-sky-500">{domain}</h1>
+                    </div>
+                ))}
                 <div className="card shadow-md m-4 p-4" onClick={() => setShowAddDomain(true)}>
                     <h1 className="font-bold text-sky-500">Add Domain</h1>
                     <PlusIcon/>
@@ -120,10 +128,10 @@ export default function Settings() {
                             <h2 className="text-lg font-bold mb-2">Domain Setup</h2>
                             <button className="rounded-full" onClick={() => setShowAddDomain(false)}><CloseIcon/></button>
                         </div>
-                        <form>
+                        <form onSubmit={(e) => { e.preventDefault(); setShowAddDomain(false); addDomain(domainName); }}>
                             <label className="block mb-2">
                             Domain Name
-                            <input type="text" className="mt-1 block dark:bg-sky-800 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                            <input onChange={e => setDomainName(e.target.value)} type="text" className="mt-1 block dark:bg-sky-800 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
                             </label>
                             <button type="submit" className="mt-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             Submit
