@@ -83,10 +83,10 @@ const RoomCanvas = ({trackedUser}) => {
             let envData = await getEnvData(rooms[i].name,"DESC", false) || [0,0,0];
             let data=envData[0]        
             Room.maxValues.temp = getCookie('tempNotification');
-            Room.maxValues.light = getCookie('lightNoitification');
+            Room.maxValues.light = getCookie('lightNotification');
             Room.maxValues.noise = getCookie('noiseNotification');
 
-            //console.log("Mav vals: temp = "+Room.maxValues.temp+" light = "+Room.maxValues.light+" noise = "+Room.maxValues.noise);
+            console.log("Mav vals: temp = "+Room.maxValues.temp+" light = "+Room.maxValues.light+" noise = "+Room.maxValues.noise);
             let temp;
             let noise;
             let light;

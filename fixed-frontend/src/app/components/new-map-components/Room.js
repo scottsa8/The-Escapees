@@ -158,12 +158,12 @@ class Room {
     //sets the current environmental data of the room
     setAndCheckEnvironmentalData(temp, noise, light){
 
-        this.temp = temp;
-        this.noise = noise;
-        this.light = light;
+        this.temp = parseFloat(temp);
+        this.noise = parseFloat(noise);
+        this.light = parseFloat(light);
         
-        this.toShow = [Room.lightIcon];//to test, empty on run
-
+        this.toShow = [];//to test, empty on run
+        
         if(this.temp > Room.maxValues.temp){
             this.toShow.push(Room.tempIcon);
         }
