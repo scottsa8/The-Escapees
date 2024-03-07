@@ -67,7 +67,7 @@ const RoomCanvas = ({trackedUser}) => {
     }
 
     //needs to be tested with data
-    function setAllRoomData(){
+    async function setAllRoomData(){
 
         let currentUserLocation = undefined;
 
@@ -80,16 +80,27 @@ const RoomCanvas = ({trackedUser}) => {
 
         for(let i=0; i<rooms.length; i++){
             //gets and sets the current environmental data
-            let envData = getEnvData(rooms[i].name,"ASC", false);
-            
+            let envData = await getEnvData(rooms[i].name,"DESC", false) || [0,0,0];
+            let data=envData[0]        
             Room.maxValues.temp = getCookie('tempNotification');
             Room.maxValues.light = getCookie('lightNoitification');
             Room.maxValues.noise = getCookie('noiseNotification');
 
-            console.log("Mav vals: temp = "+Room.maxValues.temp+" light = "+Room.maxValues.light+" noise = "+Room.maxValues.noise);
-
-            rooms[i].setAndCheckEnvironmentalData(envData.temp, envData.noise, envData.light);
-
+            //console.log("Mav vals: temp = "+Room.maxValues.temp+" light = "+Room.maxValues.light+" noise = "+Room.maxValues.noise);
+            let temp;
+            let noise;
+            let light;
+            try{
+                temp=data.temp;
+                noise=data.noise;
+                light=data.light;
+            }catch(e){
+                temp=0;
+                noise=0;
+                light=0;
+            }
+            rooms[i].setAndCheckEnvironmentalData(temp,noise,light);
+         
             //if this room is the one the tracked user is in, show the icon
             if(currentUserLocation != undefined && trackedName != undefined){
                 if(currentUserLocation == rooms[i].name){

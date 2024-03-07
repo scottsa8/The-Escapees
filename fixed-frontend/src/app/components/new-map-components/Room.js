@@ -161,17 +161,17 @@ class Room {
         this.temp = temp;
         this.noise = noise;
         this.light = light;
-
+        
         this.toShow = [Room.lightIcon];//to test, empty on run
 
         if(this.temp > Room.maxValues.temp){
-            toShow.push(Room.tempIcon);
+            this.toShow.push(Room.tempIcon);
         }
         if(this.light > Room.maxValues.light){
-            toShow.push(Room.lightIcon)
+            this.toShow.push(Room.lightIcon)
         }
         if(this.noise > Room.maxValues.noise){
-            toShow.push(Room.noiseIcon)
+            this.toShow.push(Room.noiseIcon)
         }
 
         console.log(this.name +": Temp = "+this.temp+" Noise = "+this.noise+" Light = "+this.light);
