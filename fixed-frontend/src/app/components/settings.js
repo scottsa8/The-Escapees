@@ -14,7 +14,7 @@ export default function Settings() {
     const [showAddDomain, setShowAddDomain] = useState(false);
     const [domains, setDomains] = useState(['Hotel', 'Prison']);
     const [domainName, setDomainName] = useState('');
-    setDomains(fetchApi("getDomains") || 'Hotel', 'Prison');
+    //setDomains(fetchApi("getDomains") || 'Hotel', 'Prison');
     
     const addDomain = (domainName) => {
         setDomains([...domains, domainName]);
