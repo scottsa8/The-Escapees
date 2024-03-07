@@ -161,7 +161,7 @@ class Room {
         this.temp = temp;
         this.noise = noise;
         this.light = light;
-
+        
         this.toShow = [Room.lightIcon];//to test, empty on run
 
         if(this.temp > Room.maxValues.temp){

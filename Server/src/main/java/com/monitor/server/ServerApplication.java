@@ -213,7 +213,6 @@ public class ServerApplication {
 	private String getEnv(@RequestParam(value = "loc") String loc,@RequestParam(value="order")String order){
 		StringBuilder output = new StringBuilder();
 		output.append("{\"environment\":{\"data\":[");
-		System.out.println(URL);
 		try {
 			// Get room_id from rooms table using the room name (loc)
 			PreparedStatement roomIdStatement = connection.prepareStatement(

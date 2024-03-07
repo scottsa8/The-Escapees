@@ -1,5 +1,3 @@
-// TODO: Implement fetchData function to fetch data from server
-
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { network } from "../layout";
