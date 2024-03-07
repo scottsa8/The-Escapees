@@ -42,7 +42,7 @@ body {
 .title {
   color: black;
   font-size: 34px;
-  padding-left: 20px;
+  /* padding-left: 20px; */
   font-weight: bold;
   z-index: 10000
 }
@@ -51,6 +51,13 @@ body {
   @apply transition-transform duration-500 ease-in-out;
 }
 
+.dark .divider {
+  @apply  border-white
+}
+
+.divider {
+  @apply mx-4 border border-black
+}
 
 /* Change design from bottom bar to side bar based on the screen size */
 @layer components {

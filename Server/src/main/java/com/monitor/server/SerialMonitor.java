@@ -294,6 +294,7 @@ public class SerialMonitor {
         }
     }
     public void sendMessage(String message) {
+        System.out.println(message);
         if (microbit != null && microbit.isOpen()) {
             try {
                 // Convert the message to bytes and send it to the microbit
