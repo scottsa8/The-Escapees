@@ -4,7 +4,7 @@ import Room from "./Room";
 import Door from "./Door";
 import { getCookie } from "../cookies";
 
-const RoomCanvas = () => {
+const RoomCanvas = ({trackedUser}) => {
 
     const CANVAS_WIDTH = 1500;
     const CANVAS_HEIGHT = 600;
@@ -15,7 +15,7 @@ const RoomCanvas = () => {
 
     const ICON_SIZE = 20;
 
-    const [trackedName, setTrackedName] = useState(undefined);
+    const [trackedName, setTrackedName] = useState(trackedUser);
 
     // const doorA = new Door("Office Side", [400, 110]);
     // const doorB = new Door("Office Main", [285, 200]);
@@ -180,6 +180,7 @@ const RoomCanvas = () => {
 
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
+            setTrackedName(trackedUser);
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
