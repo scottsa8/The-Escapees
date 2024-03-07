@@ -2,6 +2,7 @@ import React, { useState, useEffect, use } from 'react';
 import ToggleSwitch from './toggleSwitch';
 import {SunIcon, MoonIcon} from './heroIcons'
 import {setCookie, getCookie} from './cookies'
+import {PlusIcon,CloseIcon} from './heroIcons'
 
 export default function Settings() {
     const [temp, setTemp] = useState(30);
@@ -9,7 +10,7 @@ export default function Settings() {
     const [light, setLight] = useState(30);
     const [updateDelay, setUpdateDelay] = useState(10);
     const [theme, setTheme] = useState('light');
-    const [isEnabled, setIsEnabled] = useState(false);
+    const [showAddDomain, setShowAddDomain] = useState(false);
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -101,6 +102,37 @@ export default function Settings() {
                 />
                 <div className="text-right text-sm">{light}</div>
             </div>
+            <div className="domains-container flex flex-row">
+                <div className="card shadow-md m-4 p-4">
+                    <h1 className="font-bold text-sky-500">Prison</h1>
+                </div>
+                <div className="card shadow-md m-4 p-4">
+                    <h1 className="font-bold text-sky-500">Hotel</h1>
+                </div>
+                <div className="card shadow-md m-4 p-4" onClick={() => setShowAddDomain(true)}>
+                    <h1 className="font-bold text-sky-500">Add Domain</h1>
+                    <PlusIcon/>
+                </div>
+                {showAddDomain && (
+                    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="bg-white dark:bg-sky-900 p-4 rounded shadow flex flex-col justify-between items-start">
+                        <div className="w-full flex justify-between items-center">
+                            <h2 className="text-lg font-bold mb-2">Domain Setup</h2>
+                            <button className="rounded-full" onClick={() => setShowAddDomain(false)}><CloseIcon/></button>
+                        </div>
+                        <form>
+                            <label className="block mb-2">
+                            Domain Name
+                            <input type="text" className="mt-1 block dark:bg-sky-800 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                            </label>
+                            <button type="submit" className="mt-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Submit
+                            </button>
+                        </form>
+                        </div>
+                    </div>
+                    )}
         </div>
-    );
+    </div>
+  );
 }
