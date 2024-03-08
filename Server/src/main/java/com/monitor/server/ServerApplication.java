@@ -685,7 +685,8 @@ public class ServerApplication {
 	@GetMapping("/getAllRoomData")
 	private String getAllRoomData() {
 		StringBuilder roomData = new StringBuilder();
-	
+		roomData.append("{\"rooms\":{" +
+				"\"data\":[");
 		try {
 			// Fetch all room data from the database
 			PreparedStatement selectRoomDataStatement = connection.prepareStatement(
@@ -704,24 +705,27 @@ public class ServerApplication {
 				int roomBottomRightX = rs.getInt("bottom_right_x");
 				int roomBottomRightY = rs.getInt("bottom_right_y");
 	
-				roomData.append("Room Name: ").append(roomName).append("\n")
-						.append("Top-Left Coordinates: ").append(roomTopLeftX).append(",").append(roomTopLeftY).append("\n")
-						.append("Top-Right Coordinates: ").append(roomBottomRightX).append(",").append(roomTopLeftY).append("\n")
-						.append("Bottom-Left Coordinates: ").append(roomTopLeftX).append(",").append(roomBottomRightY).append("\n")
-						.append("Bottom-Right Coordinates: ").append(roomBottomRightX).append(",").append(roomBottomRightY).append("\n\n");
+				roomData.append("{\"Room Name\": \"").append(roomName).append("\",")
+						.append("\"TLC\": \"").append(roomTopLeftX).append(",").append(roomTopLeftY).append("\",")
+						.append("\"TRC\": \"").append(roomBottomRightX).append(",").append(roomTopLeftY).append("\",")
+						.append("\"BLC\": \"").append(roomTopLeftX).append(",").append(roomBottomRightY).append("\",")
+						.append("\"BRC\": \"").append(roomBottomRightX).append(",").append(roomBottomRightY).append("\"}");
+				if(!rs.isLast()){
+					roomData.append(",");
+				}
 			}
 	
 			if (roomData.length() == 0) {
 				// Handle the case when there are no rooms
-				roomData.append("No rooms found");
+				roomData.append("{\"error\": \"no rooms\"}");
 			}
 	
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// Handle the SQL exception
-			roomData.append("An error occurred");
+			roomData.append("{\"error\": \"SQL error\"}");
 		}
-	
+		roomData.append("]}}");
 		return roomData.toString();
 	}	
 
