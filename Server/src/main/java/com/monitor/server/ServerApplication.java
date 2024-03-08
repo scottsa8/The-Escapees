@@ -34,12 +34,14 @@ public class ServerApplication {
 		"rooms",
 		"roomOccupants",
 		"roomEnvironment",
-		"headCountHistory"
+		"headCountHistory",
+		"doors",
+    	"doorHistory"
 	};
 	
 	private static final String[] tableQuery = {
 		"user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, user_type VARCHAR(20) NOT NULL, user_microbit VARCHAR(10) UNIQUE",
-		"room_id INT AUTO_INCREMENT PRIMARY KEY, room_name VARCHAR(255) NOT NULL, room_microbit VARCHAR(10) UNIQUE",
+		"room_id INT AUTO_INCREMENT PRIMARY KEY, room_name VARCHAR(255) UNIQUE NOT NULL, room_microbit VARCHAR(10) UNIQUE, top_left_x INT NOT NULL, top_left_y INT NOT NULL, bottom_right_x INT NOT NULL, bottom_right_y INT NOT NULL, max_temperature DECIMAL(5, 2), max_noise_level DECIMAL(5, 2), max_light_level DECIMAL(8, 2)",
 		"occupancy_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, user_id INT NOT NULL, entry_timestamp TIMESTAMP, FOREIGN KEY (room_id) REFERENCES rooms(room_id), FOREIGN KEY (user_id) REFERENCES users(user_id)",
 		"data_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, timestamp TIMESTAMP, temperature DECIMAL(5, 2), noise_level DECIMAL(5, 2), light_level DECIMAL(8, 2), FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
 		"history_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, head_count INT NOT NULL, change_timestamp TIMESTAMP NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
@@ -84,6 +86,8 @@ public class ServerApplication {
 		} catch (Exception e) {
 			System.out.println("no Microbit detected");
 		}
+		// transmitMessage(1, "Hello");
+		System.out.println(getAllDoorData());
 	}
 	
 	@Scheduled(cron = "0 */2 * ? * *")
@@ -120,10 +124,46 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/setupDoors")
-	private boolean setupDoors(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
-		//insert into db
-		return false;
+	private boolean setupDoors(
+			@RequestParam(value = "roomName") String roomName,
+			@RequestParam(value = "doorName") String doorName,
+			@RequestParam(value = "xCoordinate") int xCoordinate,
+			@RequestParam(value = "yCoordinate") int yCoordinate) {
+		try {
+			// Fetch the room_id based on the roomName
+			PreparedStatement selectRoomIdStatement = connection.prepareStatement(
+					"SELECT room_id FROM rooms WHERE room_name = ?"
+			);
+			selectRoomIdStatement.setString(1, roomName);
+			ResultSet roomResultSet = selectRoomIdStatement.executeQuery();
+	
+			if (roomResultSet.next()) {
+				// Retrieve the room_id
+				int roomId = roomResultSet.getInt("room_id");
+	
+				// Insert the new door into the database
+				PreparedStatement insertDoorStatement = connection.prepareStatement(
+						"INSERT INTO doors (room_id, door_name, x_coordinate, y_coordinate) " +
+								"VALUES (?, ?, ?, ?)"
+				);
+				insertDoorStatement.setInt(1, roomId);
+				insertDoorStatement.setString(2, doorName);
+				insertDoorStatement.setInt(3, xCoordinate);
+				insertDoorStatement.setInt(4, yCoordinate);
+				insertDoorStatement.executeUpdate();
+	
+				return true;
+			} else {
+				// Handle the case when the roomName is not found
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			// Handle the exception
+			return false;
+		}
 	}
+	
 
 	@GetMapping("/getDoors")
 	private String getDoors(@RequestParam(value = "roomName") String roomName) {
@@ -152,7 +192,7 @@ public class ServerApplication {
 		output.append("]}}");
 		return output.toString();
 	}
-	
+
 	@GetMapping("/panic")
 		private String triggerPanic() {
 		if (monitor != null) {
@@ -453,6 +493,7 @@ public class ServerApplication {
 			return false; // Failed
 		}
 	}
+
 	@GetMapping("/getUserType")
 	private String getUserType(@RequestParam(value="user") String user){
 		String type="";
@@ -470,6 +511,7 @@ public class ServerApplication {
 		}
 		return type;
 	}
+
 	@GetMapping("/setup")
 	private boolean setup(@RequestParam(value="type") String type,@RequestParam(value="name") String name,
 		@RequestParam(value="microbit") String mbName,@RequestParam(value="overwrite", defaultValue = "false") boolean overwrite) {
@@ -520,6 +562,37 @@ public class ServerApplication {
 		return false;
 	}
 
+	@GetMapping("/isDoorLocked")
+	private boolean isDoorLocked(@RequestParam(value = "doorName") String doorName) {
+		try {
+			// Fetch the most recent status for the given door from the database
+			PreparedStatement selectDoorStatusStatement = connection.prepareStatement(
+					"SELECT is_locked FROM doorHistory " +
+					"JOIN doors ON doorHistory.door_id = doors.door_id " +
+							"WHERE doors.door_name = ? " +
+							"ORDER BY change_timestamp DESC " +
+							"LIMIT 1"
+							);
+							// Set the doorName parameter in the SQL query
+							selectDoorStatusStatement.setString(1, doorName);
+							// Execute the query and get the result set
+							ResultSet rs = selectDoorStatusStatement.executeQuery();
+							
+			if (rs.next()) {
+				// Retrieve the status from the result set and return it
+				return rs.getBoolean("is_locked");
+			} else {
+				// Handle the case when the door name is not found
+				return false;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// Handle the SQL exception
+			return false;
+		}
+	}
+
 	@GetMapping("/getRoomCoordinates")
 	private String getRoomCoordinates(@RequestParam(value = "roomName") String roomName) {
 		StringBuilder coordinates = new StringBuilder();
@@ -557,41 +630,87 @@ public class ServerApplication {
 		return coordinates.toString();
 	}
 
-	@GetMapping("/isDoorLocked")
-	private boolean isDoorLocked(@RequestParam(value = "doorName") String doorName) {
+	@GetMapping("/getAllRoomData")
+	private String getAllRoomData() {
+		StringBuilder roomData = new StringBuilder();
+	
 		try {
-			// Fetch the most recent status for the given door from the database
-			PreparedStatement selectDoorStatusStatement = connection.prepareStatement(
-					"SELECT is_locked FROM doorHistory " +
-							"JOIN doors ON doorHistory.door_id = doors.door_id " +
-							"WHERE doors.door_name = ? " +
-							"ORDER BY change_timestamp DESC " +
-							"LIMIT 1"
+			// Fetch all room data from the database
+			PreparedStatement selectRoomDataStatement = connection.prepareStatement(
+					"SELECT room_id, room_name, " +
+							"top_left_x, top_left_y, bottom_right_x, bottom_right_y " +
+							"FROM rooms"
 			);
-			// Set the doorName parameter in the SQL query
-			selectDoorStatusStatement.setString(1, doorName);
-			// Execute the query and get the result set
-			ResultSet rs = selectDoorStatusStatement.executeQuery();
+			ResultSet rs = selectRoomDataStatement.executeQuery();
+	
+			while (rs.next()) {
+				// Retrieve room data and append them to the StringBuilder
+				int roomId = rs.getInt("room_id");
+				String roomName = rs.getString("room_name");
+				int roomTopLeftX = rs.getInt("top_left_x");
+				int roomTopLeftY = rs.getInt("top_left_y");
+				int roomBottomRightX = rs.getInt("bottom_right_x");
+				int roomBottomRightY = rs.getInt("bottom_right_y");
+	
+				roomData.append("Room Name: ").append(roomName).append("\n")
+						.append("Top-Left Coordinates: ").append(roomTopLeftX).append(",").append(roomTopLeftY).append("\n")
+						.append("Top-Right Coordinates: ").append(roomBottomRightX).append(",").append(roomTopLeftY).append("\n")
+						.append("Bottom-Left Coordinates: ").append(roomTopLeftX).append(",").append(roomBottomRightY).append("\n")
+						.append("Bottom-Right Coordinates: ").append(roomBottomRightX).append(",").append(roomBottomRightY).append("\n\n");
+			}
+	
+			if (roomData.length() == 0) {
+				// Handle the case when there are no rooms
+				roomData.append("No rooms found");
+			}
+	
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// Handle the SQL exception
+			roomData.append("An error occurred");
+		}
+	
+		return roomData.toString();
+	}	
 
-			if (rs.next()) {
-				// Retrieve the status from the result set and return it
-				return rs.getBoolean("is_locked");
-			} else {
-				// Handle the case when the door name is not found
-				return false;
+	@GetMapping("/getAllDoorData")
+	private String getAllDoorData() {
+		StringBuilder doorData = new StringBuilder();
+
+		try {
+			// Fetch all door data from the database without returning door_id and room_id
+			PreparedStatement selectDoorDataStatement = connection.prepareStatement(
+					"SELECT door_name, x_coordinate, y_coordinate FROM doors"
+			);
+			ResultSet rs = selectDoorDataStatement.executeQuery();
+
+			while (rs.next()) {
+				// Retrieve door data and append them to the StringBuilder
+				String doorName = rs.getString("door_name");
+				int xCoordinate = rs.getInt("x_coordinate");
+				int yCoordinate = rs.getInt("y_coordinate");
+
+				doorData.append("Door Name: ").append(doorName).append("\n")
+						.append("Door Coordinates: ").append(xCoordinate).append(",").append(yCoordinate).append("\n\n");
+			}
+
+			if (doorData.length() == 0) {
+				// Handle the case when there are no doors
+				doorData.append("No doors found");
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// Handle the SQL exception
-			return false;
+			doorData.append("An error occurred");
 		}
+
+		return doorData.toString();
 	}
 
 	@GetMapping("/transmitMessage")
 	private String transmitMessage(
 			@RequestParam(value = "personId") int personId,
-			@RequestParam(value = "alertLevel", defaultValue = "1") int alertLevel,
 			@RequestParam(value = "message") String message) {
 
 		try {
@@ -606,8 +725,7 @@ public class ServerApplication {
 				sanitizedMessage += "/EOM/";
 
 				if (monitor != null) {
-					String fullMessage = alertLevel + "," + microbitName + "," + sanitizedMessage;
-					monitor.sendMessage(fullMessage);
+					// monitor.sendMessage(microbitName, sanitizedMessage);
 					return "Message transmitted successfully";
 				} else {
 					return "Microbit not available";

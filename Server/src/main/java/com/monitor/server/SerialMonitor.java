@@ -270,6 +270,7 @@ public class SerialMonitor {
             }
         });
     }
+
     public void panic() {
         try {
             // Retrieve all users with type "guard"
@@ -293,6 +294,7 @@ public class SerialMonitor {
             e.printStackTrace();
         }
     }
+
     public void sendMessage(String message) {
         System.out.println(message);
         if (microbit != null && microbit.isOpen()) {
