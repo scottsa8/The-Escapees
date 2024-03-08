@@ -1,5 +1,4 @@
 import React, { useState, useEffect, use } from 'react';
-import ToggleSwitch from './toggleSwitch';
 import {SunIcon, MoonIcon} from './heroIcons'
 import {setCookie, getCookie} from './cookies'
 import {PlusIcon,CloseIcon} from './heroIcons'
@@ -14,6 +13,12 @@ export default function Settings() {
     const [showAddDomain, setShowAddDomain] = useState(false);
     const [domains, setDomains] = useState(['Hotel', 'Prison']);
     const [domainName, setDomainName] = useState('');
+    const [selectedDomain, setSelectedDomain] = useState(null);
+
+    const selectDomain = (domain) => {
+        fetchApi("setDomain?domain="+domain);
+        setSelectedDomain(domain);
+    };
     
     const addDomain = (domainName) => {
         setDomains([...domains, domainName]);
@@ -40,6 +45,11 @@ export default function Settings() {
         setTheme(savedTheme);
         setUpdateDelay(savedUpdateDelay);
         document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+        const fetchDomains = async () => {
+            setDomains(await fetchApi("getDomains"));
+            selectDomain(await fetchApi("getDomain"));
+        };
+        fetchDomains();
     }, []);
     
     useEffect(() => {
@@ -48,20 +58,11 @@ export default function Settings() {
         setCookie('lightNotification', light);
     }, [temp, noise, light]);
 
-    useEffect(() => {
-        const fetchDomains = async () => {
-            const fetchedDomains = await fetchApi("getDomains");
-            console.log(fetchedDomains);
-            setDomains(fetchedDomains || ['Hotel']);
-        };
-    
-        fetchDomains();
-    }, []);
 
     return (
         <div className="card-container p-4 dark:text-blue-100">
             <h1 className="text-2xl font-bold mb-4">Settings</h1>
-            <div className="card shadow-md m-4 p-4">
+            <div className="settings-width card shadow-md m-4 p-4">
                 {/* Update Delay slider */}
                 <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Update Delay</label>
                 <input
@@ -76,58 +77,59 @@ export default function Settings() {
                     <div className="text-right text-sm">{updateDelay}s</div>
                 {/*Theme Toggle*/}
                 <button onClick={toggleTheme} className="rounded-full w-10 p-2">
-                    {theme === 'light' ? (<MoonIcon/>) : (<SunIcon/>)}
-                </button>
-            </div>
-            <div className="card shadow-md m-4 p-4">
-                {/* Existing components... */}
+                            {theme === 'light' ? (<MoonIcon/>) : (<SunIcon/>)}
+                        </button>
+                    </div>
                 
-                {/* Temperature slider */}
-                <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Temperature</label>
-                <input
-                    type="range"
-                    id="temp-slider"
-                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
-                    min="0"
-                    max="100"
-                    value={temp}
-                    onChange={(e) => setTemp(e.target.value)}
-                />
-                <div className="text-right text-sm">{temp}</div>
+                {/* Notification Settings */}
+                <div className="settings-width flex-grow card shadow-md m-4 p-4">
+                    <h1 className="text-xl font-bold mb-4">Notification Settings</h1>
+                    {/* Temperature slider */}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Temperature</label>
+                    <input
+                        type="range"
+                        id="temp-slider"
+                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+                        min="0"
+                        max="100"
+                        value={temp}
+                        onChange={(e) => setTemp(e.target.value)}
+                    />
+                    <div className="text-right text-sm">{temp}</div>
 
-                {/* Noise slider */}
-                <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Noise</label>
-                <input
-                    type="range"
-                    id="noise-slider"
-                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
-                    min="0"
-                    max="100"
-                    value={noise}
-                    onChange={(e) => setNoise(e.target.value)}
-                />
-                <div className="text-right text-sm">{noise}</div>
+                    {/* Noise slider */}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Noise</label>
+                    <input
+                        type="range"
+                        id="noise-slider"
+                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+                        min="0"
+                        max="100"
+                        value={noise}
+                        onChange={(e) => setNoise(e.target.value)}
+                    />
+                    <div className="text-right text-sm">{noise}</div>
 
-                {/* Light slider */}
-                <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Light</label>
-                <input
-                    type="range"
-                    id="light-slider"
-                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
-                    min="0"
-                    max="100"
-                    value={light}
-                    onChange={(e) => setLight(e.target.value)}
-                />
-                <div className="text-right text-sm">{light}</div>
-            </div>
-            <div className="domains-container flex flex-row">
+                    {/* Light slider */}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Light</label>
+                    <input
+                        type="range"
+                        id="light-slider"
+                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+                        min="0"
+                        max="100"
+                        value={light}
+                        onChange={(e) => setLight(e.target.value)}
+                    />
+                    <div className="text-right text-sm">{light}</div>
+                </div>
+                <div className="domains-container flex flex-wrap flex-row">
                 {domains.map((domain, index) => (
-                    <div key={index} onClick={() => fetchApi("setDomain?domain="+domain)} className="card shadow-md m-4 p-4">
-                        <h1 className="font-bold text-sky-500">{domain}</h1>
+                    <div key={index} onClick={() => selectDomain(domain)} className={`domain-dimensions card shadow-md m-4 p-4 ${domain === selectedDomain ? 'selected-color' : ''}`}>
+                        <h1 className="font-bold text-sky-500">{domain.charAt(0).toUpperCase() + domain.slice(1)}</h1>
                     </div>
                 ))}
-                <div className="card shadow-md m-4 p-4" onClick={() => setShowAddDomain(true)}>
+                <div className="domain-dimensions card shadow-md m-4 p-4" onClick={() => setShowAddDomain(true)}>
                     <h1 className="font-bold text-sky-500">Add Domain</h1>
                     <PlusIcon/>
                 </div>
@@ -154,3 +156,4 @@ export default function Settings() {
     </div>
   );
 }
+

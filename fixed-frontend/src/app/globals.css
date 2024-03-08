@@ -147,7 +147,13 @@ body {
     background-color: #555;
   }
 }
-
+.settings-width{
+  width: 400px;
+}
+.domain-dimensions{
+  width: 200px;
+  height: 100px;
+}
 
 .card-container {
   display: flex;
@@ -158,14 +164,18 @@ body {
 .leaflet-container{
   height: 85vh;
 }
+
 .card {
-  width: 200px;
   border-radius: 15px;
   background-color: #BDBDBC;
 }
 
 .dark .card{
   background-color: #374151;
+}
+
+.selected-color{
+  background-color: #385286 !important;
 }
 
 .card-title {

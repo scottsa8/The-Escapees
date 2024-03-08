@@ -73,6 +73,8 @@ public class ServerApplication {
 		}
 	}
 
+
+	@GetMapping("/getDomain")
 	public static String getDomain() {
 		return domain;
 	}

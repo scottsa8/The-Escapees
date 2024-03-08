@@ -33,7 +33,6 @@ export default function Chart() {
       <div className="flex mb-5">
         <RoomSelector onLocationChange={setSelectedRoom} />
       </div>
-      {selectedRoom && (
       <div className="graphs">
         <div className="flex flex-wrap flex-row">
         <ResponsiveContainer aspect={3} width={isMobile?"100%":"50%"}>
@@ -102,7 +101,6 @@ export default function Chart() {
           </button>
         </div>
       </div>
-      )}
       <div className="flex justify-center mt-4">
         <input 
           type="date" 
