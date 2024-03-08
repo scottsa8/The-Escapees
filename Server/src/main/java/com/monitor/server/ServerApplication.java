@@ -1,4 +1,5 @@
 package com.monitor.server;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,53 +28,54 @@ public class ServerApplication {
 	private static final String USER = "java";
 	private static Connection connection;
 	private static SerialMonitor monitor;
-	private static String domain = "Prison"; //default domain
+	private static String domain = "Prison"; // default domain
 
 	private static final String[] tableNames = {
-		"users",
-		"rooms",
-		"roomOccupants",
-		"roomEnvironment",
-		"headCountHistory"
+			"users",
+			"rooms",
+			"roomOccupants",
+			"roomEnvironment",
+			"headCountHistory"
 	};
-	
+
 	private static final String[] tableQuery = {
-		"user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, user_type VARCHAR(20) NOT NULL, user_microbit VARCHAR(10) UNIQUE",
-		"room_id INT AUTO_INCREMENT PRIMARY KEY, room_name VARCHAR(255) NOT NULL, room_microbit VARCHAR(10) UNIQUE",
-		"occupancy_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, user_id INT NOT NULL, entry_timestamp TIMESTAMP, FOREIGN KEY (room_id) REFERENCES rooms(room_id), FOREIGN KEY (user_id) REFERENCES users(user_id)",
-		"data_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, timestamp TIMESTAMP, temperature DECIMAL(5, 2), noise_level DECIMAL(5, 2), light_level DECIMAL(8, 2), FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
-		"history_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, head_count INT NOT NULL, change_timestamp TIMESTAMP NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
-		"door_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, door_name VARCHAR(255) UNIQUE NOT NULL, x_coordinate INT NOT NULL, y_coordinate INT NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
-    	"doorHistory_id INT AUTO_INCREMENT PRIMARY KEY, door_id INT NOT NULL, is_locked BOOLEAN NOT NULL, change_timestamp TIMESTAMP NOT NULL, FOREIGN KEY (door_id) REFERENCES doors(door_id)"
-	};	
-	
+			"user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, user_type VARCHAR(20) NOT NULL, user_microbit VARCHAR(10) UNIQUE",
+			"room_id INT AUTO_INCREMENT PRIMARY KEY, room_name VARCHAR(255) NOT NULL, room_microbit VARCHAR(10) UNIQUE",
+			"occupancy_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, user_id INT NOT NULL, entry_timestamp TIMESTAMP, FOREIGN KEY (room_id) REFERENCES rooms(room_id), FOREIGN KEY (user_id) REFERENCES users(user_id)",
+			"data_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, timestamp TIMESTAMP, temperature DECIMAL(5, 2), noise_level DECIMAL(5, 2), light_level DECIMAL(8, 2), FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
+			"history_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, head_count INT NOT NULL, change_timestamp TIMESTAMP NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
+			"door_id INT AUTO_INCREMENT PRIMARY KEY, room_id INT NOT NULL, door_name VARCHAR(255) UNIQUE NOT NULL, x_coordinate INT NOT NULL, y_coordinate INT NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(room_id)",
+			"doorHistory_id INT AUTO_INCREMENT PRIMARY KEY, door_id INT NOT NULL, is_locked BOOLEAN NOT NULL, change_timestamp TIMESTAMP NOT NULL, FOREIGN KEY (door_id) REFERENCES doors(door_id)"
+	};
+
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(ServerApplication.class, args);
 		ServerApplication serverApp = new ServerApplication();
 		serverApp.initialize();
 		serverApp.startSerialMonitor();
 	}
-	
+
 	private void initialize() {
 		try {
 			connection = DriverManager.getConnection(URL, USER, PASSWORD);
 			Statement createDBStmt = connection.createStatement();
-			createDBStmt.execute("CREATE DATABASE IF NOT EXISTS "+domain+"db");
-			URL = "jdbc:mysql://localhost:3306/"+domain+"db?useSSL=FALSE&allowPublicKeyRetrieval=True";
+			createDBStmt.execute("CREATE DATABASE IF NOT EXISTS " + domain + "db");
+			URL = "jdbc:mysql://localhost:3306/" + domain + "db?useSSL=FALSE&allowPublicKeyRetrieval=True";
 			connection = DriverManager.getConnection(URL, USER, PASSWORD);
-			
+
 			for (int i = 0; i < tableNames.length; i++) {
 				String make = "CREATE TABLE IF NOT EXISTS " + tableNames[i] + "(" + tableQuery[i] + ")";
 				PreparedStatement createTableStmt = connection.prepareStatement(make);
 				createTableStmt.executeUpdate();
 			}
-		} 
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public static String getDomain(){
+
+	@GetMapping("/getDomain")
+	public static String getDomain() {
 		return domain;
 	}
 
@@ -85,43 +87,65 @@ public class ServerApplication {
 			System.out.println("no Microbit detected");
 		}
 	}
-	
+
 	@Scheduled(cron = "0 */2 * ? * *")
-	private void cleanup(){
+	private void cleanup() {
 		System.gc();
 		System.out.println("cleaning up");
-//		monitor.stop();
-//		monitor=null;
-//		try{
-//			monitor= new SerialMonitor(connection);
-//			monitor.start();
-//		} catch (Exception e) {
-//			//e.printStackTrace();
-//		}
+		// monitor.stop();
+		// monitor=null;
+		// try{
+		// monitor= new SerialMonitor(connection);
+		// monitor.start();
+		// } catch (Exception e) {
+		// //e.printStackTrace();
+		// }
+	}
+
+	@GetMapping("/getDomains")
+	private String getDomains() {
+		StringBuilder output = new StringBuilder();
+		output.append("[");
+		try {
+			PreparedStatement selectDatabasesStatement = connection.prepareStatement(
+					"SHOW DATABASES LIKE '%db'");
+			ResultSet rs = selectDatabasesStatement.executeQuery();
+			while (rs.next()) {
+				String dbname = rs.getString(1).substring(0, rs.getString(1).length() - 2);
+				output.append("\"" + dbname + "\",");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		output.deleteCharAt(output.length() - 1);
+		output.append("]");
+		return output.toString();
 	}
 
 	@GetMapping("/setDomain")
-	public boolean setDomain(@RequestParam(value="domain") String d){
+	public boolean setDomain(@RequestParam(value = "domain") String d) {
 		String temp = domain;
-		try{
-			domain=d;
+		try {
+			domain = d;
 			initialize();
 			return true;
-		}catch (Exception e){
-			domain=temp;
+		} catch (Exception e) {
+			domain = temp;
 			return false;
 		}
 	}
 
 	@GetMapping("/setupMap")
-	private boolean setupMap(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
-		//insert into db
+	private boolean setupMap(@RequestParam(value = "roomName") String roomName,
+			@RequestParam(value = "points") int[] points) {
+		// insert into db
 		return false;
 	}
 
 	@GetMapping("/setupDoors")
-	private boolean setupDoors(@RequestParam(value = "roomName") String roomName, @RequestParam(value="points") int[] points){
-		//insert into db
+	private boolean setupDoors(@RequestParam(value = "roomName") String roomName,
+			@RequestParam(value = "points") int[] points) {
+		// insert into db
 		return false;
 	}
 
@@ -134,8 +158,7 @@ public class ServerApplication {
 		try {
 			// Retrieve all doors for the given room from the database
 			PreparedStatement selectDoorsStatement = connection.prepareStatement(
-					"SELECT door_name FROM doors WHERE room_id = (SELECT room_id FROM rooms WHERE room_name = ?)"
-			);
+					"SELECT door_name FROM doors WHERE room_id = (SELECT room_id FROM rooms WHERE room_name = ?)");
 			selectDoorsStatement.setString(1, roomName);
 			ResultSet rs = selectDoorsStatement.executeQuery();
 
@@ -152,9 +175,9 @@ public class ServerApplication {
 		output.append("]}}");
 		return output.toString();
 	}
-	
+
 	@GetMapping("/panic")
-		private String triggerPanic() {
+	private String triggerPanic() {
 		if (monitor != null) {
 			monitor.panic();
 			return "Panic function triggered successfully";
@@ -162,17 +185,18 @@ public class ServerApplication {
 			return "Microbit not available";
 		}
 	}
+
 	@GetMapping("/getAllNames")
-	private String getAllNames(){
+	private String getAllNames() {
 		StringBuilder output = new StringBuilder();
-		output.append("{\"names\":{"+
+		output.append("{\"names\":{" +
 				"\"data\":[");
 		try {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT username FROM users");
 			while (rs.next()) {
-				output.append("{\"username\": \""+rs.getString("username")+"\"}");
-				if(!rs.isLast()){
+				output.append("{\"username\": \"" + rs.getString("username") + "\"}");
+				if (!rs.isLast()) {
 					output.append(",");
 				}
 			}
@@ -183,17 +207,19 @@ public class ServerApplication {
 		output.append("]}}");
 		return output.toString();
 	}
+
 	@GetMapping("/getTracked")
-	private String getTracked(){
+	private String getTracked() {
 		StringBuilder output = new StringBuilder();
-		output.append("{\"names\":{"+
+		output.append("{\"names\":{" +
 				"\"data\":[");
 		try {
 			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT username,user_microbit FROM users WHERE user_microbit IS NOT NULL");
+			ResultSet rs = stmt
+					.executeQuery("SELECT username,user_microbit FROM users WHERE user_microbit IS NOT NULL");
 			while (rs.next()) {
-				output.append("{\"username\": \""+rs.getString("username")+"\"}");
-				if(!rs.isLast()){
+				output.append("{\"username\": \"" + rs.getString("username") + "\"}");
+				if (!rs.isLast()) {
 					output.append(",");
 				}
 			}
@@ -206,39 +232,33 @@ public class ServerApplication {
 	}
 
 	@RequestMapping(value = "/getEnv", produces = MediaType.APPLICATION_JSON_VALUE)
-	private String getEnv(@RequestParam(value = "loc") String loc,@RequestParam(value="order")String order){
+	private String getEnv(@RequestParam(value = "loc") String loc, @RequestParam(value = "order") String order) {
 		StringBuilder output = new StringBuilder();
 		output.append("{\"environment\":{\"data\":[");
-		System.out.println(URL);
 		try {
 			// Get room_id from rooms table using the room name (loc)
 			PreparedStatement roomIdStatement = connection.prepareStatement(
-					"SELECT room_id FROM rooms WHERE room_name = ?"
-			);
+					"SELECT room_id FROM rooms WHERE room_name = ?");
 			roomIdStatement.setString(1, loc);
 
 			ResultSet roomIdResultSet = roomIdStatement.executeQuery();
-			
+
 			if (roomIdResultSet.next()) {
 				int roomId = roomIdResultSet.getInt("room_id");
 				ResultSet rs;
-				if(order.equals("DESC")){
+				if (order.equals("DESC")) {
 					// Fetch records from roomEnvironment using the obtained room_id
 					PreparedStatement selectStatement = connection.prepareStatement(
-							"SELECT * FROM roomEnvironment WHERE room_id = ? ORDER BY timestamp DESC"
-					);
+							"SELECT * FROM roomEnvironment WHERE room_id = ? ORDER BY timestamp DESC");
 					selectStatement.setInt(1, roomId);
 					rs = selectStatement.executeQuery();
-				}else{
+				} else {
 					// Fetch records from roomEnvironment using the obtained room_id
 					PreparedStatement selectStatement = connection.prepareStatement(
-							"SELECT * FROM roomEnvironment WHERE room_id = ? ORDER BY timestamp ASC"
-					);
+							"SELECT * FROM roomEnvironment WHERE room_id = ? ORDER BY timestamp ASC");
 					selectStatement.setInt(1, roomId);
 					rs = selectStatement.executeQuery();
 				}
-
-
 
 				while (rs.next()) {
 					int dataId = rs.getInt("data_id");
@@ -248,7 +268,9 @@ public class ServerApplication {
 					BigDecimal lightLevel = rs.getBigDecimal("light_level");
 
 					// Customize the output format based on your needs
-					output.append("{\"DataID\": \""+dataId+"\", \"Timestamp\": \""+timestamp.toString()+"\", \"Temperature\": \""+temperature.toString()+"\", \"NoiseLevel\": \""+noiseLevel.toString()+"\", \"LightLevel\": \""+lightLevel.toString()+"\"}");
+					output.append("{\"DataID\": \"" + dataId + "\", \"Timestamp\": \"" + timestamp.toString()
+							+ "\", \"Temperature\": \"" + temperature.toString() + "\", \"NoiseLevel\": \""
+							+ noiseLevel.toString() + "\", \"LightLevel\": \"" + lightLevel.toString() + "\"}");
 					if (!rs.isLast()) {
 						output.append(",");
 					}
@@ -268,34 +290,41 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/genReport")
-	private ResponseEntity<InputStreamResource> getReport(@RequestParam (value="day") String day){
-		//format date correctly
+	private ResponseEntity<InputStreamResource> getReport(@RequestParam(value = "day") String day) {
+		// format date correctly
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		try{
-			//create a new thread to generate the report
+		try {
+			// create a new thread to generate the report
 			Runnable r = new pdfWriter(connection, new Date(formatter.parse(day).getTime()));
 			Thread thread = new Thread(r);
 			thread.start();
-			while(thread.isAlive()){ //wait for report to be generated
-				try{
+			while (thread.isAlive()) { // wait for report to be generated
+				try {
 					thread.join();
-				}catch (Exception e){wait(100);}
+				} catch (Exception e) {
+					wait(100);
+				}
 			}
-			try{
-				//turn the pdf into a response entity to be returned through HTTP request
+			try {
+				// turn the pdf into a response entity to be returned through HTTP request
 				FileInputStream fileInputStream = new FileInputStream("src/main/resources/report.pdf");
 				InputStreamResource inputStreamResource = new InputStreamResource(fileInputStream);
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentLength(Files.size(Paths.get("src/main/resources/report.pdf")));
 				headers.setContentType(MediaType.APPLICATION_PDF);
-				return new ResponseEntity<>(inputStreamResource,headers, HttpStatus.OK);
-			}catch (Exception e){e.printStackTrace();}
-		}catch (Exception e){System.out.println("failed to generate report");}
-				return null;
+				return new ResponseEntity<>(inputStreamResource, headers, HttpStatus.OK);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			System.out.println("failed to generate report");
+		}
+		return null;
 	}
 
 	@GetMapping("/getPeople")
-	private int getPeople(@RequestParam(value="loc") String loc, @RequestParam(value="type", required=false, defaultValue="inmate") String type) {
+	private int getPeople(@RequestParam(value = "loc") String loc,
+			@RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
 		int total = 0;
 
 		try (PreparedStatement selectStatement = connection.prepareStatement(
@@ -322,9 +351,9 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/getRooms")
-	private String getRooms(){
+	private String getRooms() {
 		StringBuilder output = new StringBuilder();
-		output.append("{\"rooms\":{"+
+		output.append("{\"rooms\":{" +
 				"\"data\":[");
 		try {
 			// Fetch all rooms from the database
@@ -332,8 +361,8 @@ public class ServerApplication {
 			ResultSet rs = selectStatement.executeQuery();
 			// Iterate over the result set and build the output string
 			while (rs.next()) {
-				output.append("{\"room\": \""+rs.getString("room_name")+"\"}");
-				if(!rs.isLast()){
+				output.append("{\"room\": \"" + rs.getString("room_name") + "\"}");
+				if (!rs.isLast()) {
 					output.append(",");
 				}
 			}
@@ -345,37 +374,35 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/listAll")
-	private String listAll(@RequestParam (value="user",defaultValue = "all") String user,@RequestParam(value="RT", required=false) boolean RT) {
+	private String listAll(@RequestParam(value = "user", defaultValue = "all") String user,
+			@RequestParam(value = "RT", required = false) boolean RT) {
 		StringBuilder output = new StringBuilder();
-		output.append("{\"locations\":{"+
+		output.append("{\"locations\":{" +
 				"\"data\":[");
 		try {
 			PreparedStatement selectStatement;
-			if(user.equals("all")){
+			if (user.equals("all")) {
 				selectStatement = connection.prepareStatement(
 						"SELECT u.username, r.room_name, ro.entry_timestamp " +
 								"FROM users u " +
 								"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
-								"JOIN rooms r ON ro.room_id = r.room_id"
-				);
-			}else{
-				if(RT){
+								"JOIN rooms r ON ro.room_id = r.room_id");
+			} else {
+				if (RT) {
 					selectStatement = connection.prepareStatement(
 							"SELECT u.username, r.room_name, ro.entry_timestamp " +
 									"FROM users u " +
 									"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
 									"JOIN rooms r ON ro.room_id = r.room_id " +
 									"WHERE u.username = \"" + user + "\" " +
-									"ORDER BY ro.entry_timestamp DESC LIMIT 1"
-					);
-				}else {
+									"ORDER BY ro.entry_timestamp DESC LIMIT 1");
+				} else {
 					selectStatement = connection.prepareStatement(
 							"SELECT u.username, r.room_name, ro.entry_timestamp " +
 									"FROM users u " +
 									"JOIN roomoccupants ro ON u.user_id = ro.user_id " +
 									"JOIN rooms r ON ro.room_id = r.room_id " +
-									"WHERE u.username = \"" + user + "\""
-					);
+									"WHERE u.username = \"" + user + "\"");
 				}
 			}
 			// Fetch all users and their latest location from the database
@@ -388,9 +415,10 @@ public class ServerApplication {
 				String roomName = rs.getString("room_name");
 				Timestamp timestamp = rs.getTimestamp("entry_timestamp");
 
-				//output.append("Location: ").append(roomName).append("!");
-				output.append("{\"user\": \""+username+"\", \"Location\": \""+roomName+"\", \"Timestamp\": \""+timestamp.toString()+"\"}");
-				if(!rs.isLast()){
+				// output.append("Location: ").append(roomName).append("!");
+				output.append("{\"user\": \"" + username + "\", \"Location\": \"" + roomName + "\", \"Timestamp\": \""
+						+ timestamp.toString() + "\"}");
+				if (!rs.isLast()) {
 					output.append(",");
 				}
 			}
@@ -403,17 +431,16 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/createAcc")
-	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass,
-	@RequestParam(value="type", required=false)String type){
+	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value = "pass") String pass,
+			@RequestParam(value = "type", required = false) String type) {
 		try {
 			PreparedStatement insertStatement = connection.prepareStatement(
-					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)"
-			);
+					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)");
 			insertStatement.setString(1, user);
 			insertStatement.setString(2, hashPassword(pass));
-			if(type==null){
+			if (type == null) {
 				insertStatement.setString(3, "user"); // Assuming default user_type is "user"
-			}else{
+			} else {
 				insertStatement.setString(3, type);
 			}
 
@@ -426,16 +453,15 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/checkLog")
-	private boolean checkLog(@RequestParam(value = "user") String user, @RequestParam(value="pass") String pass){
+	private boolean checkLog(@RequestParam(value = "user") String user, @RequestParam(value = "pass") String pass) {
 		try {
 			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT * FROM users WHERE username = ?"
-			);
+					"SELECT * FROM users WHERE username = ?");
 			selectStatement.setString(1, user);
 			ResultSet rs = selectStatement.executeQuery();
 			if (rs.next()) {
 				String storedHashedPassword = rs.getString("password");
-				
+
 				// Use the verifyPassword function to check if the provided password is correct
 				if (verifyPassword(pass, storedHashedPassword)) {
 					System.out.println("Password verification successful.");
@@ -453,70 +479,70 @@ public class ServerApplication {
 			return false; // Failed
 		}
 	}
+
 	@GetMapping("/getUserType")
-	private String getUserType(@RequestParam(value="user") String user){
-		String type="";
-		try{
+	private String getUserType(@RequestParam(value = "user") String user) {
+		String type = "";
+		try {
 			PreparedStatement selectStatement = connection.prepareStatement(
-					"SELECT user_type FROM users WHERE username = ?"
-			);
+					"SELECT user_type FROM users WHERE username = ?");
 			selectStatement.setString(1, user);
 			ResultSet rs = selectStatement.executeQuery();
 			if (rs.next()) {
 				type = rs.getString("user_type");
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return type;
 	}
+
 	@GetMapping("/setup")
-	private boolean setup(@RequestParam(value="type") String type,@RequestParam(value="name") String name,
-		@RequestParam(value="microbit") String mbName,@RequestParam(value="overwrite", defaultValue = "false") boolean overwrite) {
+	private boolean setup(@RequestParam(value = "type") String type, @RequestParam(value = "name") String name,
+			@RequestParam(value = "microbit") String mbName,
+			@RequestParam(value = "overwrite", defaultValue = "false") boolean overwrite) {
 		try {
 			String storedName = "";
 			if (type.equals("room")) {
 				PreparedStatement selectStatement = connection.prepareStatement(
-						"SELECT room_microbit FROM rooms WHERE room_name = ?"
-				);
+						"SELECT room_microbit FROM rooms WHERE room_name = ?");
 				selectStatement.setString(1, name);
 				ResultSet rs = selectStatement.executeQuery();
-				if(rs.next()){
+				if (rs.next()) {
 					storedName = rs.getString("room_microbit");
 				}
-				if(storedName.equals("") || overwrite) {
+				if (storedName.equals("") || overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
-							"UPDATE rooms SET room_microbit = ? WHERE room_name = ?"
-					);
+							"UPDATE rooms SET room_microbit = ? WHERE room_name = ?");
 					insertStatement.setString(1, mbName);
 					insertStatement.setString(2, name);
 					insertStatement.executeUpdate();
 					return true;
-				}else{
+				} else {
 					return false;
 				}
 			} else if (type.equals("user")) {
 				PreparedStatement selectStatement = connection.prepareStatement(
-						"SELECT user_microbit FROM users WHERE username = ?"
-				);
+						"SELECT user_microbit FROM users WHERE username = ?");
 				selectStatement.setString(1, name);
 				ResultSet rs = selectStatement.executeQuery();
-				if(rs.next()){
+				if (rs.next()) {
 					storedName = rs.getString("user_microbit");
 				}
-				if(storedName.equals("") || overwrite) {
+				if (storedName.equals("") || overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
-							"UPDATE users SET user_microbit = ? WHERE username = ?"
-					);
+							"UPDATE users SET user_microbit = ? WHERE username = ?");
 					insertStatement.setString(1, mbName);
-					insertStatement.setString(2,name);
+					insertStatement.setString(2, name);
 					insertStatement.executeUpdate();
 					return true;
-				}else{
+				} else {
 					return false;
 				}
 			}
-		}catch(Exception e){e.printStackTrace();}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 
@@ -600,7 +626,8 @@ public class ServerApplication {
 
 			if (microbitName != null) {
 				// Transmit the message to the microbit over serial with alert level
-				// Will remove "/EOM/" and commas from the message and then append "/EOM/"" at the end of the message
+				// Will remove "/EOM/" and commas from the message and then append "/EOM/"" at
+				// the end of the message
 				// To signify the end of packet transfer
 				String sanitizedMessage = message.replace("/EOM/", "").replace(",", "");
 				sanitizedMessage += "/EOM/";
@@ -627,7 +654,8 @@ public class ServerApplication {
 			@RequestParam(value = "message") String message) {
 
 		try {
-			// Retrieve the microbits linked to users of the specified user type from the database
+			// Retrieve the microbits linked to users of the specified user type from the
+			// database
 			List<String> microbitNames = getMicrobitsForUserType(userType);
 
 			if (!microbitNames.isEmpty()) {
@@ -655,8 +683,7 @@ public class ServerApplication {
 		String microbitName = null;
 		try {
 			PreparedStatement selectMicrobitStatement = connection.prepareStatement(
-					"SELECT user_microbit FROM users WHERE user_id = ?"
-			);
+					"SELECT user_microbit FROM users WHERE user_id = ?");
 			selectMicrobitStatement.setInt(1, personId);
 			ResultSet microbitResult = selectMicrobitStatement.executeQuery();
 
@@ -671,12 +698,12 @@ public class ServerApplication {
 	}
 
 	private List<String> getMicrobitsForUserType(String userType) throws SQLException {
-		// Retrieve the microbits linked to users of the specified user type from the database
+		// Retrieve the microbits linked to users of the specified user type from the
+		// database
 		List<String> microbitNames = new ArrayList<>();
 		try {
 			PreparedStatement selectMicrobitsStatement = connection.prepareStatement(
-					"SELECT user_microbit FROM users WHERE user_type = ?"
-			);
+					"SELECT user_microbit FROM users WHERE user_type = ?");
 			selectMicrobitsStatement.setString(1, userType);
 			ResultSet microbitResult = selectMicrobitsStatement.executeQuery();
 
@@ -691,11 +718,12 @@ public class ServerApplication {
 	}
 
 	public static String hashPassword(String plainPassword) {
-        // Adjust the log rounds to change security (larger number takes longer but more secure)
-        return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
-    }
+		// Adjust the log rounds to change security (larger number takes longer but more
+		// secure)
+		return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
+	}
 
-    public static boolean verifyPassword(String plainPassword, String hashedPassword) {
-        return BCrypt.checkpw(plainPassword, hashedPassword);
-    }
+	public static boolean verifyPassword(String plainPassword, String hashedPassword) {
+		return BCrypt.checkpw(plainPassword, hashedPassword);
+	}
 }

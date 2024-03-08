@@ -1,5 +1,3 @@
-// TODO: Implement fetchData function to fetch data from server
-
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { network } from "../layout";
@@ -35,7 +33,6 @@ export default function Chart() {
       <div className="flex mb-5">
         <RoomSelector onLocationChange={setSelectedRoom} />
       </div>
-      {selectedRoom && (
       <div className="graphs">
         <div className="flex flex-wrap flex-row">
         <ResponsiveContainer aspect={3} width={isMobile?"100%":"50%"}>
@@ -104,7 +101,6 @@ export default function Chart() {
           </button>
         </div>
       </div>
-      )}
       <div className="flex justify-center mt-4">
         <input 
           type="date" 
