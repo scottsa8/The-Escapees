@@ -155,6 +155,7 @@ def main():
             message_str = message[0][3:].decode('utf-8')
             if "PANIC" in message_str and name in message_str:
                 panic()
+            display.scroll(message_str)
             message_data = message_str.split(',')
 
             # if message_data[0].strip().isdigit() and message_data[1] == name:
