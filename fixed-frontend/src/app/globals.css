@@ -13,6 +13,14 @@ body {
   background-color: #22314f;
 }
 
+@keyframes reverse-loading {
+  from { width: 100%; }
+  to { width: 0; }
+}
+
+.animate-reverse-loading {
+  animation: reverse-loading 3s linear forwards;
+}
 
 .banner {
   background-color: #B7B6B7;
@@ -68,7 +76,7 @@ body {
     color: #DBE9FE;
   }
 
-  .sidebar::-webkit-scrollbar {
+  *::-webkit-scrollbar {
     display: none;
   }
 
@@ -163,6 +171,15 @@ body {
 }
 .leaflet-container{
   height: 85vh;
+}
+.notif-card{
+  background-color: #5e3a74 !important;
+  opacity: 0.8;
+}
+
+.deleting {
+  transition: transform 0.1s ease-in-out;
+  transform: translateX(100%);
 }
 
 .card {

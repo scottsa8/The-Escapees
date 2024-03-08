@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { network } from "../layout";
 import RoomCard from "./RoomCard";
 import { useQuery } from 'react-query';
 import { fetchApi } from './apiFetcher';

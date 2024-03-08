@@ -29,9 +29,10 @@ export function useNotification() {
 
     const NotificationComponent = () => (
         showNotification && (
-            <div className="absolute bottom-10 rounded-lg shadow-lg left-20 p-4 z-20 bg-sky-600 ">
+            <div className="absolute bottom-10 rounded-lg shadow-lg left-20 p-4 z-20 bg-sky-600">
                 <h2>{notificationTitle}</h2>
                 <h3>{notificationOptions}</h3>
+                <div className="absolute bottom-0 left-0 rounded-b-lg h-2 bg-red-600 w-full animate-reverse-loading"></div>
             </div>
         )
     );

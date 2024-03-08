@@ -1,7 +1,7 @@
 import React, { useState, useEffect, use } from 'react';
 import {SunIcon, MoonIcon} from './heroIcons'
 import {setCookie, getCookie} from './cookies'
-import {PlusIcon,CloseIcon} from './heroIcons'
+import {PlusIcon,CloseIcon,SettingsIcon,DeleteIcon} from './heroIcons'
 import { fetchApi } from './apiFetcher';
 
 export default function Settings() {
@@ -19,7 +19,12 @@ export default function Settings() {
         fetchApi("setDomain?domain="+domain);
         setSelectedDomain(domain);
     };
-    
+    const deleteDomain = (domain) => {
+        // fetchApi("deleteDomain?domain="+domain);
+        console.log("deleting domain: " + domain);
+        setSelectedDomain(null);
+        setDomains(domains.filter(d => d !== domain));
+    }
     const addDomain = (domainName) => {
         setDomains([...domains, domainName]);
         fetchApi("setDomain?domain="+domainName)
@@ -126,7 +131,10 @@ export default function Settings() {
                 <div className="domains-container flex flex-wrap flex-row">
                 {domains.map((domain, index) => (
                     <div key={index} onClick={() => selectDomain(domain)} className={`domain-dimensions card shadow-md m-4 p-4 ${domain === selectedDomain ? 'selected-color' : ''}`}>
-                        <h1 className="font-bold text-sky-500">{domain.charAt(0).toUpperCase() + domain.slice(1)}</h1>
+                        <h1 className="font-bold text-sky-500">{domain.charAt(0).toUpperCase() + domain.slice(1)}</h1><br/>
+                        <div onClick={() => deleteDomain(domain)}>
+                            <DeleteIcon />
+                        </div>
                     </div>
                 ))}
                 <div className="domain-dimensions card shadow-md m-4 p-4" onClick={() => setShowAddDomain(true)}>

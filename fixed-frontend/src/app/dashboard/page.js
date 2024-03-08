@@ -6,8 +6,9 @@ import HomePage from "./HomePage";
 import MapPage from "../components/new-map-components/MapPage"
 import Settings from "../components/settings"
 import Chart from "../components/charts"
+import MicroManager from "../components/MicroManager"
 import { getCookie } from "../components/cookies"
-import { HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon,NotificationIcon } from "../components/heroIcons"
+import { HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon,NotificationIcon,CPUIcon } from "../components/heroIcons"
 import { useNotification } from "../components/notifications";
 import { fetchApi } from "../components/apiFetcher";
 import dynamic from "next/dynamic";
@@ -19,7 +20,8 @@ const views = {
   homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
   interactiveMap: {page: <MapPage/>, pageTitle: "Interactive Map"},
   settings: {page: <Settings/>, pageTitle: "Settings"},
-  charts: {page: <Chart/>, pageTitle: "Charts"}
+  charts: {page: <Chart/>, pageTitle: "Charts"},
+  microManager: {page: <MicroManager/>, pageTitle: "Microbit Manager"}
 }
 
 const brands = {
@@ -36,13 +38,23 @@ const Dashboard = () => {
   const { sendNotification, NotificationComponent } = useNotification();
   const [ showNotifications, setShowNotifications ] = useState(false); 
   const [currentBrand,setBrand] = useState(brands.prison);
+  const [deleting, setDeleting] = useState(null);
 
   var notifications = null;
   if (typeof window !== 'undefined') {
     notifications = JSON.parse(localStorage.getItem('notifications')) || [];
   }else{}
 
-  console.log(notifications);
+  const deleteNotification = (index) => {
+    setDeleting(index);
+    setTimeout(() => {
+      const newNotifications = [...notifications];
+      newNotifications.splice(index, 1);
+      localStorage.setItem('notifications', JSON.stringify(newNotifications));
+      setDeleting(null);
+    }, 200);
+  }
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
     setUsername(getCookie("username"));
@@ -73,8 +85,23 @@ const Dashboard = () => {
             {/* margin-right: 1rem;border-right: 1px solid white;margin-left: 1rem; */}
             <h1 className="title">{currentView.pageTitle}</h1> 
           </div>
-          
-          <UserButton username={username} />
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <button onClick={() => setShowNotifications(!showNotifications)} className="rounded-md shadow-md p-2 bg-red-600"><NotificationIcon/></button>
+            {showNotifications && (
+              <div className="absolute -ml-16 top-full mt-2 overflow-y-auto max-h-64 w-64">
+                {notifications.map((notification, index) => (
+                  <div className={`card notif-card ml-6 p-4 mb-2 relative ${deleting === index ? 'deleting' : ''}`} key={index}>  
+                        <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1">X</button>
+                    <h1>{notification.title}</h1>
+                    <p>{notification.options}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            </div>
+            <UserButton username={username} className="p-2"/>
+          </div>
         </div>
 
         {/* Used to navigate pages */}
@@ -84,6 +111,7 @@ const Dashboard = () => {
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.interactiveMap)}>Map <MapIcon/></button>
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.charts)}>Analytics <AnalyticsIcon/></button>
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.settings)}>Settings <SettingsIcon/></button>
+          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit Manager<CPUIcon/></button>
         </div>
 
         {/* Where the screen contents are shown */}
@@ -99,17 +127,6 @@ const Dashboard = () => {
             }
           }}
           >Panic</button>
-          <button onClick={() => setShowNotifications(!showNotifications)} className="fixed rounded-md m-4 ml-8 shadow-md bottom-0 flex justify-end p-2 bg-red-600"><NotificationIcon/></button>
-          {showNotifications && (
-            <div>
-              {notifications.map((notification, index) => (
-                <div className="card ml-6 p-4" key={index}>
-                  <h1>{notification.title}</h1>
-                  <p>{notification.options}</p>
-                </div>
-              ))}
-            </div>
-          )}
           <NotificationComponent />
         </div>
       </body>
