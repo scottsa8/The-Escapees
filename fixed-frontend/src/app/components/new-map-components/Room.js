@@ -1,5 +1,9 @@
+/**
+ * A class representing a room to draw to a canvas
+ */
 class Room {
 
+    //default maximum room values
     static maxValues = {
         maxTemp: 100,
         maxLight: 100,
@@ -15,7 +19,10 @@ class Room {
 
     static contextRef;
 
-    //sets the bounds used to detect a user click
+    /**
+     * Sets the bounds used to detect if a user has clicked the room
+     * @param {*} coordinates The corners of the room
+     */
     #setBounds(coordinates){
         //search through coordinates and find smallest and largest x and y vals
 
@@ -44,7 +51,9 @@ class Room {
         this.lowerBound_x = minX;
         this.lowerBound_y = minY;
     }
-    //finds the center point between bounds
+    /**
+     * Finds the center point between bounds
+     */
     #setCenterPoint(){
         this.centerPoint[0] = ((this.upperBound_x - this.lowerBound_x)/2) + this.lowerBound_x;
         this.centerPoint[1] = ((this.upperBound_y - this.lowerBound_y)/2) + this.lowerBound_y;
@@ -65,7 +74,12 @@ class Room {
         this.#setCenterPoint()
     }
 
-    //checks if the user has clicked this box
+   /**
+    * Fetches the current room if it has been clicked
+    * @param {*} x X coordinate clicked
+    * @param {*} y Y coordinae clicked
+    * @returns the room object that has been selected
+    */
     checkClick(x, y){
         let roomFound = undefined;
         if(this.coords != undefined && this.coords != null){
@@ -79,6 +93,12 @@ class Room {
         return roomFound;
     }
 
+    /**
+     * Draws the doors for the current rooms
+     * @param {*} fillColour The background colour
+     * @param {*} borderColour The colour around the edge of the room
+     * @returns void
+     */
     drawDoors(fillColour, borderColour){
         if(this.doors == null){
             return;
@@ -88,6 +108,11 @@ class Room {
         }
     }
 
+    /**
+     * Draws the current room and any icons that need to be shown
+     * @param {*} fillColour The background colour
+     * @param {*} borderColour The colour around he edge of the room
+     */
     draw(fillColour, borderColour){
         //defining colours used
         Room.contextRef.current.fillStyle = fillColour;
@@ -155,7 +180,12 @@ class Room {
 
     }
 
-    //sets the current environmental data of the room
+    /**
+     * Sets the current environmental data of the room and checks what icons need to be displayed
+     * @param {*} temp The temperature of the current room
+     * @param {*} noise The noise level in the current room
+     * @param {*} light The light level in the current room
+     */
     setAndCheckEnvironmentalData(temp, noise, light){
 
         this.temp = parseFloat(temp);
@@ -174,10 +204,11 @@ class Room {
             this.toShow.push(Room.noiseIcon)
         }
 
-        //console.log(this.name +": Temp = "+this.temp+" Noise = "+this.noise+" Light = "+this.light);
     }
 
-    //sets the room colour to red
+    /**
+     * Sets the room colour to red to indicate that there is a problem in that room
+     */
     alarm(){
         this.draw("#EABBBB", "Black");
         this.drawDoors("#D8E0E6","black");

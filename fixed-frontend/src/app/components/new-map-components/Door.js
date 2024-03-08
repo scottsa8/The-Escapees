@@ -1,3 +1,6 @@
+/**
+ * A class representing a door to draw to a canvas
+ */
 class Door{
 
     static closedLockIcon = new Image();
@@ -6,7 +9,11 @@ class Door{
     static contextRef;
     static ICON_SIZE;
 
-    //sets coords for the corners of the 
+    /**
+     * Sets the coordinates for the corners of the door
+     * @param {*} size The size of the door to draw
+     * @param {*} location Where the center of the door is to be placed
+     */ 
     #setCoords(size, location){
         size = size/2;
         let x = location[0];
@@ -24,6 +31,9 @@ class Door{
         Door.ICON_SIZE = this.size - 5;
     }
 
+    /**
+     * Draws the lock icon inside the door
+     */
     #drawIcon(){
 
         if(this.doorLocked == true){
@@ -35,7 +45,11 @@ class Door{
         }
     }
 
-    //draws the room
+    /**
+     * Draws the door to a canvas
+     * @param {*} fillColour The background colour
+     * @param {*} borderColour The outer colour
+     */
     draw(fillColour, borderColour){
         //defining colours used
         Door.contextRef.current.fillStyle = fillColour;
