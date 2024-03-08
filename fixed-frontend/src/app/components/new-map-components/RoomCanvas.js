@@ -110,9 +110,7 @@ const RoomCanvas = ({trackedUser}) => {
                 room = new Room(entry.Name,tl,tr,br,bl,null);
             }else{
                 room = new Room(entry.Name,tl,tr,br,bl,doors[index]);
-            }
-            console.log(room.name)
-            
+            }            
             //check if room already exists
             if(rooms.some(r => r.name === entry.Name)){
             }else{
@@ -120,7 +118,6 @@ const RoomCanvas = ({trackedUser}) => {
                 rooms.push(room)
             } 
         }
-      
         console.log(rooms)
     }
 
