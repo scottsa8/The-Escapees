@@ -1,40 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 
 export function useNotification() {
-    const [showNotification, setShowNotification] = useState(false);
-    const [notificationTitle, setNotificationTitle] = useState('');
-    const [notificationOptions, setNotificationOptions] = useState('');
-
-    useEffect(() => {
-        if (showNotification) {
-            const timer = setTimeout(() => {
-                const existingNotifications = JSON.parse(localStorage.getItem('notifications')) || [];
-                existingNotifications.push({ title: notificationTitle, options: notificationOptions });
-                localStorage.setItem('notifications', JSON.stringify(existingNotifications));
-    
-                setShowNotification(false);
-            }, 3000);
-    
-            return () => {
-                clearTimeout(timer);
-            };
-        }
-    }, [showNotification, notificationTitle, notificationOptions]);
+    const [notifications, setNotifications] = useState([]);
+    const timers = useRef({});
 
     const sendNotification = (title, options) => {
-        setNotificationTitle(title);
-        setNotificationOptions(options);
-        setShowNotification(true);
+        const id = Date.now(); 
+        const timestamp = new Date();
+        setNotifications(prevNotifications => [...prevNotifications, { id, title, options, timestamp }]);
+
+        timers.current[id] = setTimeout(() => {
+            setNotifications(prevNotifications => prevNotifications.filter(n => n.id !== id));
+            delete timers.current[id];
+
+            const existingNotifications = JSON.parse(localStorage.getItem('notifications')) || [];
+            existingNotifications.push({ id, title, options, timestamp });
+            localStorage.setItem('notifications', JSON.stringify(existingNotifications));
+        }, 3000);
     };
 
     const NotificationComponent = () => (
-        showNotification && (
-            <div className="absolute bottom-10 rounded-lg shadow-lg left-20 p-4 z-20 bg-sky-600">
-                <h2>{notificationTitle}</h2>
-                <h3>{notificationOptions}</h3>
-                <div className="absolute bottom-0 left-0 rounded-b-lg h-2 bg-red-600 w-full animate-reverse-loading"></div>
+        notifications.map((notification, index) => (
+            <div key={notification.id} className="notification" style={{ bottom: `${10 + index * 110}px` }}>
+                <h2 className="font-bold">{notification.title}</h2>
+                <h3>{notification.options}</h3>
+                <p>{notification.timestamp.toLocaleString()}</p>
+                <div className="loading-bar"/>
             </div>
-        )
+        ))
     );
 
     return { sendNotification, NotificationComponent };
