@@ -17,23 +17,24 @@ def sendDataFromServer():
         if "PANIC" in decodedMessage:
             radio.send(decodedMessage)
         else:
-            display.scroll(decodedMessage)
+
+            display.scroll("1:" + decodedMessage)
             components = decodedMessage.split(',')
+            
             if len(components) >= 2:
                 name = components[0]
+                # display.scroll(components[0])
                 message = ','.join(components[1:])
             
-            # Split the message into packets of size PACKET_SIZE
-            for packet_number, packet_start in enumerate(range(0, len(message), PACKET_SIZE)):
-                packet_end = packet_start + PACKET_SIZE
-                packet = message[packet_start:packet_end]
-                
-                # Prepend the name and packet number to each packet
-                packetWithPrefix = name + "," + str(packet_number) + "," + packet
-
-                display.scroll(packet)
-                radio.send(packetWithPrefix)
-            
+                # Split the message into groups of size PACKET_SIZE
+                for packet_start in range(0, len(message), PACKET_SIZE):
+                    packet_end = packet_start + PACKET_SIZE
+                    packet_group = message[packet_start:packet_end]
+                    
+                    # Prepend the name to the start of each group
+                    packetWithPrefix = name + "," + packet_group
+                    # display.scroll(decodedMessage)
+                    radio.send(decodedMessage)
         radio.config(channel=21)
 
 def findEntries():
