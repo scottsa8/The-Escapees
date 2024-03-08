@@ -1,7 +1,6 @@
 import RoomCanvas from "./RoomCanvas";
 import { useState } from "react";
 import {SelectUserBox} from "./SelectUserBox";
-import {UploadMap} from "./UploadMap";
 
 const MapPage = () => {
 
