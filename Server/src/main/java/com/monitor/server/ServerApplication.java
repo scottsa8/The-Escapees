@@ -140,10 +140,40 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/setupMap")
-	private boolean setupMap(@RequestParam(value = "roomName") String roomName,
-			@RequestParam(value = "points") int[] points) {
-		// insert into db
-		return false;
+	private boolean setupMap(
+			@RequestParam(value = "roomName") String roomName,
+			@RequestParam(value = "points") int[] points
+	) {
+		// Check if the 'points' array has exactly four elements (x1, y1, x2, y2)
+		if (points.length != 4) {
+			return false; // Invalid input
+		}
+	
+		try {
+			// Insert new room into the database
+			// Function only requires top left and bottom right coordinate of the room to work out all 4 coordinates
+			PreparedStatement insertRoomStatement = connection.prepareStatement(
+					"INSERT INTO rooms (room_name, top_left_x, top_left_y, bottom_right_x, bottom_right_y) " +
+							"VALUES (?, ?, ?, ?, ?)"
+			);
+	
+			// Set parameters
+			insertRoomStatement.setString(1, roomName);
+			insertRoomStatement.setInt(2, points[0]); // top_left_x
+			insertRoomStatement.setInt(3, points[1]); // top_left_y
+			insertRoomStatement.setInt(4, points[2]); // bottom_right_x
+			insertRoomStatement.setInt(5, points[3]); // bottom_right_y
+	
+			// Execute the insert statement
+			int rowsAffected = insertRoomStatement.executeUpdate();
+	
+			// Check if the insertion was successful (1 row affected)
+			return rowsAffected == 1;
+	
+		} catch (SQLException e) {
+			e.printStackTrace(); // Handle the SQL exception appropriately
+			return false;
+		}
 	}
 
 	@GetMapping("/setupDoors")
