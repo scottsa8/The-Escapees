@@ -14,10 +14,10 @@ export default function Settings() {
     const [showAddDomain, setShowAddDomain] = useState(false);
     const [domains, setDomains] = useState(['Hotel', 'Prison']);
     const [domainName, setDomainName] = useState('');
-    //setDomains(fetchApi("getDomains") || 'Hotel', 'Prison');
     
     const addDomain = (domainName) => {
         setDomains([...domains, domainName]);
+        fetchApi("setDomain?domain="+domainName)
         setShowAddDomain(false);
     };
 
@@ -47,6 +47,16 @@ export default function Settings() {
         setCookie('noiseNotification', noise);
         setCookie('lightNotification', light);
     }, [temp, noise, light]);
+
+    useEffect(() => {
+        const fetchDomains = async () => {
+            const fetchedDomains = await fetchApi("getDomains");
+            console.log(fetchedDomains);
+            setDomains(fetchedDomains || ['Hotel']);
+        };
+    
+        fetchDomains();
+    }, []);
 
     return (
         <div className="card-container p-4 dark:text-blue-100">
@@ -113,7 +123,7 @@ export default function Settings() {
             </div>
             <div className="domains-container flex flex-row">
                 {domains.map((domain, index) => (
-                    <div key={index} onClick={fetchApi("setDomain?"+domain)}className="card shadow-md m-4 p-4">
+                    <div key={index} onClick={() => fetchApi("setDomain?domain="+domain)} className="card shadow-md m-4 p-4">
                         <h1 className="font-bold text-sky-500">{domain}</h1>
                     </div>
                 ))}
