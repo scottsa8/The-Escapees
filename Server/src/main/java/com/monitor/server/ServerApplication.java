@@ -705,7 +705,7 @@ public class ServerApplication {
 				int roomBottomRightX = rs.getInt("bottom_right_x");
 				int roomBottomRightY = rs.getInt("bottom_right_y");
 	
-				roomData.append("{\"Room Name\": \"").append(roomName).append("\",")
+				roomData.append("{\"Name\": \"").append(roomName).append("\",")
 						.append("\"TLC\": \"").append(roomTopLeftX).append(",").append(roomTopLeftY).append("\",")
 						.append("\"TRC\": \"").append(roomBottomRightX).append(",").append(roomTopLeftY).append("\",")
 						.append("\"BLC\": \"").append(roomTopLeftX).append(",").append(roomBottomRightY).append("\",")
@@ -732,7 +732,8 @@ public class ServerApplication {
 	@GetMapping("/getAllDoorData")
 	private String getAllDoorData() {
 		StringBuilder doorData = new StringBuilder();
-
+		doorData.append("{\"doors\":{" +
+				"\"data\":[");
 		try {
 			// Fetch all door data from the database without returning door_id and room_id
 			PreparedStatement selectDoorDataStatement = connection.prepareStatement(
@@ -746,21 +747,24 @@ public class ServerApplication {
 				int xCoordinate = rs.getInt("x_coordinate");
 				int yCoordinate = rs.getInt("y_coordinate");
 
-				doorData.append("Door Name: ").append(doorName).append("\n")
-						.append("Door Coordinates: ").append(xCoordinate).append(",").append(yCoordinate).append("\n\n");
+				doorData.append("{\"Name\": \"").append(doorName).append("\",")
+						.append("\"coords\": \"").append(xCoordinate).append(",").append(yCoordinate).append("\"}");
+				if(!rs.isLast()){
+					doorData.append(",");
+				}
 			}
 
 			if (doorData.length() == 0) {
 				// Handle the case when there are no doors
-				doorData.append("No doors found");
+				doorData.append("{\"error\": \"no doors\"}");
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// Handle the SQL exception
-			doorData.append("An error occurred");
+			doorData.append("{\"error\": \"SQL error\"}");
 		}
-
+		doorData.append("]}}");
 		return doorData.toString();
 	}
 
