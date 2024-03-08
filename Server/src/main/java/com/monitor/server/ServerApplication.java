@@ -89,7 +89,6 @@ public class ServerApplication {
 			System.out.println("no Microbit detected");
 		}
 		// transmitMessage(1, "Hello");
-		System.out.println(getAllDoorData());
 	}
 
 	@Scheduled(cron = "0 */2 * ? * *")

@@ -155,35 +155,18 @@ def main():
             message_str = message[0][3:].decode('utf-8')
             if "PANIC" in message_str and name in message_str:
                 panic()
-            display.scroll(message_str)
-            message_data = message_str.split(',')
 
-            # if message_data[0].strip().isdigit() and message_data[1] == name:
-            #     # New message
-            #     display.scroll("x")
-            #     full_message = message_data[2]
-            # # elif name in message_str:
-            # #     #update the list for the user's location
-            # #     display.scroll("y")
-            # #     updateCounts()
-            # #     locationNodeName = findLocation()
-            # #     #send the user's name and location to the receiver
-            # #     radio.config(channel=21)#send message to server
-            # #     radio.send(str(MESSAGE_ID)+","+name+","+locationNodeName)
-            # #     radio.config(channel=22)#receive from node
-            # else:
-            #     # Append the received part to the existing message
-            #     display.scroll("z")
-            #     full_message += message_data[0]
-            #     display.scroll(message_data[0])
+            #update the list for the user's location
+            hasLocation = decodeMessage(message)
 
-            #     # Check if the message contains the terminator "/eom/"
-            #     if "/EOM/" in full_message:
-            #         display.scroll("2")
-            #         # Remove the terminator and display the message
-            #         full_message = full_message.replace("/EOM/", "")
-            #         display.scroll(full_message)
-            #         full_message = ""  # Reset the message buffer after displaying  
-            # hasLocation = False
+            if hasLocation:
+                updateCounts()
+                locationNodeName = findLocation()
+
+                #send the user's name and location to the receiver
+                radio.config(channel=21)#send message to server
+                radio.send(str(MESSAGE_ID)+","+name+","+locationNodeName)
+                radio.config(channel=22)#receive from node
+                hasLocation = False
         sleep(100) 
 main()
