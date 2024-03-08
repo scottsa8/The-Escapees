@@ -60,6 +60,25 @@ const RoomCanvas = ({trackedUser}) => {
         
     }
 
+    /**
+     * Fetches the rooms from the database and creates corresponding objects ready to be drawn
+     */
+    function loadRooms(){
+
+        //TODO
+
+        //FETCH ROOMS FROM DB
+
+        //FETCH DOORS FROM DB
+        
+        //CREATE DOOR CLASSES E.G:
+        //const cellCD = new Door("Cell C Door", [575,200]);
+
+        //CREATE ROOM CLASS E.G:
+        // new Room("Cell C", [[500,50],[650,50],[650,200],[500,200]],[cell_C_Door])
+
+    }
+
     //clears and redraws the rooms
     function refreshCanvas(){
         contextRef.current.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);

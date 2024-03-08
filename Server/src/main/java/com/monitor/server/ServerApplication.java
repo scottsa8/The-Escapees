@@ -141,8 +141,7 @@ public class ServerApplication {
 	@GetMapping("/setupMap")
 	private boolean setupMap(
 			@RequestParam(value = "roomName") String roomName,
-			@RequestParam(value = "points") int[] points
-	) {
+			@RequestParam(value = "points") int[] points) {
 		// Check if the 'points' array has exactly four elements (x1, y1, x2, y2)
 		if (points.length != 4) {
 			return false; // Invalid input
@@ -648,7 +647,8 @@ public class ServerApplication {
 	@GetMapping("/getRoomCoordinates")
 	private String getRoomCoordinates(@RequestParam(value = "roomName") String roomName) {
 		StringBuilder coordinates = new StringBuilder();
-
+		coordinates.append("{\"coords\":{" +
+				"\"data\":[");
 		try {
 			// Fetch all coordinates for the given room from the database
 			PreparedStatement selectCoordinatesStatement = connection.prepareStatement(
@@ -656,7 +656,6 @@ public class ServerApplication {
 			);
 			selectCoordinatesStatement.setString(1, roomName);
 			ResultSet rs = selectCoordinatesStatement.executeQuery();
-
 			if (rs.next()) {
 				// Retrieve coordinates and append them to the StringBuilder
 				int topLeftX = rs.getInt("top_left_x");
@@ -668,24 +667,25 @@ public class ServerApplication {
 						.append(bottomRightX).append(",").append(topLeftY).append(",")
 						.append(bottomRightX).append(",").append(bottomRightY).append(",")
 						.append(topLeftX).append(",").append(bottomRightY);
+
 			} else {
 				// Handle the case when the room name is not found
 				coordinates.append("Room not found");
 			}
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// Handle the SQL exception
 			coordinates.append("An error occurred");
 		}
-
+		coordinates.append("]}}");
 		return coordinates.toString();
 	}
 
 	@GetMapping("/getAllRoomData")
 	private String getAllRoomData() {
 		StringBuilder roomData = new StringBuilder();
-	
+		roomData.append("{\"rooms\":{" +
+				"\"data\":[");
 		try {
 			// Fetch all room data from the database
 			PreparedStatement selectRoomDataStatement = connection.prepareStatement(
@@ -704,24 +704,27 @@ public class ServerApplication {
 				int roomBottomRightX = rs.getInt("bottom_right_x");
 				int roomBottomRightY = rs.getInt("bottom_right_y");
 	
-				roomData.append("Room Name: ").append(roomName).append("\n")
-						.append("Top-Left Coordinates: ").append(roomTopLeftX).append(",").append(roomTopLeftY).append("\n")
-						.append("Top-Right Coordinates: ").append(roomBottomRightX).append(",").append(roomTopLeftY).append("\n")
-						.append("Bottom-Left Coordinates: ").append(roomTopLeftX).append(",").append(roomBottomRightY).append("\n")
-						.append("Bottom-Right Coordinates: ").append(roomBottomRightX).append(",").append(roomBottomRightY).append("\n\n");
+				roomData.append("{\"Room Name\": \"").append(roomName).append("\",")
+						.append("\"TLC\": \"").append(roomTopLeftX).append(",").append(roomTopLeftY).append("\",")
+						.append("\"TRC\": \"").append(roomBottomRightX).append(",").append(roomTopLeftY).append("\",")
+						.append("\"BLC\": \"").append(roomTopLeftX).append(",").append(roomBottomRightY).append("\",")
+						.append("\"BRC\": \"").append(roomBottomRightX).append(",").append(roomBottomRightY).append("\"}");
+				if(!rs.isLast()){
+					roomData.append(",");
+				}
 			}
 	
 			if (roomData.length() == 0) {
 				// Handle the case when there are no rooms
-				roomData.append("No rooms found");
+				roomData.append("{\"error\": \"no rooms\"}");
 			}
 	
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// Handle the SQL exception
-			roomData.append("An error occurred");
+			roomData.append("{\"error\": \"SQL error\"}");
 		}
-	
+		roomData.append("]}}");
 		return roomData.toString();
 	}	
 
