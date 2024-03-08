@@ -1,0 +1,14 @@
+INSERT INTO prisondb.rooms SET room_id= 1, room_name="gate1",top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0, max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 2, room_name="gate2",top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0, max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 3, room_name="Cell Block", top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0,max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 4, room_name="Corridor", top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0,max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 6, room_name="Courtyard",top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0, max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 7, room_name="Canteen", top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0,max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 8, room_name="Security Check",top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0, max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 9, room_name="Reception",top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0, max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 10, room_name="Visitor Area", top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0,max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 11, room_name="Staff Room", top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0,max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 12, room_name="Cell A",top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0, max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 13, room_name="Cell B",top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0, max_temperature=30, max_noise_level=30, max_light_level=30;
+INSERT INTO prisondb.rooms SET room_id= 14, room_name="Cell C",top_left_x=0,top_left_y=0,bottom_right_x=0,bottom_right_y=0, max_temperature=30, max_noise_level=30, max_light_level=30;
+SELECT * FROM prisondb.rooms;

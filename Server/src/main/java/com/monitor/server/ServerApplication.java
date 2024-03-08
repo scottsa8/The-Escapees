@@ -617,8 +617,8 @@ public class ServerApplication {
 	}
 
 	@GetMapping("/getRoomCoordinates")
-	private String getRoomCoordinates(@RequestParam(value = "roomName") String roomName) {
-		StringBuilder coordinates = new StringBuilder();
+	private int[] getRoomCoordinates(@RequestParam(value = "roomName") String roomName) {
+		int[] coordinates = new int[4];
 
 		try {
 			// Fetch all coordinates for the given room from the database
@@ -630,27 +630,25 @@ public class ServerApplication {
 
 			if (rs.next()) {
 				// Retrieve coordinates and append them to the StringBuilder
-				int topLeftX = rs.getInt("top_left_x");
-				int topLeftY = rs.getInt("top_left_y");
-				int bottomRightX = rs.getInt("bottom_right_x");
-				int bottomRightY = rs.getInt("bottom_right_y");
+				coordinates[0] = rs.getInt("top_left_x");
+				coordinates[1] = rs.getInt("top_left_y");
+				coordinates[2] = rs.getInt("bottom_right_x");
+				coordinates[3] = rs.getInt("bottom_right_y");
 
-				coordinates.append(topLeftX).append(",").append(topLeftY).append(",")
-						.append(bottomRightX).append(",").append(topLeftY).append(",")
-						.append(bottomRightX).append(",").append(bottomRightY).append(",")
-						.append(topLeftX).append(",").append(bottomRightY);
+//				coordinates.append(topLeftX).append(",").append(topLeftY).append(",")
+//						.append(bottomRightX).append(",").append(bottomRightY).append(",");
 			} else {
 				// Handle the case when the room name is not found
-				coordinates.append("Room not found");
+//				coordinates.append("Room not found");
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// Handle the SQL exception
-			coordinates.append("An error occurred");
+//			coordinates.append("An error occurred");
 		}
 
-		return coordinates.toString();
+		return coordinates;
 	}
 
 	@GetMapping("/getAllRoomData")
