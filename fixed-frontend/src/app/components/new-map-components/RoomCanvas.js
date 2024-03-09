@@ -16,7 +16,8 @@ const RoomCanvas = ({trackedUser}) => {
     const ICON_SIZE = 20;
 
     let [trackedName, setTrackedName] = useState(trackedUser);
-    let [rooms, setRooms] = useState([]);
+    //const [rooms, setRooms] = useState([]);
+    let rooms = [];
 
     // const doorA = new Door("Office Side", [400, 110]);
     // const doorB = new Door("Office Main", [285, 200]);
@@ -123,7 +124,8 @@ const RoomCanvas = ({trackedUser}) => {
                 tempRoomArr.push(room);
             } 
         }
-        setRooms(tempRoomArr);
+        //setRooms(tempRoomArr);
+        rooms = tempRoomArr;
 
         console.log(rooms)
     }
