@@ -53,6 +53,7 @@ const RoomCanvas = ({trackedUser}) => {
     //draw every room to the canvas
     const drawRooms = () =>{
         //loadRooms();
+        console.log(rooms)
         for(let j=0; j<rooms.length; j++){
             rooms[j].draw("#D8E0E6","black");
         }
@@ -93,12 +94,13 @@ const RoomCanvas = ({trackedUser}) => {
             if(entry.Name==="gate1"||entry.Name==="gate2"){continue;}
             //topleft
             let tl=[parseInt(entry.TLC.split(",")[0]),parseInt(entry.TLC.split(",")[1])];
+            console.log(tl);
             //top right
             let tr=[parseInt(entry.TRC.split(",")[0]),parseInt(entry.TRC.split(",")[1])]
             //bottom right
-            let br=[parseInt(entry.BLC.split(",")[0]),parseInt(entry.BLC.split(",")[1])]
+            let br=[parseInt(entry.BRC.split(",")[0]),parseInt(entry.BRC.split(",")[1])]
             //bottom left
-            let bl=[parseInt(entry.BRC.split(",")[0]),parseInt(entry.BRC.split(",")[1])]
+            let bl=[parseInt(entry.BLC.split(",")[0]),parseInt(entry.BLC.split(",")[1])]
             //get the door index
             let index;
             for(const d in doors){
@@ -111,9 +113,9 @@ const RoomCanvas = ({trackedUser}) => {
             //create the room 
             let room
             if(index==-1){
-                room = new Room(entry.Name,tl,tr,br,bl,null);
+                room = new Room(entry.Name,[tl,tr,br,bl],null);
             }else{
-                room = new Room(entry.Name,tl,tr,br,bl,doors[index]);
+                room = new Room(entry.Name,[tl,tr,br,bl],doors[index]);
             }
             console.log(tempRoomArr)
             //check if room already exists
