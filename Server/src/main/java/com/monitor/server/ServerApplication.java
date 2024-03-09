@@ -729,17 +729,19 @@ public class ServerApplication {
 	}	
 
 	@GetMapping("/getAllDoorData")
-	private String getAllDoorData() {
+	private String getAllDoorData(@RequestParam (value="room") String roomName) {
 		StringBuilder doorData = new StringBuilder();
 		doorData.append("{\"doors\":{" +
 				"\"data\":[");
 		try {
 			// Fetch all door data from the database without returning door_id and room_id
 			PreparedStatement selectDoorDataStatement = connection.prepareStatement(
-					"SELECT door_name, x_coordinate, y_coordinate FROM doors"
-			);
-			ResultSet rs = selectDoorDataStatement.executeQuery();
+					"SELECT door_name, x_coordinate, y_coordinate FROM doors "+
+					"JOIN rooms ON doors.room_id = rooms.room_id WHERE rooms.room_name= ?"
 
+			);
+			selectDoorDataStatement.setString(1,roomName);
+			ResultSet rs = selectDoorDataStatement.executeQuery();
 			while (rs.next()) {
 				// Retrieve door data and append them to the StringBuilder
 				String doorName = rs.getString("door_name");
