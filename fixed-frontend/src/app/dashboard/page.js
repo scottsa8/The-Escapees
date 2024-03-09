@@ -46,9 +46,9 @@ const Dashboard = () => {
   }else{}
 
   const deleteNotification = (index) => {
+    const newNotifications = [...notifications];
     setDeleting(index);
     setTimeout(() => {
-      const newNotifications = [...notifications];
       newNotifications.splice(index, 1);
       localStorage.setItem('notifications', JSON.stringify(newNotifications));
       setDeleting(null);
