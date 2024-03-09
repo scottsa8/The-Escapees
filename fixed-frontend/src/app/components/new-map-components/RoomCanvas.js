@@ -53,12 +53,14 @@ const RoomCanvas = ({trackedUser}) => {
     //draw every room to the canvas
     const drawRooms = () =>{
         //loadRooms();
-        console.log(rooms)
         for(let j=0; j<rooms.length; j++){
             rooms[j].draw("#D8E0E6","black");
         }
+        console.log(rooms)
         //draw doors after rooms so the rooms don't overlap doors
         for(let i=0;i<rooms.length; i++){
+            console.log(i)
+            console.log(rooms[i].doors)
             rooms[i].drawDoors("#D8E0E6","black");
         }
         
@@ -71,18 +73,6 @@ const RoomCanvas = ({trackedUser}) => {
 
         let tempRoomArr = [];//tempoary array to store created rooms in.
 
-        //FETCH DOORS FROM DB
-        let doorData = await fetchApi("getAllDoorData");
-        if(doorData!=undefined){
-            doorData = doorData.doors.data;
-        }
-        //create doors
-        const doors=[];
-        for(let i=0;i<doorData.length;i++){
-            let entry = doorData[i];
-            doors.push(new Door(entry.Name,[parseInt(entry.coords.split(",")[0]),parseInt(entry.coords.split(",")[1])]))
-        }
-        console.log(doors)
         //FETCH ROOMS FROM DB
         let roomData = await fetchApi("getAllRoomData");
         if(roomData!=undefined){
@@ -94,42 +84,36 @@ const RoomCanvas = ({trackedUser}) => {
             if(entry.Name==="gate1"||entry.Name==="gate2"){continue;}
             //topleft
             let tl=[parseInt(entry.TLC.split(",")[0]),parseInt(entry.TLC.split(",")[1])];
-            console.log(tl);
             //top right
             let tr=[parseInt(entry.TRC.split(",")[0]),parseInt(entry.TRC.split(",")[1])]
             //bottom right
             let br=[parseInt(entry.BRC.split(",")[0]),parseInt(entry.BRC.split(",")[1])]
             //bottom left
             let bl=[parseInt(entry.BLC.split(",")[0]),parseInt(entry.BLC.split(",")[1])]
-            //get the door index
-            let index;
-            for(const d in doors){
-                if(doors[d].doorName.includes(entry.Name)){
-                    index=d     //I think this works, though if you run into any errors, then its mostly likely this
-                }else{
-                    index-1
-                }
-            }           
-            //create the room 
-            let room
-            if(index==-1){
+
+              //FETCH DOORS FROM DB
+            let doorData = await fetchApi("getAllDoorData?room="+entry.Name);
+            console.log(doorData)
+            if(doorData!=undefined){
+                doorData = doorData.doors.data[0];
+            }
+               //create create the room with the door 
+            let door;
+            let room;
+            if(doorData==undefined){
                 room = new Room(entry.Name,[tl,tr,br,bl],null);
             }else{
-                room = new Room(entry.Name,[tl,tr,br,bl],doors[index]);
-            }
-            console.log(tempRoomArr)
+                door = new Door(doorData.Name,[parseInt(doorData.coords.split(",")[0]),parseInt(doorData.coords.split(",")[1])])
+                room = new Room(entry.Name,[tl,tr,br,bl],[door]);
+            }            
             //check if room already exists
             if(tempRoomArr.some(r => r.name === entry.Name)){
             }else{
                 //add it if it doesnt exist
-                //setRooms(prevRooms => [...prevRooms, room]);//append room to array
                 tempRoomArr.push(room);
             } 
         }
-        //setRooms(tempRoomArr);
         rooms = tempRoomArr;
-
-        console.log(rooms)
     }
 
     //clears and redraws the rooms
