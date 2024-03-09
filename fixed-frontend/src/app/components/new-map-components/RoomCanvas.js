@@ -67,6 +67,8 @@ const RoomCanvas = ({trackedUser}) => {
      */
     async function loadRooms(){
 
+        let tempRoomArr = [];//tempoary array to store created rooms in.
+
         //FETCH DOORS FROM DB
         let doorData = await fetchApi("getAllDoorData");
         if(doorData!=undefined){
@@ -112,14 +114,17 @@ const RoomCanvas = ({trackedUser}) => {
             }else{
                 room = new Room(entry.Name,tl,tr,br,bl,doors[index]);
             }
-            console.log(rooms)
+            console.log(tempRoomArr)
             //check if room already exists
-            if(rooms.some(r => r.name === entry.Name)){
+            if(tempRoomArr.some(r => r.name === entry.Name)){
             }else{
                 //add it if it doesnt exist
-                setRooms(prevRooms => [...prevRooms, room]);//append room to array
+                //setRooms(prevRooms => [...prevRooms, room]);//append room to array
+                tempRoomArr.push(room);
             } 
         }
+        setRooms(tempRoomArr);
+
         console.log(rooms)
     }
 
