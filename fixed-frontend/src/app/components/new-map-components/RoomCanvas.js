@@ -34,22 +34,23 @@ const RoomCanvas = ({trackedUser}) => {
     const rooms = [
         // new Room("Office", [[30,20],[400,20],[400,200],[30,200]],[doorA, doorB]), 
         // new Room("Kitchen", [[500,20],[870,20],[870,200],[500,200]],null)
-        new Room("Corridor",[[650,50],[750,50],[750,400],[650,400]],[corridorD]),
-        new Room("Cell Block", [[200,200],[650,200],[650,400],[200,400]], [cellBlockD]),
-        new Room("Courtyard", [[50,50], [200, 50], [200,550], [50,550]],[courtyardD]),
-        new Room("Canteen", [[200,400],[550,400],[550,550],[200,550]],[canteenD]),
-        new Room("Security Check", [[550,400],[750,400],[750,550],[550,550]],null),
-        new Room("Reception", [[750,400],[1100,400],[1100,550],[750,550]],[receptionD]),
-        new Room("Visitor Area", [[750,200],[1100,200],[1100,400],[750,400]],[visitorAreaD]),
-        new Room("Staff Room", [[750,50],[1100,50],[1100,200],[750,200]],[staffRoomD]),
-        new Room("Cell A", [[200,50],[350,50],[350,200],[200,200]],[cellAD]),
-        new Room("Cell B", [[350,50],[500,50],[500,200],[350,200]],[cellBD]),
-        new Room("Cell C", [[500,50],[650,50],[650,200],[500,200]],[cellCD])
+        // new Room("Corridor",[[650,50],[750,50],[750,400],[650,400]],[corridorD]),
+        // new Room("Cell Block", [[200,200],[650,200],[650,400],[200,400]], [cellBlockD]),
+        // new Room("Courtyard", [[50,50], [200, 50], [200,550], [50,550]],[courtyardD]),
+        // new Room("Canteen", [[200,400],[550,400],[550,550],[200,550]],[canteenD]),
+        // new Room("Security Check", [[550,400],[750,400],[750,550],[550,550]],null),
+        // new Room("Reception", [[750,400],[1100,400],[1100,550],[750,550]],[receptionD]),
+        // new Room("Visitor Area", [[750,200],[1100,200],[1100,400],[750,400]],[visitorAreaD]),
+        // new Room("Staff Room", [[750,50],[1100,50],[1100,200],[750,200]],[staffRoomD]),
+        // new Room("Cell A", [[200,50],[350,50],[350,200],[200,200]],[cellAD]),
+        // new Room("Cell B", [[350,50],[500,50],[500,200],[350,200]],[cellBD]),
+        // new Room("Cell C", [[500,50],[650,50],[650,200],[500,200]],[cellCD])
 
     ];
 
     //draw every room to the canvas
     const drawRooms = () =>{
+        loadRooms();
         for(let j=0; j<rooms.length; j++){
             rooms[j].draw("#D8E0E6","black");
         }
@@ -60,6 +61,66 @@ const RoomCanvas = ({trackedUser}) => {
         
     }
 
+    /**
+     * Fetches the rooms from the database and creates corresponding objects ready to be drawn
+     */
+    async function loadRooms(){
+
+        //FETCH DOORS FROM DB
+        let doorData = await fetchApi("getAllDoorData");
+        if(doorData!=undefined){
+            doorData = doorData.doors.data;
+        }
+        //create doors
+        const doors=[];
+        for(let i=0;i<doorData.length;i++){
+            let entry = doorData[i];
+            doors.push(new Door(entry.Name,[parseInt(entry.coords.split(",")[0]),parseInt(entry.coords.split(",")[1])]))
+        }
+        console.log(doors)
+        //FETCH ROOMS FROM DB
+        let roomData = await fetchApi("getAllRoomData");
+        if(roomData!=undefined){
+            roomData = roomData.rooms.data;
+        }
+        //create rooms
+        for(let i=0;i<roomData.length;i++){
+           let entry = roomData[i];
+            if(entry.Name==="gate1"||entry.Name==="gate2"){continue;}
+            //topleft
+            let tl=[parseInt(entry.TLC.split(",")[0]),parseInt(entry.TLC.split(",")[1])];
+            //top right
+            let tr=[parseInt(entry.TRC.split(",")[0]),parseInt(entry.TRC.split(",")[1])]
+            //bottom right
+            let br=[parseInt(entry.BLC.split(",")[0]),parseInt(entry.BLC.split(",")[1])]
+            //bottom left
+            let bl=[parseInt(entry.BRC.split(",")[0]),parseInt(entry.BRC.split(",")[1])]
+            //get the door index
+            let index;
+            for(const d in doors){
+                if(doors[d].doorName.includes(entry.Name)){
+                    index=d     //I think this works, though if you run into any errors, then its mostly likely this
+                }else{
+                    index-1
+                }
+            }           
+            //create the room 
+            let room
+            if(index==-1){
+                room = new Room(entry.Name,tl,tr,br,bl,null);
+            }else{
+                room = new Room(entry.Name,tl,tr,br,bl,doors[index]);
+            }            
+            //check if room already exists
+            if(rooms.some(r => r.name === entry.Name)){
+            }else{
+              //add it if it doesnt exist
+                rooms.push(room)
+            } 
+        }
+        console.log(rooms)
+    }
+
     //clears and redraws the rooms
     function refreshCanvas(){
         contextRef.current.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
@@ -68,7 +129,7 @@ const RoomCanvas = ({trackedUser}) => {
 
     //needs to be tested with data
     async function setAllRoomData(){
-
+    
         let currentUserLocation = undefined;
         trackedName="Ethan"
         // TEST get the location of the current selected user
@@ -76,7 +137,14 @@ const RoomCanvas = ({trackedUser}) => {
         if(trackedName != undefined){
             //get the current location of the user
             currentUserLocation = await fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
-            currentUserLocation = currentUserLocation.locations.data[0].Location;
+            if(currentUserLocation!=undefined){
+                try{
+                    currentUserLocation = currentUserLocation.locations.data[0].Location;
+                }catch(err){
+                    currentUserLocation=""
+                }
+               
+            }
             console.log(trackedName+" is in "+currentUserLocation);
         }
 
