@@ -112,7 +112,7 @@ const RoomCanvas = ({trackedUser}) => {
             }else{
                 room = new Room(entry.Name,tl,tr,br,bl,doors[index]);
             }
-
+            console.log(rooms)
             //check if room already exists
             if(rooms.some(r => r.name === entry.Name)){
             }else{
@@ -135,7 +135,7 @@ const RoomCanvas = ({trackedUser}) => {
         let currentUserLocation = undefined;
         trackedName="Ethan"
         // TEST get the location of the current selected user
-        console.log(trackedName)
+        //console.log(trackedName)
         if(trackedName != undefined){
             //get the current location of the user
             currentUserLocation = await fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
@@ -147,7 +147,7 @@ const RoomCanvas = ({trackedUser}) => {
                 }
                
             }
-            console.log(trackedName+" is in "+currentUserLocation);
+            //console.log(trackedName+" is in "+currentUserLocation);
         }
 
         for(let i=0; i<rooms.length; i++){
