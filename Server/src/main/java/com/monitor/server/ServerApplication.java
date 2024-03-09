@@ -104,7 +104,12 @@ public class ServerApplication {
 		// //e.printStackTrace();
 		// }
 	}
-
+	@GetMapping("/delDomain")
+	private boolean delDomain(@RequestParam (value="domain") String domain){
+		//drop db?
+		this.setDomain("prison");
+		return true;
+	}
 	@GetMapping("/getDomains")
 	private String getDomains() {
 		StringBuilder output = new StringBuilder();
