@@ -16,6 +16,7 @@ const RoomCanvas = ({trackedUser}) => {
     const ICON_SIZE = 20;
 
     let [trackedName, setTrackedName] = useState(trackedUser);
+    let [rooms, setRooms] = useState([]);
 
     // const doorA = new Door("Office Side", [400, 110]);
     // const doorB = new Door("Office Main", [285, 200]);
@@ -31,7 +32,7 @@ const RoomCanvas = ({trackedUser}) => {
     const cellBD = new Door("Cell B Door", [425,200]);
     const cellCD = new Door("Cell C Door", [575,200]);
 
-    const rooms = [
+    //const rooms = [
         // new Room("Office", [[30,20],[400,20],[400,200],[30,200]],[doorA, doorB]), 
         // new Room("Kitchen", [[500,20],[870,20],[870,200],[500,200]],null)
         // new Room("Corridor",[[650,50],[750,50],[750,400],[650,400]],[corridorD]),
@@ -46,11 +47,11 @@ const RoomCanvas = ({trackedUser}) => {
         // new Room("Cell B", [[350,50],[500,50],[500,200],[350,200]],[cellBD]),
         // new Room("Cell C", [[500,50],[650,50],[650,200],[500,200]],[cellCD])
 
-    ];
+    //];
 
     //draw every room to the canvas
     const drawRooms = () =>{
-        loadRooms();
+        //loadRooms();
         for(let j=0; j<rooms.length; j++){
             rooms[j].draw("#D8E0E6","black");
         }
@@ -110,12 +111,13 @@ const RoomCanvas = ({trackedUser}) => {
                 room = new Room(entry.Name,tl,tr,br,bl,null);
             }else{
                 room = new Room(entry.Name,tl,tr,br,bl,doors[index]);
-            }            
+            }
+
             //check if room already exists
             if(rooms.some(r => r.name === entry.Name)){
             }else{
-              //add it if it doesnt exist
-                rooms.push(room)
+                //add it if it doesnt exist
+                setRooms(prevRooms => [...prevRooms, room]);//append room to array
             } 
         }
         console.log(rooms)
@@ -251,6 +253,7 @@ const RoomCanvas = ({trackedUser}) => {
 
     useEffect(() => {
         console.log("Generating canvas");
+        loadRooms();
         setIcons();
         const canvas = canvasRef.current;//finds canvas element
         const context = canvas.getContext("2d");//the drawing object
