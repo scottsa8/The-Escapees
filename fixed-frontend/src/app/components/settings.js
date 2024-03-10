@@ -3,6 +3,7 @@ import {SunIcon, MoonIcon} from './heroIcons'
 import {setCookie, getCookie} from './cookies'
 import {PlusIcon,CloseIcon,SettingsIcon,DeleteIcon} from './heroIcons'
 import { fetchApi } from './apiFetcher';
+import { useQuery } from 'react-query';
 
 export default function Settings() {
     const [temp, setTemp] = useState(30);
@@ -11,23 +12,20 @@ export default function Settings() {
     const [updateDelay, setUpdateDelay] = useState(10);
     const [theme, setTheme] = useState('light');
     const [showAddDomain, setShowAddDomain] = useState(false);
-    const [domains, setDomains] = useState(['Hotel', 'Prison']);
     const [domainName, setDomainName] = useState('');
-    const [selectedDomain, setSelectedDomain] = useState(null);
+    const { data: domains, refetch: refetchDomains } = useQuery('domains', () => fetchApi("getDomains"), { initialData: ['Hotel', 'Prison'] });
+    const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'Prison' });
 
-    const selectDomain = (domain) => {
-        fetchApi("setDomain?domain="+domain);
-        setSelectedDomain(domain);
+    const selectDomain = async (domain) => {
+        await fetchApi("setDomain?domain="+domain);
+        refetchSelectedDomain();
     };
-    const deleteDomain = (domain) => {
-        // fetchApi("deleteDomain?domain="+domain);
+    const deleteDomain = async (domain) => {;
         console.log("deleting domain: " + domain);
-        setSelectedDomain(null);
-        setDomains(domains.filter(d => d !== domain));
     }
-    const addDomain = (domainName) => {
-        setDomains([...domains, domainName]);
-        fetchApi("setDomain?domain="+domainName)
+    const addDomain = async (domainName) => {
+        await fetchApi("setDomain?domain="+domainName)
+        refetchDomains();
         setShowAddDomain(false);
     };
 
@@ -50,11 +48,6 @@ export default function Settings() {
         setTheme(savedTheme);
         setUpdateDelay(savedUpdateDelay);
         document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-        const fetchDomains = async () => {
-            setDomains(await fetchApi("getDomains"));
-            selectDomain(await fetchApi("getDomain"));
-        };
-        fetchDomains();
     }, []);
     
     useEffect(() => {
@@ -62,7 +55,6 @@ export default function Settings() {
         setCookie('noiseNotification', noise);
         setCookie('lightNotification', light);
     }, [temp, noise, light]);
-
 
     return (
         <div className="card-container p-4 dark:text-blue-100">
