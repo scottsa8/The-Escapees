@@ -15,7 +15,7 @@ const MapPage = () => {
     return ( 
         <div className="MapPage">
             <div className="flex mb-5">
-                <SelectUserBox onLocationChange={setSelectedUser} />
+                {/* <SelectUserBox onLocationChange={setSelectedUser} /> */}
             </div>
             <form>
                 <input type={"file"} onChange={handleFileChange} accept={".csv"}></input>
