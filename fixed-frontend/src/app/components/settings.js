@@ -1,7 +1,7 @@
 import React, { useState, useEffect, use } from 'react';
 import {SunIcon, MoonIcon} from './heroIcons'
 import {setCookie, getCookie} from './cookies'
-import {PlusIcon,CloseIcon,SettingsIcon,DeleteIcon} from './heroIcons'
+import {PlusIcon,CloseIcon,SettingsIcon} from './heroIcons'
 import { fetchApi } from './apiFetcher';
 import { useQuery } from 'react-query';
 
@@ -28,6 +28,28 @@ export default function Settings() {
         refetchDomains();
         setShowAddDomain(false);
     };
+    const toggleDomainSettings = (domain) => {
+        const type = window.prompt("Enter type (room or user):");
+        const name = window.prompt("Enter name:");
+        const microbit = window.prompt("Enter microbit name:");
+        const overwrite = window.prompt("Enter overwrite (true or false):");
+    
+        if (type && name && microbit && overwrite) {
+            const endpoint = `addNode?type=${type}&name=${name}&microbit=${microbit}&overwrite=${overwrite}`;
+            fetchApi(endpoint)
+                .then(response => {
+                    if (response.ok) {
+                        alert('Data updated successfully');
+                    } else {
+                        alert('Error updating data');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        } else {
+            alert('Please enter all fields');
+        }
+    };
+
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -124,8 +146,8 @@ export default function Settings() {
                 {domains.map((domain, index) => (
                     <div key={index} onClick={() => selectDomain(domain)} className={`domain-dimensions card shadow-md m-4 p-4 ${domain === selectedDomain ? 'selected-color' : ''}`}>
                         <h1 className="font-bold text-sky-500">{domain.charAt(0).toUpperCase() + domain.slice(1)}</h1><br/>
-                        <div onClick={() => deleteDomain(domain)}>
-                            <DeleteIcon />
+                        <div onClick={() => toggleDomainSettings(domain)}>
+                            <SettingsIcon />
                         </div>
                     </div>
                 ))}
