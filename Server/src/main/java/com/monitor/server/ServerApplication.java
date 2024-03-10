@@ -649,6 +649,25 @@ public class ServerApplication {
 			throw new RuntimeException(e);
 		}
 	}
+	@GetMapping("/updateMax")
+	private boolean updateMax(@RequestParam(value="roomName") String roomName,@RequestParam(value="max") int[] maxes){
+		try{
+			PreparedStatement update = connection.prepareStatement(
+					"UPDATE rooms SET max_temperature=?, max_noise_level=?, max_light_level=? WHERE room_name=?"
+			);
+			update.setInt(1,maxes[0]);
+			update.setInt(2,maxes[1]);
+			update.setInt(3,maxes[2]);
+			update.setString(4,roomName);
+			update.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+
+		}
+
+	}
 	@GetMapping("/isDoorLocked")
 	private boolean isDoorLocked(@RequestParam(value = "doorName") String doorName) {
 		try {
