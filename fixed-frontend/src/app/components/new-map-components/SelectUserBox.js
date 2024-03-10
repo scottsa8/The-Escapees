@@ -19,9 +19,12 @@ const SelectUserBox = ({onUserChange}) => {
             console.error(error);
             return;
         }
-       consolge.log(data)
-        const trackedNames = data//...TODO
+        consolge.log(data)
 
+        ///THIS NEEDS TO BE FINISHED, COMPARE TO ROOMSELECTOR.JS
+        const trackedNames = data.names.data//This will need checking idk if '.names' is correct
+            .map(nameObj => nameObj.name)
+            .filter(roomName => roomName && !roomName.includes('TEMP, PLEASE CHANGE'));//Probably won't work
         setTrackedUsers(trackedNames);
 
     }, [data, error, refetch]);
