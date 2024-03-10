@@ -62,7 +62,7 @@ export default function Settings() {
     const updateDomainSettings = (event) => {
         event.preventDefault();
         const { name, microbit, maxTemp, maxNoise, maxLight } = formValues;
-        fetchApi(`addNode?roomName=${name}&mb=${microbit}&maxes=${maxTemp, maxNoise, maxLight}`)
+        fetchApi(`addNode?roomName=${name}&mb=${microbit}&maxes=${maxTemp},${maxNoise},${maxLight}`)
             .then(response => {
                 if (response.ok) {
                     alert('Data updated successfully');
