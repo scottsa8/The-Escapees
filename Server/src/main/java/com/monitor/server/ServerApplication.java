@@ -284,7 +284,7 @@ public class ServerApplication {
 			ResultSet rs = stmt
 					.executeQuery("SELECT username,user_microbit FROM users WHERE user_microbit IS NOT NULL");
 			while (rs.next()) {
-				output.append("{\"username\": \"" + rs.getString("username") + "\"}");
+				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
 					output.append(",");
 				}
@@ -562,8 +562,11 @@ public class ServerApplication {
 		}
 		return type;
 	}
-
-	@GetMapping("/setup")
+	@GetMapping("/getLocationInfo")
+	private String getLocationInfo(){
+		return "";
+	}
+	@GetMapping("/addNode")
 	private boolean setup(@RequestParam(value = "type") String type, @RequestParam(value = "name") String name,
 			@RequestParam(value = "microbit") String mbName,
 			@RequestParam(value = "overwrite", defaultValue = "false") boolean overwrite) {
