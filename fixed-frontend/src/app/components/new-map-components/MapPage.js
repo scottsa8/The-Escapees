@@ -9,7 +9,17 @@ const MapPage = () => {
 
     const handleFileChange = (e) =>{
         let selectedFile = e.target.files[0];
-        console.log(selectedFile);
+        
+        const fileReader = new FileReader();
+        fileReader.readAsText(selectedFile);
+
+        //reads the csv file here
+        fileReader.onload = (readerEvent) => {
+            const csvContent = fileReader.result;
+            console.log("Content ",csvContent);
+        };
+
+
     }
 
     return ( 
