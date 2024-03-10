@@ -175,8 +175,13 @@ export default function Settings() {
                     </div>
                     )}
                 {domainSettings && (
-                <div className="form-overlay">
+                <motion.div className="form-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                >
                     <form onSubmit={updateDomainSettings}>
+                        <button onClick={() => setDomainSettings(false)}><CloseIcon/></button>
                         <label>Name:
                             <input type="text" name="name" onChange={handleChange} />
                         </label>
@@ -194,8 +199,7 @@ export default function Settings() {
                         </label>
                         <button type="submit">Submit</button>
                     </form>
-                    <button onClick={() => setDomainSettings(false)}>Close</button>
-                </div>
+                </motion.div>
             )}
         </div>
     </div>
