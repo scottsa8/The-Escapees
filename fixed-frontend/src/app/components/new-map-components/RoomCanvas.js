@@ -1,222 +1,119 @@
-import { useEffect, useRef } from "react";
-import {getEnvData} from "../apiFetcher";
+import { useEffect, useRef, useState} from "react";
+import {fetchApi, getEnvData} from "../apiFetcher";
+import Room from "./Room";
+import Door from "./Door";
+import { getCookie } from "../cookies";
 
-const RoomCanvas = () => {
+const RoomCanvas = ({trackedUser}) => {
 
-    const CANVAS_WIDTH = 1000;
-    const CANVAS_HEIGHT = 1000;
+    const CANVAS_WIDTH = 1500;
+    const CANVAS_HEIGHT = 600;
     const SECOND = 1000;
 
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
 
-    class Door{
+    const ICON_SIZE = 20;
 
-        //sets coords for the corners of the 
-        #setCoords(size, location){
-            size = size/2;
-            let x = location[0];
-            let y = location[1];
+    let [trackedName, setTrackedName] = useState(trackedUser);
+    //const [rooms, setRooms] = useState([]);
+    let rooms = [];
 
-            this.coords = [[x-size,y-size],[x+size, y-size],[x+size, y+size],[x-size, y+size]];
-        }
+    // const doorA = new Door("Office Side", [400, 110]);
+    // const doorB = new Door("Office Main", [285, 200]);
 
-        constructor(name, location){
-            this.doorName = name;
-            this.location = location;//the center point for the box representing the door
-            this.size = 50;//50pixels in height and width
-            this.#setCoords(this.size, location);
-            this.doorLocked = true;
-        }
+    const cellBlockD = new Door("Cell Block Door", [375,400]);
+    const courtyardD = new Door("Courtyard Door", [200,475]);
+    const canteenD = new Door("Canteen Door", [550,475]);
+    const corridorD = new Door("Corridor Door", [700,400]);
+    const receptionD = new Door("Reception Door", [750,475]);
+    const visitorAreaD = new Door("Visitor Area Door", [925,400]);
+    const staffRoomD = new Door("Staff Room Door", [750,125]);
+    const cellAD = new Door("Cell A Door", [275,200]);
+    const cellBD = new Door("Cell B Door", [425,200]);
+    const cellCD = new Door("Cell C Door", [575,200]);
 
-        //draws the room
-        draw(fillColour, borderColour){
-            //defining colours used
-            contextRef.current.fillStyle = fillColour;
-            contextRef.current.strokeStyle = borderColour;
+    //const rooms = [
+        // new Room("Office", [[30,20],[400,20],[400,200],[30,200]],[doorA, doorB]), 
+        // new Room("Kitchen", [[500,20],[870,20],[870,200],[500,200]],null)
+        // new Room("Corridor",[[650,50],[750,50],[750,400],[650,400]],[corridorD]),
+        // new Room("Cell Block", [[200,200],[650,200],[650,400],[200,400]], [cellBlockD]),
+        // new Room("Courtyard", [[50,50], [200, 50], [200,550], [50,550]],[courtyardD]),
+        // new Room("Canteen", [[200,400],[550,400],[550,550],[200,550]],[canteenD]),
+        // new Room("Security Check", [[550,400],[750,400],[750,550],[550,550]],null),
+        // new Room("Reception", [[750,400],[1100,400],[1100,550],[750,550]],[receptionD]),
+        // new Room("Visitor Area", [[750,200],[1100,200],[1100,400],[750,400]],[visitorAreaD]),
+        // new Room("Staff Room", [[750,50],[1100,50],[1100,200],[750,200]],[staffRoomD]),
+        // new Room("Cell A", [[200,50],[350,50],[350,200],[200,200]],[cellAD]),
+        // new Room("Cell B", [[350,50],[500,50],[500,200],[350,200]],[cellBD]),
+        // new Room("Cell C", [[500,50],[650,50],[650,200],[500,200]],[cellCD])
 
-            contextRef.current.beginPath();
-
-            //move to starting coord
-            contextRef.current.moveTo(this.coords[0][0], this.coords[0][1]);
-
-            for(let i=0; i<this.coords.length; i++){
-
-                if(i+1 < this.coords.length){
-                    //draw to next coordinate
-                    contextRef.current.lineTo(this.coords[i+1][0],this.coords[i+1][1]);
-                }else{
-                    //draw back to the first coordinate to complete polygon
-                    contextRef.current.lineTo(this.coords[0][0], this.coords[0][1]);
-                }
-            }
-
-            //draw the shape
-            contextRef.current.closePath();
-            contextRef.current.fill();
-            contextRef.current.stroke();
-        }
-
-        //sets true if the door is locked
-        setDoorLocked(status){
-            this.doorLocked = status;
-
-            if(this.doorLocked){
-                //Change colour to green
-                this.draw("#C7FAC4", "black");
-            }else{
-                //set to red for "unlocked"
-                this.draw("#EABBBB", "black");
-            }
-        }
-    }
-
-    class Room {
-        //sets the bounds used to detect a user click
-        #setBounds(coordinates){
-            //search through coordinates and find smallest and largest x and y vals
-
-            let minX = coordinates[0][0];
-            let minY = coordinates[0][1];
-            let maxX = coordinates[0][0];
-            let maxY = coordinates[0][1];
-
-            for(let i=0; i<coordinates.length; i++){
-
-                if(coordinates[i][0] < minX){
-                    minX = coordinates[i][0];
-                }
-                if(coordinates[i][0] > maxX){
-                    maxX = coordinates[i][0];
-                }
-                if(coordinates[i][1] < minY){
-                    minY = coordinates[i][1];
-                }
-                if(coordinates[i][1] > maxY){
-                    maxY = coordinates[i][1];
-                }
-            }
-            this.upperBound_x = maxX;
-            this.upperBound_y = maxY;
-            this.lowerBound_x = minX;
-            this.lowerBound_y = minY;
-        }
-        //finds the center point between bounds
-        #setCenterPoint(){
-            this.centerPoint[0] = ((this.upperBound_x - this.lowerBound_x)/2) + this.lowerBound_x;
-            this.centerPoint[1] = ((this.upperBound_y - this.lowerBound_y)/2) + this.lowerBound_y;
-        }
-
-        constructor(name, coordinates,doors){
-            this.name = name;
-            this.coords = coordinates;
-            this.centerPoint = [];
-            this.doors = doors;
-            this.temp = 0;
-            this.noise = 0;
-            this.light = 0;
-            this.user = false;//if the current user is in the room or not
-
-            this.#setBounds(coordinates);
-            this.#setCenterPoint()
-        }
-
-        //checks if the user has clicked this box
-        checkClick(x, y){
-            let roomFound = undefined;
-            
-            if((this.coords.length == 4) && (roomFound == undefined)){
-                //if it is within the bounds
-                if((x > this.lowerBound_x && x < this.upperBound_x) && (y > this.lowerBound_y && y < this.upperBound_y)){
-                    roomFound = this;
-                }  
-            }
-            return roomFound;
-        }
-
-        drawDoors(fillColour, borderColour){
-            if(this.doors == null){
-                return;
-            }
-            for(let i=0; i<this.doors.length; i++){
-                this.doors[i].draw(fillColour, borderColour);
-            }
-        }
-
-        draw(fillColour, borderColour){
-            //defining colours used
-            contextRef.current.fillStyle = fillColour;
-            contextRef.current.strokeStyle = borderColour;
-
-            contextRef.current.beginPath();
-
-            //move to starting coord
-            contextRef.current.moveTo(this.coords[0][0], this.coords[0][1]);
-
-            for(let i=0; i<this.coords.length; i++){
-
-                if(i+1 < this.coords.length){
-                    //draw to next coordinate
-                    contextRef.current.lineTo(this.coords[i+1][0],this.coords[i+1][1]);
-                }else{
-                    //draw back to the first coordinate to complete polygon
-                    contextRef.current.lineTo(this.coords[0][0], this.coords[0][1]);
-                }
-            }
-
-            //draw the shape
-            contextRef.current.closePath();
-            contextRef.current.fill();
-            contextRef.current.stroke();   
-
-            //drawing text
-            contextRef.current.fillStyle = "black";
-            contextRef.current.font = "30px Arial";
-            contextRef.current.textAlign = "center";
-            contextRef.current.fillText(this.name, this.centerPoint[0], this.lowerBound_y + 40);
-        }
-
-        //sets the current environmental data of the room
-        setEnvironmentalData(temp, noise, light){
-            this.temp = temp;
-            this.noise = noise;
-            this.light = light;
-        }
-
-        //sets if the current user is in this room or not
-        toggleUser(status){
-            this.user = status;
-
-            if(this.user){
-                //show icon
-            }else{
-                //hide icon
-            }
-        }
-
-        //sets the room colour to red
-        alarm(){
-            refreshCanvas();
-            this.draw("#EABBBB", "Black");
-            this.drawDoors("#D8E0E6","black");
-        }
-
-    }
-
-    const doorA = new Door("Office Side", [400, 110]);
-    const doorB = new Door("Office Main", [285, 200]);
-
-    const rooms = [
-        new Room("Office", [[30,20],[400,20],[400,200],[30,200]],[doorA, doorB]), 
-        new Room("Kitchen", [[500,20],[870,20],[870,200],[500,200]],null)
-    ];
+    //];
 
     //draw every room to the canvas
     const drawRooms = () =>{
+        //loadRooms();
         for(let j=0; j<rooms.length; j++){
-            rooms[j].draw("#D8E0E6","black")
-            rooms[j].drawDoors("#D8E0E6","black")
+            rooms[j].draw("#D8E0E6","black");
         }
+        console.log(rooms)
+        //draw doors after rooms so the rooms don't overlap doors
+        for(let i=0;i<rooms.length; i++){
+            console.log(i)
+            console.log(rooms[i].doors)
+            rooms[i].drawDoors("#D8E0E6","black");
+        }
+        
+    }
+
+    /**
+     * Fetches the rooms from the database and creates corresponding objects ready to be drawn
+     */
+    async function loadRooms(){
+
+        let tempRoomArr = [];//tempoary array to store created rooms in.
+
+        //FETCH ROOMS FROM DB
+        let roomData = await fetchApi("getAllRoomData");
+        if(roomData!=undefined){
+            roomData = roomData.rooms.data;
+        }
+        //create rooms
+        for(let i=0;i<roomData.length;i++){
+           let entry = roomData[i];
+            if(entry.Name==="gate1"||entry.Name==="gate2"){continue;}
+            //topleft
+            let tl=[parseInt(entry.TLC.split(",")[0]),parseInt(entry.TLC.split(",")[1])];
+            //top right
+            let tr=[parseInt(entry.TRC.split(",")[0]),parseInt(entry.TRC.split(",")[1])]
+            //bottom right
+            let br=[parseInt(entry.BRC.split(",")[0]),parseInt(entry.BRC.split(",")[1])]
+            //bottom left
+            let bl=[parseInt(entry.BLC.split(",")[0]),parseInt(entry.BLC.split(",")[1])]
+
+              //FETCH DOORS FROM DB
+            let doorData = await fetchApi("getAllDoorData?room="+entry.Name);
+            console.log(doorData)
+            if(doorData!=undefined){
+                doorData = doorData.doors.data[0];
+            }
+               //create create the room with the door 
+            let door;
+            let room;
+            if(doorData==undefined){
+                room = new Room(entry.Name,[tl,tr,br,bl],null);
+            }else{
+                door = new Door(doorData.Name,[parseInt(doorData.coords.split(",")[0]),parseInt(doorData.coords.split(",")[1])])
+                room = new Room(entry.Name,[tl,tr,br,bl],[door]);
+            }            
+            //check if room already exists
+            if(tempRoomArr.some(r => r.name === entry.Name)){
+            }else{
+                //add it if it doesnt exist
+                tempRoomArr.push(room);
+            } 
+        }
+        rooms = tempRoomArr;
     }
 
     //clears and redraws the rooms
@@ -226,16 +123,70 @@ const RoomCanvas = () => {
     }
 
     //needs to be tested with data
-    function setAllRoomData(){
+    async function setAllRoomData(){
+    
+        let currentUserLocation = undefined;
+        trackedName="Ethan"
+        // TEST get the location of the current selected user
+        //console.log(trackedName)
+        if(trackedName != undefined){
+            //get the current location of the user
+            currentUserLocation = await fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
+            if(currentUserLocation!=undefined){
+                try{
+                    currentUserLocation = currentUserLocation.locations.data[0].Location;
+                }catch(err){
+                    currentUserLocation=""
+                }
+               
+            }
+            //console.log(trackedName+" is in "+currentUserLocation);
+        }
+
         for(let i=0; i<rooms.length; i++){
             //gets and sets the current environmental data
-            let envData = getEnvData(rooms[i].name,"ASC", false);
-            rooms[i].setEnvironmentalData(envData.temp, envData.noise, envData.light);
+            let envData = await getEnvData(rooms[i].name,"DESC", false) || [0,0,0];
+            let data=envData[0]        
+            Room.maxValues.temp = getCookie('tempNotification');
+            Room.maxValues.light = getCookie('lightNotification');
+            Room.maxValues.noise = getCookie('noiseNotification');
 
-            //gets and sets the current location data
+            //console.log("Mav vals: temp = "+Room.maxValues.temp+" light = "+Room.maxValues.light+" noise = "+Room.maxValues.noise);
+            let temp;
+            let noise;
+            let light;
+            try{
+                temp=data.temp;
+                noise=data.noise;
+                light=data.light;
+            }catch(e){
+                temp=0;
+                noise=0;
+                light=0;
+            }
+            rooms[i].setAndCheckEnvironmentalData(temp,noise,light);
+         
+            //if this room is the one the tracked user is in, show the icon
+            if(currentUserLocation != undefined && trackedName != undefined){
+                if(currentUserLocation == rooms[i].name){
+                    rooms[i].user = true;
+                }else{
+                    rooms[i].user = false;
+                }
+            }
 
             //gets and sets the current door data???
+            if(rooms[i].doors != null){
+                for(let j=0; j<rooms[i].doors.length; j++){
+                    //return is boolean
+                    //this.rooms[i].doors[j].doorLocked = fetchApi(doorname);
+                    console.log(rooms[i].doors[j].name+" locked = "+rooms[i].doors[j].doorLocked);
+                }
+            }
+
         }
+
+
     }
 
     const handleClick = (event) => {
@@ -244,44 +195,88 @@ const RoomCanvas = () => {
         const userX = event.clientX - event.target.offsetLeft;
         const userY = event.clientY - event.target.offsetTop;
     
-        let roomFound = undefined;
+        // let roomFound = undefined;
+        // refreshCanvas();
 
-        refreshCanvas();
+        // //for a room with 4 sides
+        // for(let i=0; i<rooms.length; i++){
+        //     //check if the user has clicked within the bounds of one of the drawn rooms
+        //     roomFound = rooms[i].checkClick(userX, userY);
+        //     if(roomFound){
+        //         break;
+        //     }
+        // }
+        // //if a room has been clicked
+        // if(roomFound != undefined){
+        //     console.log("Clicked "+roomFound.name);
+        //     roomFound.user = true;
+            
+        //     try{
+        //         roomFound.doors[0].doorLocked = false;
+        //         roomFound.doors[1].doorLocked = false;
+        //     }catch(e){
 
-        //for a room with 4 sides
-        for(let i=0; i<rooms.length; i++){
-            //check if the user has clicked within the bounds of one of the drawn rooms
-            roomFound = rooms[i].checkClick(userX, userY);
-            if(roomFound){
-                break;
-            }
-        }
-        //if a room has been clicked, change its colour
-        if(roomFound != undefined){
-            console.log("Clicked "+roomFound.name);
-            roomFound.alarm();
-        }
+        //     }
+
+        //     refreshCanvas();         
+        // }
+    }
+
+    //Initialise the images to be used
+    function setIcons() {
+
+        Room.ICON_SIZE = ICON_SIZE;
+
+        //adding the image paths
+        Room.userIcon.src="/userSolid.png";
+        Door.openLockIcon.src = "/lock-open-solid.png";
+        Door.closedLockIcon.src = "/lock-solid.png";
+        Room.tempIcon.src = "/temperature-high-solid.png"
+        Room.noiseIcon.src = "/volume-high-solid.png";
+        Room. lightIcon.src = "/sun-solid.png";
+
+        //loading the image can take longer than drawing the icon to the screen
+        Room.userIcon.onload = () => {refreshCanvas()};
+        Door.openLockIcon.onload = () => {refreshCanvas()};
+        Door.closedLockIcon.onload = () => {refreshCanvas()};
+        Room.tempIcon.onload = () => {refreshCanvas()};
+        Room.lightIcon.onload = () => {refreshCanvas()};
+        Room.noiseIcon.onload = () => {refreshCanvas()};
     }
 
     useEffect(() => {
         console.log("Generating canvas");
-
+        loadRooms();
+        setIcons();
         const canvas = canvasRef.current;//finds canvas element
         const context = canvas.getContext("2d");//the drawing object
         contextRef.current = context;
 
+        Door.contextRef = contextRef;
+        Room.contextRef = contextRef;
+
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
+            setTrackedName(trackedUser);
             setAllRoomData();
+            refreshCanvas();
         }, SECOND);
+        
+        //Load room data
+        //If there is no room data/cannot connect: display, "cannot load rooms from database", load default?
+        //Load room data
+        //link rooms to the data coming in
+        //
+
 
         drawRooms();
-
+        refreshCanvas();
+        return () => clearInterval(dataFetch);
     },[])
 
     return ( 
         <>
-        <canvas
+        <canvas id="main-canvas"
             width={CANVAS_WIDTH}
             height={CANVAS_HEIGHT}
             ref={canvasRef}

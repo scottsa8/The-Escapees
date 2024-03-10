@@ -11,7 +11,10 @@ export const fetchApi = async (endpoint) => {
     try {
         const response = await axios({
             method: 'GET',
-            url: `https://${network.ip}:${network.port}/${endpoint}`
+            url: `https://${network.ip}:${network.port}/${endpoint}`,
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
         });
         return response.data;
     } catch (error) {

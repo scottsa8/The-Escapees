@@ -27,7 +27,6 @@ def getName():
         d *= letters
         ld *= letters
         name.insert(0, codebook[i][h])
-
     return ("".join(name))
 
 
@@ -35,11 +34,9 @@ def getName():
 def main():
     radio.on()
     radio.config(channel=22)#send to location-ping microbits
-
     name = getName()
 
     while True:
-
         radio.send(name)
         sleep(1000)
 
