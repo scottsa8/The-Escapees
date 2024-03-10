@@ -141,6 +141,7 @@ export default function Settings() {
                 <div className="domains-container flex flex-wrap flex-row">
                 {domains.map((domain, index) => (
                     <motion.div key={index} onClick={() => selectDomain(domain)} className={`domain-dimensions card shadow-md m-4 p-4 ${domain === selectedDomain ? 'selected-color' : ''}`}
+                        layoutId={domain.toLowerCase()} 
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         transition ={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -176,11 +177,13 @@ export default function Settings() {
                     )}
                 {domainSettings && (
                 <motion.div className="form-overlay"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0}}
+                    animate={{ opacity: 1}}
                 >
-                    <form onSubmit={updateDomainSettings}>
+                    <motion.form onSubmit={updateDomainSettings}
+
+                    layoutId={`${selectedDomain.toLowerCase()}`}
+                    >
                         <button onClick={() => setDomainSettings(false)}><CloseIcon/></button>
                         <label>Name:
                             <input type="text" name="name" onChange={handleChange} />
@@ -198,7 +201,7 @@ export default function Settings() {
                             <input type="text" name="maxLight" onChange={handleChange} />
                         </label>
                         <button type="submit">Submit</button>
-                    </form>
+                    </motion.form>
                 </motion.div>
             )}
         </div>
