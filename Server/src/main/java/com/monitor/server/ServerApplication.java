@@ -582,7 +582,7 @@ public class ServerApplication {
 				}
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
 		output.append("]}}");
 		return output.toString();
