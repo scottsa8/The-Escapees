@@ -562,9 +562,30 @@ public class ServerApplication {
 		}
 		return type;
 	}
-	@GetMapping("/getLocationInfo")
-	private String getLocationInfo(){
-		return "";
+	@GetMapping("/getRoomInfo")
+	private String getRoomInfo(){
+		StringBuilder output = new StringBuilder();
+		output.append("{\"rooms\":{" +
+				"\"data\":[");
+		try{
+			PreparedStatement selectStatement = connection.prepareStatement(
+					"SELECT * FROM rooms");
+			ResultSet rs = selectStatement.executeQuery();
+			while(rs.next()){
+				output.append("{\"name\": \""+rs.getString("room_name")+"\", " +
+						"\"microbit\": \""+rs.getString("room_microbit")+"\", "+
+						"\"maxTemp\": \""+rs.getInt("max_temperature")+"\", "+
+						"\"maxNoise\": \""+rs.getInt("max_noise_level")+"\", "+
+						"\"maxLight\": \""+rs.getInt("max_light_level")+"\"}");
+				if(!rs.isLast()){
+					output.append(",");
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		output.append("]}}");
+		return output.toString();
 	}
 	@GetMapping("/updateMB")
 	private boolean setup(@RequestParam(value = "type") String type, @RequestParam(value = "name") String name,
