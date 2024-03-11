@@ -15,17 +15,50 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 
 // Lists the pages for the navigation bar on the dashboard
-const views = {
-  individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
-  homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
-  interactiveMap: {page: <MapPage/>, pageTitle: "Interactive Map"},
-  settings: {page: <Settings/>, pageTitle: "Settings"},
-  charts: {page: <Chart/>, pageTitle: "Charts"},
-  microManager: {page: <MicroManager/>, pageTitle: "Microbit Manager"}
+
+
+const brandImages = {
+  prison : {
+    light: <Image src="/prison-logo.png" height={50} width={70} />,
+    dark: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
+  },
 }
 
-const brands = {
-  prison : <Image src="/prison-logo.png" height={50} width={70} />
+
+
+const themes = {
+  prison: {
+    cssRules:{
+    "--light-body-background": "#EAEAEB",
+    "--light-banner-colour": "#B7B6B7",
+    "--light-sidebar": "#D9D9D9",
+    "--light-title-colour": "black",
+
+    "--dark-body-background": "#22314f",
+    "--dark-sidebar-background": "#1b2030",
+    "--dark-sidebar-main": "#DBE9FE",
+    "--dark-banner-gradient": "linear-gradient(to right, #1d2232, #1b2030)",
+    "--dark-title-colour": "#dbeafe"
+    },
+    lightImage: <Image src="/prison-logo.png" height={50} width={70} />,
+    darkImage: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
+  },
+  hotel: {
+    cssRules:{
+      "--light-body-background": "#EAEAEB",
+      "--light-banner-colour": "#B7B6B7",
+      "--light-sidebar": "#D9D9D9",
+      "--light-title-colour": "black",
+
+      "--dark-body-background": "#22314f",
+      "--dark-sidebar-background": "#1b2030",
+      "--dark-sidebar-main": "#DBE9FE",
+      "--dark-banner-gradient": "linear-gradient(to right, #1d2232, #1b2030)",
+      "--dark-title-colour": "#dbeafe"
+    },
+    lightImage: <Image src="/prison-logo.png" height={50} width={70} />,
+    darkImage: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
+  }
 }
 
 
@@ -33,12 +66,24 @@ const brands = {
 //It's the constant border around the main page
 const Dashboard = () => {
 
-  const [currentView,setView] = useState(views.homePage);
+
   const [username, setUsername] = useState('');
   const { sendNotification, NotificationComponent } = useNotification();
   const [ showNotifications, setShowNotifications ] = useState(false); 
-  const [currentBrand,setBrand] = useState(brands.prison);
+  const [currentTheme,setTheme] = useState(themes.prison);
+  const [isLightTheme,setLightTheme] = useState(true)
   const [deleting, setDeleting] = useState(null);
+
+  const views = {
+    individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
+    homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
+    interactiveMap: {page: <MapPage/>, pageTitle: "Interactive Map"},
+    settings: {page: <Settings dashThemeHook={setLightTheme}/>, pageTitle: "Settings"},
+    charts: {page: <Chart/>, pageTitle: "Charts"},
+    microManager: {page: <MicroManager/>, pageTitle: "Microbit Manager"}
+  }
+
+  const [currentView,setView] = useState(views.homePage);
 
   var notifications = null;
   if (typeof window !== 'undefined') {
@@ -57,6 +102,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
+    setLightTheme(getCookie('theme') === 'light')
     setUsername(getCookie("username"));
   }, []);
 
@@ -84,7 +130,7 @@ const Dashboard = () => {
         <div className="banner">
           <div className="flex px-4">
             {/* <Image src="/prison-logo.png" height={50} width={70} /> */}
-            {currentBrand}
+            {isLightTheme?currentTheme.lightImage:currentTheme.darkImage}
             <div className="divider"></div>
             {/* margin-right: 1rem;border-right: 1px solid white;margin-left: 1rem; */}
             <h1 className="title">{currentView.pageTitle}</h1> 
