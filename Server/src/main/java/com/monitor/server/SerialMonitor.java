@@ -2,12 +2,14 @@ package com.monitor.server;
 import java.net.MalformedURLException;
 import com.fazecast.jSerialComm.*;
 import java.time.LocalDateTime;
-import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.net.URL;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SerialMonitor {
     private boolean DEBUG=true;
@@ -262,6 +264,38 @@ public class SerialMonitor {
                         e.printStackTrace();
                     }
                 }
+                else if (packetType == 4) { // Door lock packet
+                    String microbitName = sensorData[1];
+                    String state = sensorData[2];
+                
+                    try {
+                        // Retrieve door_id based on door_microbit
+                        PreparedStatement selectDoorIdStatement = connection.prepareStatement(
+                            "SELECT door_id FROM doors WHERE door_microbit = ?"
+                        );
+                        selectDoorIdStatement.setString(1, microbitName);
+                        ResultSet doorResult = selectDoorIdStatement.executeQuery();
+                
+                        // Check if a door with the specified door_microbit exists
+                        if (doorResult.next()) {
+                            int doorID = doorResult.getInt("door_id");
+                
+                            // Update the state of the door in doorHistory
+                            PreparedStatement updateDoorStateStatement = connection.prepareStatement(
+                                "INSERT INTO doorHistory (door_id, is_locked, change_timestamp) VALUES (?, ?, ?)"
+                            );
+                            updateDoorStateStatement.setInt(1, doorID);
+                            updateDoorStateStatement.setBoolean(2, state.equals("True")); // Assuming state is a string "true" or "false"
+                            updateDoorStateStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+                            updateDoorStateStatement.executeUpdate();
+                        } else {
+                            // Handle the case where the microbitName does not correspond to any door
+                            System.out.println("No door found for microbitName: " + microbitName);
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }    
                 else{
                     System.out.println("someone elses shit");
                     data="";
@@ -287,29 +321,68 @@ public class SerialMonitor {
 
             // Send "PANIC" message to all guard microbits
             for (String guardMicrobit : guardMicrobits) {
-                String panicMessage = guardMicrobit + ",PANIC";
-                sendMessage(panicMessage);
+                sendMessage(guardMicrobit, "PANIC");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void sendMessage(String message) {
-        System.out.println(message);
+    public void sendMessage(String microbitName, String message) {
+        // Preset packet size
+        int packetSize = 10; // Adjust the size as needed
+    
+        // Microbit truncates first packet so initialising with an opening message removes this issue
+        try {
+            microbit.writeBytes("rec".getBytes("UTF-8"), 3);
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         if (microbit != null && microbit.isOpen()) {
             try {
-                // Convert the message to bytes and send it to the microbit
-                byte[] messageBytes = message.getBytes();
-                microbit.writeBytes(messageBytes, messageBytes.length);
+                // Convert the message to bytes and calculate the total number of packets needed
+                byte[] messageBytes = message.getBytes("UTF-8");
+                int totalPackets = (int) Math.ceil((double) messageBytes.length / packetSize);
+    
+                // Send each packet separately
+                for (int packetNumber = 0; packetNumber < totalPackets; packetNumber++) {
+                    // Calculate the start and end indices for the current and use to extract relevant data
+                    int startIdx = packetNumber * packetSize;
+                    int endIdx = Math.min((packetNumber + 1) * packetSize, messageBytes.length);
+                    byte[] packetBytes = Arrays.copyOfRange(messageBytes, startIdx, endIdx);
+    
+                    // Create a new packet with microbit name, packet number, and packet data
+                    String packetMessage = microbitName + "," + packetNumber + "," + new String(packetBytes, "UTF-8");
+    
+                    // Print the packet message
+                    System.out.println(packetMessage);
+    
+                    // Send the full packet to the receiver microbit
+                    microbit.writeBytes(packetMessage.getBytes("UTF-8"), packetMessage.length());
+                    Thread.sleep(10000);
+    
+                    // Check if this is the last packet and break out of the loop
+                    if (endIdx == messageBytes.length) {
+                        break;
+                    }
+                }
+    
+                // Send the end of message indicator in the final packet
+                int eomPacketNumber = totalPackets;
+                String eomMessage = microbitName + "," + eomPacketNumber + ",/EOM/";
+                System.out.println(eomMessage);
+                microbit.writeBytes(eomMessage.getBytes("UTF-8"), eomMessage.length());
+    
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             System.out.println("Microbit not available or port not open.");
         }
-    }  
- 
+    }    
+
     public void stop(){
         try{
             microbit.closePort();

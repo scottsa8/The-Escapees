@@ -88,7 +88,8 @@ public class ServerApplication {
 		} catch (Exception e) {
 			System.out.println("no Microbit detected");
 		}
-		// transmitMessage(1, "Hello");
+		// transmitMessage(1, "Hello testing sending a long message with a variety of different stuff in the message so that I know what is going on with the thing im working on");
+		// transmitMessage(1, "Message");
 	}
 
 	@Scheduled(cron = "0 */2 * ? * *")
@@ -778,15 +779,13 @@ public class ServerApplication {
 			String microbitName = getMicrobitForPerson(personId);
 
 			if (microbitName != null) {
-				// Transmit the message to the microbit over serial with alert level
-				// Will remove "/EOM/" and commas from the message and then append "/EOM/"" at
-				// the end of the message
-				// To signify the end of packet transfer
-				String sanitizedMessage = message.replace("/EOM/", "").replace(",", "");
-				sanitizedMessage += "/EOM/";
+				// Transmit the message to the microbit over serial
+				// Will remove "/EOM/" and commas from the message as "/EOM/" will
+				// signify the end of the message for the microbit
+				String sanitizedMessage = message.replace(",", "");
 
 				if (monitor != null) {
-					// monitor.sendMessage(microbitName, sanitizedMessage);
+					monitor.sendMessage(microbitName, sanitizedMessage);
 					return "Message transmitted successfully";
 				} else {
 					return "Microbit not available";
@@ -815,7 +814,7 @@ public class ServerApplication {
 				if (monitor != null) {
 					for (String microbitName : microbitNames) {
 						String fullMessage = userType + ":" + microbitName + "," + message;
-						monitor.sendMessage(fullMessage);
+						// monitor.sendMessage(fullMessage);
 					}
 					return "Messages transmitted successfully";
 				} else {

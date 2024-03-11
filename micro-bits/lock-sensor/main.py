@@ -49,22 +49,22 @@ def main():
             track = not track
             sleep(500)
             if track:
-                previous_state = "CLOSED"
+                previous_state = "True"
                 display.show(Image.NO)
             else:
                 music.play(['C5:1', 'C5:1', 'C5:1'])
                 display.clear()
 
-        current_state = "OPEN" if compass.get_field_strength() < threshold else "CLOSED"
+        current_state = "False" if compass.get_field_strength() < threshold else "True"
 
         if track and current_state != previous_state:
             print("Force: {}, State: {}".format(compass.get_field_strength(), current_state))
-            if current_state == "OPEN":
+            if current_state == "False":
                 display.show(Image.YES)  # Open
                 music.play(['F#5:6', 'C5:6'])
             else:
                 display.show(Image.NO)  # Closed
-            radio.send(name + "," + current_state)
+            radio.send("4," + name + "," + current_state)
 
         previous_state = current_state
         sleep(100)
