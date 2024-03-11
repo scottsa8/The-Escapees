@@ -11,15 +11,11 @@ export default function EnviromentContainer(){
         light: "0",
         noise: "0"
       });
-    let timeout=0;
     const dialSize = 170;
     const dialClassName="dial-container";
 
     
-    const handleRoomClick = (roomName) => {
-        const room = locationData.find(location => location.room === roomName);
-        setSelectedLocation(room ? room : null);
-    };
+   
 
     const { data: locationData, isError: locationError } = useQuery('locations', async () => {
         const data = await fetchApi('getRooms');
@@ -27,27 +23,27 @@ export default function EnviromentContainer(){
         return rooms;
     });
 
+    const handleRoomClick = (roomName) => {
+      const room = locationData.find(location => location === roomName);
+      console.log(room)
+      setSelectedLocation(roomName);
+  };
+
     const { data: envData, isError: envError, refetch } = useQuery(['environmentData', selectedLocation], async () => {
-        const data = await fetchApi(`getEnv?loc=${selectedLocation.room}&order=DESC`);
-        let realData = data.environment.data[0]; //index of the data you want from array 0 = most recent
-        let inTime = realData.Timestamp.split(" ")[1].split(".")[0]
-        if(inTime!=timeoutTime){
-          timeout=timeout+1;
-          if(timeout>=3){
-            throw new Error("lost connection")
-          }
-        }else{
-          if(!realData.error==""){
+        const data = await fetchApi(`getEnv?loc=${selectedLocation}&order=DESC`);
+        console.log(data)
+        let realData = data.environment.data[0]; //index of the data you want from array 0 = most recent      
+        if(realData==undefined){
             throw new Error("no room in DB")
-          }else{
-            timeout=0;
+        }else if(realData.error =="Room not found"){
+            throw new Error("no room in DB")
+        }else{
             let newValues = {
               temp: realData.Temperature,
               noise: realData.NoiseLevel,
               light: realData.LightLevel
             };
             return newValues;         
-          }
         }
     });
     
