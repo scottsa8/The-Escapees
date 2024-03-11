@@ -1,6 +1,6 @@
 import RoomCanvas from "./RoomCanvas";
 import { useState } from "react";
-import {SelectUserBox} from "./SelectUserBox";
+import SelectUserBox from "./SelectUserBox";
 
 const MapPage = () => {
 
@@ -9,18 +9,27 @@ const MapPage = () => {
 
     const handleFileChange = (e) =>{
         let selectedFile = e.target.files[0];
-        console.log(selectedFile);
+        
+        const fileReader = new FileReader();
+        fileReader.readAsText(selectedFile);
+
+        //reads the csv file here
+        fileReader.onload = (readerEvent) => {
+            const csvContent = fileReader.result;
+            console.log("Content ",csvContent);
+        };
+
     }
 
     return ( 
         <div className="MapPage">
-            {/* <div className="flex mb-5">
-                <SelectUserBox onLocationChange={setSelectedUser} />
-            </div> */}
+            <div className="flex mb-5">
+                { <SelectUserBox /> }
+            </div>
             <form>
                 <input type={"file"} onChange={handleFileChange} accept={".csv"}></input>
             </form>
-            <RoomCanvas selectedUser={selectedUser}></RoomCanvas>
+            <RoomCanvas ></RoomCanvas>
         </div>
      );
 }

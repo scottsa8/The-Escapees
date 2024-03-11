@@ -4,7 +4,7 @@ import Room from "./Room";
 import Door from "./Door";
 import { getCookie } from "../cookies";
 
-const RoomCanvas = ({trackedUser}) => {
+const RoomCanvas = () => {
 
     const CANVAS_WIDTH = 1500;
     const CANVAS_HEIGHT = 600;
@@ -15,40 +15,17 @@ const RoomCanvas = ({trackedUser}) => {
 
     const ICON_SIZE = 20;
 
-    let [trackedName, setTrackedName] = useState(trackedUser);
-    //const [rooms, setRooms] = useState([]);
-    let rooms = [];
+    let trackedName="";
 
-    // const doorA = new Door("Office Side", [400, 110]);
-    // const doorB = new Door("Office Main", [285, 200]);
+    //default doors
+    const doorA = new Door("Office Side", [400, 110]);
+    const doorB = new Door("Office Main", [285, 200]);
 
-    const cellBlockD = new Door("Cell Block Door", [375,400]);
-    const courtyardD = new Door("Courtyard Door", [200,475]);
-    const canteenD = new Door("Canteen Door", [550,475]);
-    const corridorD = new Door("Corridor Door", [700,400]);
-    const receptionD = new Door("Reception Door", [750,475]);
-    const visitorAreaD = new Door("Visitor Area Door", [925,400]);
-    const staffRoomD = new Door("Staff Room Door", [750,125]);
-    const cellAD = new Door("Cell A Door", [275,200]);
-    const cellBD = new Door("Cell B Door", [425,200]);
-    const cellCD = new Door("Cell C Door", [575,200]);
-
-    //const rooms = [
-        // new Room("Office", [[30,20],[400,20],[400,200],[30,200]],[doorA, doorB]), 
-        // new Room("Kitchen", [[500,20],[870,20],[870,200],[500,200]],null)
-        // new Room("Corridor",[[650,50],[750,50],[750,400],[650,400]],[corridorD]),
-        // new Room("Cell Block", [[200,200],[650,200],[650,400],[200,400]], [cellBlockD]),
-        // new Room("Courtyard", [[50,50], [200, 50], [200,550], [50,550]],[courtyardD]),
-        // new Room("Canteen", [[200,400],[550,400],[550,550],[200,550]],[canteenD]),
-        // new Room("Security Check", [[550,400],[750,400],[750,550],[550,550]],null),
-        // new Room("Reception", [[750,400],[1100,400],[1100,550],[750,550]],[receptionD]),
-        // new Room("Visitor Area", [[750,200],[1100,200],[1100,400],[750,400]],[visitorAreaD]),
-        // new Room("Staff Room", [[750,50],[1100,50],[1100,200],[750,200]],[staffRoomD]),
-        // new Room("Cell A", [[200,50],[350,50],[350,200],[200,200]],[cellAD]),
-        // new Room("Cell B", [[350,50],[500,50],[500,200],[350,200]],[cellBD]),
-        // new Room("Cell C", [[500,50],[650,50],[650,200],[500,200]],[cellCD])
-
-    //];
+    //default rooms
+    let rooms = [
+        new Room("Office", [[30,20],[400,20],[400,200],[30,200]],[doorA, doorB]), 
+        new Room("Kitchen", [[500,20],[870,20],[870,200],[500,200]],null)
+    ];
 
     //draw every room to the canvas
     const drawRooms = () =>{
@@ -59,8 +36,8 @@ const RoomCanvas = ({trackedUser}) => {
         console.log(rooms)
         //draw doors after rooms so the rooms don't overlap doors
         for(let i=0;i<rooms.length; i++){
-            console.log(i)
-            console.log(rooms[i].doors)
+            // console.log(i)
+            // console.log(rooms[i].doors)
             rooms[i].drawDoors("#D8E0E6","black");
         }
         
@@ -79,41 +56,46 @@ const RoomCanvas = ({trackedUser}) => {
             roomData = roomData.rooms.data;
         }
         //create rooms
-        for(let i=0;i<roomData.length;i++){
-           let entry = roomData[i];
-            if(entry.Name==="gate1"||entry.Name==="gate2"){continue;}
-            //topleft
-            let tl=[parseInt(entry.TLC.split(",")[0]),parseInt(entry.TLC.split(",")[1])];
-            //top right
-            let tr=[parseInt(entry.TRC.split(",")[0]),parseInt(entry.TRC.split(",")[1])]
-            //bottom right
-            let br=[parseInt(entry.BRC.split(",")[0]),parseInt(entry.BRC.split(",")[1])]
-            //bottom left
-            let bl=[parseInt(entry.BLC.split(",")[0]),parseInt(entry.BLC.split(",")[1])]
+        try{
+            for(let i=0;i<roomData.length;i++){
+                let entry = roomData[i];
+                    if(entry.Name==="gate1"||entry.Name==="gate2"){continue;}
+                    //topleft
+                    let tl=[parseInt(entry.TLC.split(",")[0]),parseInt(entry.TLC.split(",")[1])];
+                    //top right
+                    let tr=[parseInt(entry.TRC.split(",")[0]),parseInt(entry.TRC.split(",")[1])]
+                    //bottom right
+                    let br=[parseInt(entry.BRC.split(",")[0]),parseInt(entry.BRC.split(",")[1])]
+                    //bottom left
+                    let bl=[parseInt(entry.BLC.split(",")[0]),parseInt(entry.BLC.split(",")[1])]
+    
+                    //FETCH DOORS FROM DB
+                    let doorData = await fetchApi("getAllDoorData?room="+entry.Name);
+                    if(doorData!=undefined){
+                        doorData = doorData.doors.data[0];
+                    }
+                    //create create the room with the door 
+                    let door;
+                    let room;
+                    if(doorData==undefined){
+                        room = new Room(entry.Name,[tl,tr,br,bl],null);
+                    }else{
+                        door = new Door(doorData.Name,[parseInt(doorData.coords.split(",")[0]),parseInt(doorData.coords.split(",")[1])])
+                        room = new Room(entry.Name,[tl,tr,br,bl],[door]);
+                    }            
+                    //check if room already exists
+                    if(tempRoomArr.some(r => r.name === entry.Name)){
+                    }else{
+                        //add it if it doesnt exist
+                        tempRoomArr.push(room);
+                    } 
+                }
+                rooms = tempRoomArr;
+        }catch(e){
+            //if you are unable to load rooms
+            console.log("Unable to load rooms from database");
 
-              //FETCH DOORS FROM DB
-            let doorData = await fetchApi("getAllDoorData?room="+entry.Name);
-            console.log(doorData)
-            if(doorData!=undefined){
-                doorData = doorData.doors.data[0];
-            }
-               //create create the room with the door 
-            let door;
-            let room;
-            if(doorData==undefined){
-                room = new Room(entry.Name,[tl,tr,br,bl],null);
-            }else{
-                door = new Door(doorData.Name,[parseInt(doorData.coords.split(",")[0]),parseInt(doorData.coords.split(",")[1])])
-                room = new Room(entry.Name,[tl,tr,br,bl],[door]);
-            }            
-            //check if room already exists
-            if(tempRoomArr.some(r => r.name === entry.Name)){
-            }else{
-                //add it if it doesnt exist
-                tempRoomArr.push(room);
-            } 
         }
-        rooms = tempRoomArr;
     }
 
     //clears and redraws the rooms
@@ -126,9 +108,9 @@ const RoomCanvas = ({trackedUser}) => {
     async function setAllRoomData(){
     
         let currentUserLocation = undefined;
-        trackedName="Ethan"
+        trackedName=getCookie("trackedUser");
         // TEST get the location of the current selected user
-        //console.log(trackedName)
+        console.log(trackedName)
         if(trackedName != undefined){
             //get the current location of the user
             currentUserLocation = await fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
@@ -257,7 +239,6 @@ const RoomCanvas = ({trackedUser}) => {
 
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
-            setTrackedName(trackedUser);
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
