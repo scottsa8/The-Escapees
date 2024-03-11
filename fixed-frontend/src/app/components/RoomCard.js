@@ -1,5 +1,6 @@
 import { useQuery } from "react-query";
 import { fetchApi } from "./apiFetcher";
+import { motion } from "framer-motion";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
 
@@ -18,12 +19,15 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
           : { cursor: 'pointer' };
 
     return (
-      <div onClick={onClick} style={cardStyle} className="bg-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 dark:bg-gray-700 dark:text-blue-100">
+      <motion.div onClick={onClick} style={cardStyle} className="bg-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 dark:bg-gray-700 dark:text-blue-100"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}>
         <h2 className="text-xl font-semibold text-gray-600 dark:text-blue-300">{`${roomName}`}</h2>
         <p className="text-gray-500 mt-2 dark:text-blue-100">{`Prisoners: ${inmateCount}`}</p>
         <p className="text-gray-500 mt-2 dark:text-blue-100">{`Guards: ${guardCount}`}</p>
         <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${guardCount+inmateCount}`}</p>
-      </div>
+      </motion.div>
     );
 }
  

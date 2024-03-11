@@ -1,9 +1,10 @@
 import React, { useState, useEffect, use } from 'react';
 import {SunIcon, MoonIcon} from './heroIcons'
 import {setCookie, getCookie} from './cookies'
-import {PlusIcon,CloseIcon,SettingsIcon,DeleteIcon} from './heroIcons'
+import {PlusIcon,CloseIcon,SettingsIcon} from './heroIcons'
 import { fetchApi } from './apiFetcher';
-
+import { useQuery } from 'react-query';
+import {motion} from 'framer-motion';
 export default function Settings() {
     const [temp, setTemp] = useState(30);
     const [noise, setNoise] = useState(30);
@@ -11,25 +12,25 @@ export default function Settings() {
     const [updateDelay, setUpdateDelay] = useState(10);
     const [theme, setTheme] = useState('light');
     const [showAddDomain, setShowAddDomain] = useState(false);
-    const [domains, setDomains] = useState(['Hotel', 'Prison']);
     const [domainName, setDomainName] = useState('');
-    const [selectedDomain, setSelectedDomain] = useState(null);
+    const [domainSettings, setDomainSettings] = useState(false);
+    const [formValues, setFormValues] = useState({ name: '', microbit: '', maxTemp: '', maxNoise: '', maxLight: '' });
+    const { data: domains, refetch: refetchDomains } = useQuery('domains', () => fetchApi("getDomains"), { initialData: ['Hotel', 'Prison'] });
+    const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'Prison' });
 
-    const selectDomain = (domain) => {
-        fetchApi("setDomain?domain="+domain);
-        setSelectedDomain(domain);
+    const selectDomain = async (domain) => {
+        await fetchApi("setDomain?domain="+domain);
+        refetchSelectedDomain();
     };
-    const deleteDomain = (domain) => {
-        // fetchApi("deleteDomain?domain="+domain);
-        console.log("deleting domain: " + domain);
-        setSelectedDomain(null);
-        setDomains(domains.filter(d => d !== domain));
-    }
-    const addDomain = (domainName) => {
-        setDomains([...domains, domainName]);
-        fetchApi("setDomain?domain="+domainName)
+    const addDomain = async (domainName) => {
+        await fetchApi("setDomain?domain="+domainName)
+        refetchDomains();
         setShowAddDomain(false);
     };
+    const handleChange = (event) => {
+        setFormValues({ ...formValues, [event.target.name]: event.target.value });
+    };
+
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -50,11 +51,6 @@ export default function Settings() {
         setTheme(savedTheme);
         setUpdateDelay(savedUpdateDelay);
         document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-        const fetchDomains = async () => {
-            setDomains(await fetchApi("getDomains"));
-            selectDomain(await fetchApi("getDomain"));
-        };
-        fetchDomains();
     }, []);
     
     useEffect(() => {
@@ -63,6 +59,20 @@ export default function Settings() {
         setCookie('lightNotification', light);
     }, [temp, noise, light]);
 
+    const updateDomainSettings = (event) => {
+        event.preventDefault();
+        const { name, microbit, maxTemp, maxNoise, maxLight } = formValues;
+        fetchApi(`addNode?roomName=${name}&mb=${microbit}&maxes=${maxTemp},${maxNoise},${maxLight}`)
+            .then(response => {
+                if (response.ok) {
+                    alert('Data updated successfully');
+                } else {
+                    alert('Error updating data');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        setDomainSettings(false);
+    };
 
     return (
         <div className="card-container p-4 dark:text-blue-100">
@@ -130,12 +140,17 @@ export default function Settings() {
                 </div>
                 <div className="domains-container flex flex-wrap flex-row">
                 {domains.map((domain, index) => (
-                    <div key={index} onClick={() => selectDomain(domain)} className={`domain-dimensions card shadow-md m-4 p-4 ${domain === selectedDomain ? 'selected-color' : ''}`}>
+                    <motion.div key={index} onClick={() => selectDomain(domain)} className={`domain-dimensions card shadow-md m-4 p-4 ${domain === selectedDomain ? 'selected-color' : ''}`}
+                        layoutId={domain.toLowerCase()} 
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition ={{ type: "spring", stiffness: 400, damping: 17 }}
+                        >
                         <h1 className="font-bold text-sky-500">{domain.charAt(0).toUpperCase() + domain.slice(1)}</h1><br/>
-                        <div onClick={() => deleteDomain(domain)}>
-                            <DeleteIcon />
+                        <div onClick={() => setDomainSettings(true)}>
+                            <SettingsIcon />
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
                 <div className="domain-dimensions card shadow-md m-4 p-4" onClick={() => setShowAddDomain(true)}>
                     <h1 className="font-bold text-sky-500">Add Domain</h1>
@@ -160,6 +175,35 @@ export default function Settings() {
                         </div>
                     </div>
                     )}
+                {domainSettings && (
+                <motion.div className="form-overlay"
+                    initial={{ opacity: 0}}
+                    animate={{ opacity: 1}}
+                >
+                    <motion.form onSubmit={updateDomainSettings}
+
+                    layoutId={`${selectedDomain.toLowerCase()}`}
+                    >
+                        <button onClick={() => setDomainSettings(false)}><CloseIcon/></button>
+                        <label>Name:
+                            <input type="text" name="name" onChange={handleChange} />
+                        </label>
+                        <label>Microbit:
+                            <input type="text" name="microbit" onChange={handleChange} />
+                        </label>
+                        <label>Max Temp:
+                            <input type="text" name="maxTemp" onChange={handleChange} />
+                        </label>
+                        <label>Max Noise:
+                            <input type="text" name="maxNoise" onChange={handleChange} />
+                        </label>
+                        <label>Max Light:
+                            <input type="text" name="maxLight" onChange={handleChange} />
+                        </label>
+                        <button type="submit">Submit</button>
+                    </motion.form>
+                </motion.div>
+            )}
         </div>
     </div>
   );

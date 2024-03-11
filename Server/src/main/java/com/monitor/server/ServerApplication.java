@@ -151,17 +151,17 @@ public class ServerApplication {
 			// Insert new room into the database
 			// Function only requires top left and bottom right coordinate of the room to work out all 4 coordinates
 			PreparedStatement insertRoomStatement = connection.prepareStatement(
-					"INSERT INTO rooms (room_name, top_left_x, top_left_y, bottom_right_x, bottom_right_y) " +
-							"VALUES (?, ?, ?, ?, ?)"
+					"INSERT INTO rooms (top_left_x, top_left_y, bottom_right_x, bottom_right_y) " +
+							"VALUES (?, ?, ?, ?) WHERE room_name = ?"
 			);
 	
 			// Set parameters
-			insertRoomStatement.setString(1, roomName);
-			insertRoomStatement.setInt(2, points[0]); // top_left_x
-			insertRoomStatement.setInt(3, points[1]); // top_left_y
-			insertRoomStatement.setInt(4, points[2]); // bottom_right_x
-			insertRoomStatement.setInt(5, points[3]); // bottom_right_y
-	
+
+			insertRoomStatement.setInt(1, points[0]); // top_left_x
+			insertRoomStatement.setInt(2, points[1]); // top_left_y
+			insertRoomStatement.setInt(3, points[2]); // bottom_right_x
+			insertRoomStatement.setInt(4, points[3]); // bottom_right_y
+			insertRoomStatement.setString(5, roomName);
 			// Execute the insert statement
 			int rowsAffected = insertRoomStatement.executeUpdate();
 	
@@ -285,7 +285,7 @@ public class ServerApplication {
 			ResultSet rs = stmt
 					.executeQuery("SELECT username,user_microbit FROM users WHERE user_microbit IS NOT NULL");
 			while (rs.next()) {
-				output.append("{\"username\": \"" + rs.getString("username") + "\"}");
+				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
 					output.append(",");
 				}
@@ -563,8 +563,32 @@ public class ServerApplication {
 		}
 		return type;
 	}
-
-	@GetMapping("/setup")
+	@GetMapping("/getRoomInfo")
+	private String getRoomInfo(){
+		StringBuilder output = new StringBuilder();
+		output.append("{\"rooms\":{" +
+				"\"data\":[");
+		try{
+			PreparedStatement selectStatement = connection.prepareStatement(
+					"SELECT * FROM rooms");
+			ResultSet rs = selectStatement.executeQuery();
+			while(rs.next()){
+				output.append("{\"name\": \""+rs.getString("room_name")+"\", " +
+						"\"microbit\": \""+rs.getString("room_microbit")+"\", "+
+						"\"maxTemp\": \""+rs.getInt("max_temperature")+"\", "+
+						"\"maxNoise\": \""+rs.getInt("max_noise_level")+"\", "+
+						"\"maxLight\": \""+rs.getInt("max_light_level")+"\"}");
+				if(!rs.isLast()){
+					output.append(",");
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		output.append("]}}");
+		return output.toString();
+	}
+	@GetMapping("/updateMB")
 	private boolean setup(@RequestParam(value = "type") String type, @RequestParam(value = "name") String name,
 			@RequestParam(value = "microbit") String mbName,
 			@RequestParam(value = "overwrite", defaultValue = "false") boolean overwrite) {
@@ -612,7 +636,60 @@ public class ServerApplication {
 		}
 		return false;
 	}
+	@GetMapping("/addNode")
+	private boolean addNode(@RequestParam(value="roomName")String roomName,@RequestParam(value="mb") String mb,
+							@RequestParam(value="maxes") int[] max){
+		//check it doesn't exist first
+		try{
+			PreparedStatement findRoom = connection.prepareStatement(
+					"SELECT room_name FROM rooms WHERE room_name = ?"
+			);
+			findRoom.setString(1,roomName);
+			ResultSet rs= findRoom.executeQuery();
+			if(!rs.next()){
+				PreparedStatement createRoom = connection.prepareStatement(
+						"INSERT INTO rooms (room_name, room_microbit, top_left_x, top_left_y, bottom_right_x, bottom_right_y, " +
+								"max_temperature, max_noise_level, max_light_level) " +
+								"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+				);
+				createRoom.setString(1,roomName);
+				createRoom.setString(2,mb);
+				createRoom.setInt(3,0);
+				createRoom.setInt(4,0);
+				createRoom.setInt(5,0);
+				createRoom.setInt(6,0);
+				createRoom.setInt(7,max[0]);
+				createRoom.setInt(8,max[1]);
+				createRoom.setInt(9,max[2]);
+				createRoom.executeUpdate();
+				return true;
+			}else{
+				return false;
+			}
 
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	@GetMapping("/updateMax")
+	private boolean updateMax(@RequestParam(value="roomName") String roomName,@RequestParam(value="max") int[] maxes){
+		try{
+			PreparedStatement update = connection.prepareStatement(
+					"UPDATE rooms SET max_temperature=?, max_noise_level=?, max_light_level=? WHERE room_name=?"
+			);
+			update.setInt(1,maxes[0]);
+			update.setInt(2,maxes[1]);
+			update.setInt(3,maxes[2]);
+			update.setString(4,roomName);
+			update.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+
+		}
+
+	}
 	@GetMapping("/isDoorLocked")
 	private boolean isDoorLocked(@RequestParam(value = "doorName") String doorName) {
 		try {
