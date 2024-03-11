@@ -19,18 +19,17 @@ const MapPage = () => {
             console.log("Content ",csvContent);
         };
 
-
     }
 
     return ( 
         <div className="MapPage">
             <div className="flex mb-5">
-                {/* <SelectUserBox onLocationChange={setSelectedUser} /> */}
+                { <SelectUserBox /> }
             </div>
             <form>
                 <input type={"file"} onChange={handleFileChange} accept={".csv"}></input>
             </form>
-            <RoomCanvas selectedUser={selectedUser}></RoomCanvas>
+            <RoomCanvas ></RoomCanvas>
         </div>
      );
 }
