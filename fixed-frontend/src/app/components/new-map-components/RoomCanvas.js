@@ -4,7 +4,7 @@ import Room from "./Room";
 import Door from "./Door";
 import { getCookie } from "../cookies";
 
-const RoomCanvas = ({trackedUser}) => {
+const RoomCanvas = () => {
 
     const CANVAS_WIDTH = 1500;
     const CANVAS_HEIGHT = 600;
@@ -15,7 +15,7 @@ const RoomCanvas = ({trackedUser}) => {
 
     const ICON_SIZE = 20;
 
-    let [trackedName, setTrackedName] = useState(trackedUser);
+    let trackedName="";
 
     //default doors
     const doorA = new Door("Office Side", [400, 110]);
@@ -36,8 +36,8 @@ const RoomCanvas = ({trackedUser}) => {
         console.log(rooms)
         //draw doors after rooms so the rooms don't overlap doors
         for(let i=0;i<rooms.length; i++){
-            console.log(i)
-            console.log(rooms[i].doors)
+            // console.log(i)
+            // console.log(rooms[i].doors)
             rooms[i].drawDoors("#D8E0E6","black");
         }
         
@@ -71,7 +71,6 @@ const RoomCanvas = ({trackedUser}) => {
     
                     //FETCH DOORS FROM DB
                     let doorData = await fetchApi("getAllDoorData?room="+entry.Name);
-                    console.log(doorData)
                     if(doorData!=undefined){
                         doorData = doorData.doors.data[0];
                     }
@@ -109,9 +108,9 @@ const RoomCanvas = ({trackedUser}) => {
     async function setAllRoomData(){
     
         let currentUserLocation = undefined;
-        trackedName="Ethan"
+        trackedName=getCookie("trackedUser");
         // TEST get the location of the current selected user
-        //console.log(trackedName)
+        console.log(trackedName)
         if(trackedName != undefined){
             //get the current location of the user
             currentUserLocation = await fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
@@ -240,7 +239,6 @@ const RoomCanvas = ({trackedUser}) => {
 
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
-            setTrackedName(trackedUser);
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
