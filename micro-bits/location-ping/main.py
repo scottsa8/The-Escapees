@@ -176,5 +176,5 @@ def main():
                 radio.send(str(MESSAGE_ID)+","+name+","+locationNodeName)
                 radio.config(channel=22)#receive from node
                 hasLocation = False
-        sleep(100) 
+        sleep(150) 
 main()
