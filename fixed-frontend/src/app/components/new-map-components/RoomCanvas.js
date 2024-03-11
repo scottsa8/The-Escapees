@@ -171,39 +171,6 @@ const RoomCanvas = () => {
 
     }
 
-    const handleClick = (event) => {
-
-        //gets coordinates of where the client has clicked on the canvas
-        const userX = event.clientX - event.target.offsetLeft;
-        const userY = event.clientY - event.target.offsetTop;
-    
-        // let roomFound = undefined;
-        // refreshCanvas();
-
-        // //for a room with 4 sides
-        // for(let i=0; i<rooms.length; i++){
-        //     //check if the user has clicked within the bounds of one of the drawn rooms
-        //     roomFound = rooms[i].checkClick(userX, userY);
-        //     if(roomFound){
-        //         break;
-        //     }
-        // }
-        // //if a room has been clicked
-        // if(roomFound != undefined){
-        //     console.log("Clicked "+roomFound.name);
-        //     roomFound.user = true;
-            
-        //     try{
-        //         roomFound.doors[0].doorLocked = false;
-        //         roomFound.doors[1].doorLocked = false;
-        //     }catch(e){
-
-        //     }
-
-        //     refreshCanvas();         
-        // }
-    }
-
     //Initialise the images to be used
     function setIcons() {
 
@@ -242,13 +209,6 @@ const RoomCanvas = () => {
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
-        
-        //Load room data
-        //If there is no room data/cannot connect: display, "cannot load rooms from database", load default?
-        //Load room data
-        //link rooms to the data coming in
-        //
-
 
         drawRooms();
         refreshCanvas();
@@ -261,7 +221,6 @@ const RoomCanvas = () => {
             width={CANVAS_WIDTH}
             height={CANVAS_HEIGHT}
             ref={canvasRef}
-            onClick={handleClick}
         >
         </canvas>
         </>

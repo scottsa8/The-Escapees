@@ -12,6 +12,7 @@ const MapPage = () => {
      * Checks to see if the room data is valid
      * @param {*} rooms Room objects
      * @param {*} doors Door objects
+     * @returns {*} true if the data is valid
      */
     function checkValid(rooms, doors){
 
