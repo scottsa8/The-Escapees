@@ -260,9 +260,9 @@ public class ServerApplication {
 				"\"data\":[");
 		try {
 			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT username FROM users");
+			ResultSet rs = stmt.executeQuery("SELECT username,user_microbit FROM users");
 			while (rs.next()) {
-				output.append("{\"username\": \"" + rs.getString("username") + "\"}");
+				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit:\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
 					output.append(",");
 				}
@@ -283,7 +283,7 @@ public class ServerApplication {
 		try {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt
-					.executeQuery("SELECT username,user_microbit FROM users WHERE user_microbit IS NOT NULL");
+					.executeQuery("SELECT username,user_microbit FROM users WHERE user_microbit IS NOT NULL AND user_microbit != \"\"");
 			while (rs.next()) {
 				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
