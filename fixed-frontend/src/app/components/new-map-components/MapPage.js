@@ -79,6 +79,11 @@ const MapPage = () => {
 
     }
 
+    //loads the loaded rooms and the doors to the database
+    function loadToDatabase(rooms, doors){
+
+    }
+
 
     const handleFileChange = (e) =>{
 
@@ -112,11 +117,8 @@ const MapPage = () => {
             for(let i =0; i<data.length; i++){
                 let drawType = data[i][0];
 
-                //console.log(data[i]);
-
                 if(drawType == "Room"){
                     //Data for creating a room
-
                     try{
                         let currentRoom = {
                             name: data[i][1], 
@@ -133,7 +135,6 @@ const MapPage = () => {
                                     doorNames.push(data[i][j]);
                                 }
                             }
-                            //console.log(doorNames);
 
                             //making sure a blank array isn't added
                             if(doorNames != ['']){
@@ -150,7 +151,6 @@ const MapPage = () => {
                 }
                 else if(drawType == "Door"){
                     //data for creating a door
-                    
                     try{
                         let currentDoor = {
                             name: data[i][1],
@@ -170,6 +170,13 @@ const MapPage = () => {
             console.log(validData);
             console.log(rooms);
             console.log(doors);
+
+            //if the uploaded data is valid, load it to the database
+            if(validData == true){
+                loadToDatabase(rooms, doors);
+            }else{
+                console.log("Invalid data, please check CSV format");
+            }
 
         };
 
