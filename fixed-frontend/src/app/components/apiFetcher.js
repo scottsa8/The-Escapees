@@ -16,7 +16,7 @@ export const fetchApi = async (endpoint) => {
                 'Access-Control-Allow-Origin': '*'
             }
         });
-        return response.data;
+      return response.data;
     } catch (error) {
         console.error(error);
     }

@@ -1,37 +1,38 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "../apiFetcher";
 import { useQuery } from "react-query";
+import {getCookie, setCookie} from "../cookies"
 import React from "react";
 
-const SelectUserBox = ({onUserChange}) => {
+const SelectUserBox = () => {
 
-    const [trackedUsers, setTrackedUsers] = useState([" ", "Hannah"]);//Default values for testing
-    const [selectedUser, setSelectedUser] = useState("");
-    const {data, error, refetch} = useQuery('trackedNames', () => fetchApi('/getTracked'));//TODO
+    const [trackedUsers, setTrackedUsers] = useState([""]);//Default values for testing
+    const {data, error, refetch} = useQuery('usernames', () => fetchApi('getTracked'));//TODO
 
-    const handleUserChange = (e) => {
-        setSelectedUser(e.target.value);
-        onUserChange(e.target.value);
-    };
 
     useEffect(() => {
+      
         if(error || !data){
             console.error(error);
-            return;
+            refetch();
+        }else{
+            console.log(data)
+
+            ///THIS NEEDS TO BE FINISHED, COMPARE TO ROOMSELECTOR.JS
+            const trackedNames = data.names.data//This will need checking idk if '.names' is correct
+            .map(roomObj => roomObj.username);
+            setTrackedUsers(trackedNames);
+            console.log(trackedNames)
         }
-       consolge.log(data)
-        const trackedNames = data//...TODO
-
-        setTrackedUsers(trackedNames);
-
-    }, [data, error, refetch]);
+      
+    }, [data, error]);
 
 
     return ( 
         <div className="userSelector"> 
-        <select value={selectedUser} onChange={handleUserChange} className="p-2 border rounded-md shadow-md">
+        <select onLoad={(e) => setCookie("trackedUser",e.target.value)} onChange={(e) => setCookie("trackedUser",e.target.value)} className="p-2 border rounded-md shadow-md">
             {trackedUsers.map((trackedUsers, index) => (
-                <option key={index} value={location}>{location}</option>
+                <option key={index} value={trackedUsers}>{trackedUsers}</option>
             ))}
         </select>
         </div>

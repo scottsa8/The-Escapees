@@ -14,27 +14,8 @@ def sendDataFromServer():
         radio.config(channel=22)
         data = uart.read()
         decodedMessage = data.decode('utf-8').strip()
-        if "PANIC" in decodedMessage:
-            radio.send(decodedMessage)
-        else:
-
-            display.scroll("1:" + decodedMessage)
-            components = decodedMessage.split(',')
-            
-            if len(components) >= 2:
-                name = components[0]
-                # display.scroll(components[0])
-                message = ','.join(components[1:])
-            
-                # Split the message into groups of size PACKET_SIZE
-                for packet_start in range(0, len(message), PACKET_SIZE):
-                    packet_end = packet_start + PACKET_SIZE
-                    packet_group = message[packet_start:packet_end]
-                    
-                    # Prepend the name to the start of each group
-                    packetWithPrefix = name + "," + packet_group
-                    # display.scroll(decodedMessage)
-                    radio.send(decodedMessage)
+        # display.scroll(decodedMessage)
+        radio.send(decodedMessage)
         radio.config(channel=21)
 
 def findEntries():

@@ -156,7 +156,15 @@ def main():
             if "PANIC" in message_str and name in message_str:
                 panic()
 
-            #update the list for the user's location
+            #display.scroll(message_str)
+            # Split the message into components
+            components = message_str.split(',')
+
+            # Check if the name matches the microbit name
+            #if len(components) > 1 and components[0] == name:
+                #display.scroll(components[2])
+
+            # #update the list for the user's location
             hasLocation = decodeMessage(message)
 
             if hasLocation:
@@ -168,5 +176,5 @@ def main():
                 radio.send(str(MESSAGE_ID)+","+name+","+locationNodeName)
                 radio.config(channel=22)#receive from node
                 hasLocation = False
-        sleep(100) 
+        sleep(150) 
 main()
