@@ -96,14 +96,14 @@ public class ServerApplication {
 	private void cleanup() {
 		System.gc();
 		System.out.println("cleaning up");
-		// monitor.stop();
-		// monitor=null;
-		// try{
-		// monitor= new SerialMonitor(connection);
-		// monitor.start();
-		// } catch (Exception e) {
-		// //e.printStackTrace();
-		// }
+		 monitor.stop();
+		 monitor=null;
+		 try{
+		 monitor= new SerialMonitor(connection);
+		 monitor.start();
+		 } catch (Exception e) {
+		 //e.printStackTrace();
+		 }
 	}
 	@GetMapping("/getDomains")
 	private String getDomains() {

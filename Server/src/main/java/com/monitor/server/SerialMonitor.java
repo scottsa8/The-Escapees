@@ -42,6 +42,7 @@ public class SerialMonitor {
         for (SerialPort port : ports) {
             if (port.getDescriptivePortName().contains("USB Serial Device")) {
                 microbit = port;
+                microbit.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING,0,0);
                 break;
             }
         }
@@ -93,9 +94,14 @@ public class SerialMonitor {
                     panic();
                 }
                 String[] sensorData = data.split(",");
-                int packetType = Integer.parseInt(sensorData[0]);
+                int packetType;
+                try{
+                    packetType= Integer.parseInt(sensorData[0]);
+                }catch (Exception e){
+                    return;
+                }
                 if (packetType == 1) { //moving device
-                    if(sensorData.length>3){
+                    if(sensorData.length!=3){
                         return;
                     }
                     String deviceName = sensorData[1];
@@ -159,10 +165,12 @@ public class SerialMonitor {
                     }
                 }                               
                 else if (packetType == 2) { //env
-                    if (sensorData.length > 5) {
+                    if (sensorData.length!=5) {
+                        return;
+                    } else if (sensorData[1].length()<4) {
                         return;
                     }
-                
+
                     String microbitName = sensorData[1];
                     String temperature = sensorData[2];
                     BigDecimal lightLevel = new BigDecimal(sensorData[3]).setScale(2, RoundingMode.HALF_EVEN);
