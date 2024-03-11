@@ -42,6 +42,7 @@ public class SerialMonitor {
         for (SerialPort port : ports) {
             if (port.getDescriptivePortName().contains("USB Serial Device")) {
                 microbit = port;
+                microbit.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING,0,0);
                 break;
             }
         }
@@ -93,11 +94,19 @@ public class SerialMonitor {
                     panic();
                 }
                 String[] sensorData = data.split(",");
-                int packetType = Integer.parseInt(sensorData[0]);
+                int packetType;
+                try{
+                    packetType= Integer.parseInt(sensorData[0]);
+                }catch (Exception e){
+                    return;
+                }
                 if (packetType == 1) { //moving device
+                    if(sensorData.length!=3){
+                        return;
+                    }
                     String deviceName = sensorData[1];
                     String roomMicrobit = sensorData[2];
-                
+
                     try {
                         // Retrieve room_id based on room_microbit
                         PreparedStatement selectRoomIdStatement = connection.prepareStatement(
@@ -105,20 +114,20 @@ public class SerialMonitor {
                         );
                         selectRoomIdStatement.setString(1, roomMicrobit);
                         ResultSet roomResult = selectRoomIdStatement.executeQuery();
-                
+
                         // Check if a room with the specified room_microbit exists
                         if (roomResult.next()) {
-                            int roomID = roomResult.getInt("room_id");                
+                            int roomID = roomResult.getInt("room_id");
                             // Retrieve user_id based on user_microbit
                             PreparedStatement selectUserIdStatement = connection.prepareStatement(
                                 "SELECT user_id FROM users WHERE user_microbit = ?"
                             );
                             selectUserIdStatement.setString(1, deviceName);
                             ResultSet userResult = selectUserIdStatement.executeQuery();
-                
+
                             // Check if a user with the specified user_microbit exists
                             if (userResult.next()) {
-                                int userID = userResult.getInt("user_id");                
+                                int userID = userResult.getInt("user_id");
                                 // Retrieve the last recorded room for the user
                                 PreparedStatement selectLastRoomStatement = connection.prepareStatement(
                                     "SELECT room_id FROM roomOccupants " +
@@ -128,7 +137,7 @@ public class SerialMonitor {
                                 );
                                 selectLastRoomStatement.setInt(1, userID);
                                 ResultSet lastRoomResult = selectLastRoomStatement.executeQuery();
-                
+
                                 // Check if there is a last recorded room
                                 if (!lastRoomResult.next() || lastRoomResult.getInt("room_id") != roomID) {
                                     // Insert data into the database for movement
@@ -156,10 +165,12 @@ public class SerialMonitor {
                     }
                 }                               
                 else if (packetType == 2) { //env
-                    if (sensorData.length > 5) {
+                    if (sensorData.length!=5) {
+                        return;
+                    } else if (sensorData[1].length()<4) {
                         return;
                     }
-                
+
                     String microbitName = sensorData[1];
                     String temperature = sensorData[2];
                     BigDecimal lightLevel = new BigDecimal(sensorData[3]).setScale(2, RoundingMode.HALF_EVEN);

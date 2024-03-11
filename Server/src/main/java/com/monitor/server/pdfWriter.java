@@ -186,7 +186,7 @@ public class pdfWriter implements Runnable {
     private void home(){
         Paragraph main = new Paragraph();
         //add hyper link text
-        PdfAction page = PdfAction.gotoLocalPage(titlePage,new PdfDestination(titlePage),writer);
+        PdfAction page = PdfAction.gotoLocalPage(writer.getPageNumber(),new PdfDestination(writer.getPageNumber()),writer);
         Chunk chunk = new Chunk("Back to top",new Font(Font.FontFamily.HELVETICA,15,Font.BOLD));
         chunk.setAction(page);
         main.add(chunk);
@@ -332,13 +332,11 @@ public class pdfWriter implements Runnable {
         graphs.add(createGraph("Noise_level",false,room));
         graphs.add(createGraph("Light_level",false,room));
         document.add(graphs);
-        home();
         //new page
         document.newPage();
         //add location table
         document.add(addBack());
         document.add(createLocation(room));
-        home();
         document.newPage();
     }
     private void addPeaks(Document document) throws DocumentException {
@@ -357,7 +355,6 @@ public class pdfWriter implements Runnable {
         main.add(createGraph("Noise_level",true,""));
         main.add(createGraph("Light_level",true,""));
         document.add(main);
-        home();
         document.newPage();
     }
 
