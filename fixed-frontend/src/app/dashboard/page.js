@@ -117,6 +117,12 @@ const Dashboard = () => {
     document.title = `${currentView.pageTitle} - Prison System`
   }
 
+  useEffect(() => {
+    if (notifications.length === 0) {
+      setShowNotifications(false);
+    }
+  }, [notifications.length]);
+  
   return (
     <>
       {/* <title>{currentView.pageTitle} - Prison System</title> */}
@@ -133,7 +139,7 @@ const Dashboard = () => {
           </div>
         <div className="flex items-center space-x-4">
           <div className="relative">
-          <button onClick={() => setShowNotifications(!showNotifications)} className="relative inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+          <button onClick={() => notifications.length > 0 && setShowNotifications(!showNotifications)} className="relative inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
             <span className="sr-only">Notifications</span>
             <NotificationIcon/>
             <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900">
