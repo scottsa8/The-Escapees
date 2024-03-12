@@ -5,7 +5,9 @@ import {PlusIcon,CloseIcon,SettingsIcon} from './heroIcons'
 import { fetchApi } from './apiFetcher';
 import { useQuery } from 'react-query';
 import {motion} from 'framer-motion';
-export default function Settings() {
+
+//Hook to set if the light theme is active or not
+export default function Settings({dashThemeHook}) {
     const [temp, setTemp] = useState(30);
     const [noise, setNoise] = useState(30);
     const [light, setLight] = useState(30);
@@ -35,6 +37,7 @@ export default function Settings() {
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
+        dashThemeHook(newTheme === 'light')
         setCookie('theme', newTheme);
         document.documentElement.classList.toggle('dark', newTheme === 'dark');
     };

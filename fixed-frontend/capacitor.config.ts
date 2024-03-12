@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.example.app',
-  appName: 'set-frontend',
+  appName: 'Smart System',
   webDir: 'out',
   server: {
     androidScheme: 'https'

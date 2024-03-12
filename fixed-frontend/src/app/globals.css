@@ -2,20 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Variables used for theme colours */
+:root {
+  --light-body-background: #EAEAEB;
+  --light-banner-colour: #B7B6B7;
+  --light-sidebar: #D9D9D9;
+  --light-title-colour: black;
 
+  --navbar-hover: #555;
+
+  --dark-body-background: #22314f;
+  --dark-sidebar-background: #1b2030;
+  --dark-sidebar-main: #DBE9FE;
+  --dark-banner-gradient: linear-gradient(to right, #1d2232, #1b2030);
+  --dark-title-colour: #dbeafe;
+}
 
 body {
   font-family: 'Roboto', sans-serif;
-  background-color: #EAEAEB;
+  /* background-color: #EAEAEB; */
+  background-color: var(--light-body-background);
   overflow-x: hidden;
 }
 
 .dark body{
-  background-color: #22314f;
+  /* background-color: #22314f; */
+  background-color: var(--dark-body-background);
 }
 
 .banner {
-  background-color: #B7B6B7;
+  /* background-color: #B7B6B7; */
+  background-color: var(--light-banner-colour);
   height: 100px;
   display: flex;
   align-items: center;
@@ -26,11 +43,13 @@ body {
   z-index: 2000;
 }
 .dark .banner{
-  background: linear-gradient(to right, #1d2232, #1b2030);
+  /* background: linear-gradient(to right, #1d2232, #1b2030); */
+  background: var(--dark-banner-gradient);
 }
 
 .dark .title{
-  color: rgb(219 234 254);
+  /* color: #dbeafe; */
+  color: var(--dark-title-colour)
 }
 
 .interactive-map {
@@ -44,7 +63,8 @@ body {
 }
 
 .title {
-  color: black;
+  /* color: black; */
+  color: var(--light-title-colour);
   font-size: 34px;
   /* padding-left: 20px; */
   font-weight: bold;
@@ -68,8 +88,10 @@ body {
 
   /* Sidebar code */
   .dark .sidebar{
-    background-color: #1b2030;
-    color: #DBE9FE;
+    /* background-color: #1b2030;
+    color: #DBE9FE; */
+    background-color: var(--dark-sidebar-background);
+    color: var(--dark-sidebar-main);
   }
 
   ::-webkit-scrollbar {
@@ -94,7 +116,8 @@ body {
   .sidebar {
     position:fixed;
     top: 0;
-    background-color: #D9D9D9;
+    /* background-color: #D9D9D9; */
+    background-color: var(--light-sidebar);
     width: 160px;
     height: 100vh;
     left: -110px;
@@ -118,7 +141,8 @@ body {
     }
   
     .dark .topbar{
-      background: linear-gradient(to right, #1b2030, #1f2535);
+      /* background: linear-gradient(to right, #1b2030, #1f2535); */
+      background: var(--dark-banner-gradient);
       color: #DBE9FE;
     }
 }
@@ -143,7 +167,7 @@ body {
   }
   
   .sidebar-button:hover {
-    background-color: #555;
+    background-color: var(--navbar-hover);
     text-indent: 0;
   }
 
@@ -159,7 +183,7 @@ body {
   }
 
   .topbar-button:hover {
-    background-color: #555;
+    background-color: var(--navbar-hover);
   }
 }
 .settings-width{

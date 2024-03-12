@@ -156,6 +156,7 @@ def main():
             if "PANIC" in message_str and name in message_str:
                 panic()
 
+            #display.scroll(message_str)
             # Split the message into components
             components = message_str.split(',')
             display.scroll(message_str)
@@ -180,16 +181,16 @@ def main():
                     radio.config(channel=22)  # Change back to the original channel
 
             # #update the list for the user's location
-            # hasLocation = decodeMessage(message)
+            hasLocation = decodeMessage(message)
 
-            # if hasLocation:
-            #     updateCounts()
-            #     locationNodeName = findLocation()
+            if hasLocation:
+                updateCounts()
+                locationNodeName = findLocation()
 
-            #     #send the user's name and location to the receiver
-            #     radio.config(channel=21)#send message to server
-            #     radio.send(str(MESSAGE_ID)+","+name+","+locationNodeName)
-            #     radio.config(channel=22)#receive from node
-            #     hasLocation = False
-        sleep(100) 
+                #send the user's name and location to the receiver
+                radio.config(channel=21)#send message to server
+                radio.send(str(MESSAGE_ID)+","+name+","+locationNodeName)
+                radio.config(channel=22)#receive from node
+                hasLocation = False
+        sleep(150) 
 main()

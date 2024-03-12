@@ -96,14 +96,14 @@ public class ServerApplication {
 	private void cleanup() {
 		System.gc();
 		System.out.println("cleaning up");
-		// monitor.stop();
-		// monitor=null;
-		// try{
-		// monitor= new SerialMonitor(connection);
-		// monitor.start();
-		// } catch (Exception e) {
-		// //e.printStackTrace();
-		// }
+		 monitor.stop();
+		 monitor=null;
+		 try{
+		 monitor= new SerialMonitor(connection);
+		 monitor.start();
+		 } catch (Exception e) {
+		 //e.printStackTrace();
+		 }
 	}
 	@GetMapping("/getDomains")
 	private String getDomains() {
@@ -146,24 +146,49 @@ public class ServerApplication {
 		if (points.length != 4) {
 			return false; // Invalid input
 		}
-	
+		int rowsAffected;
 		try {
-			// Insert new room into the database
-			// Function only requires top left and bottom right coordinate of the room to work out all 4 coordinates
-			PreparedStatement insertRoomStatement = connection.prepareStatement(
-					"INSERT INTO rooms (top_left_x, top_left_y, bottom_right_x, bottom_right_y) " +
-							"VALUES (?, ?, ?, ?) WHERE room_name = ?"
-			);
-	
-			// Set parameters
+			PreparedStatement stmt = connection.prepareStatement("SELECT room_name FROM rooms WHERE room_name = ?");
+			stmt.setString(1,roomName);
+			ResultSet rs = stmt.executeQuery();
 
-			insertRoomStatement.setInt(1, points[0]); // top_left_x
-			insertRoomStatement.setInt(2, points[1]); // top_left_y
-			insertRoomStatement.setInt(3, points[2]); // bottom_right_x
-			insertRoomStatement.setInt(4, points[3]); // bottom_right_y
-			insertRoomStatement.setString(5, roomName);
-			// Execute the insert statement
-			int rowsAffected = insertRoomStatement.executeUpdate();
+			if(rs.next()){
+				// update room
+				// Function only requires top left and bottom right coordinate of the room to work out all 4 coordinates
+				PreparedStatement insertRoomStatement = connection.prepareStatement(
+						"UPDATE rooms SET top_left_x=?, top_left_y=?, bottom_right_x=?, bottom_right_y=? " +
+								"WHERE room_name = ?"
+				);
+
+				// Set parameters
+
+				insertRoomStatement.setInt(1, points[0]); // top_left_x
+				insertRoomStatement.setInt(2, points[1]); // top_left_y
+				insertRoomStatement.setInt(3, points[2]); // bottom_right_x
+				insertRoomStatement.setInt(4, points[3]); // bottom_right_y
+				insertRoomStatement.setString(5, roomName);
+				System.out.println(insertRoomStatement);
+				// Execute the insert statement
+				rowsAffected = insertRoomStatement.executeUpdate();
+			}else{
+				// create new room
+				// Function only requires top left and bottom right coordinate of the room to work out all 4 coordinates
+				PreparedStatement insertRoomStatement = connection.prepareStatement(
+						"INSERT INTO rooms (room_name, top_left_x, top_left_y, bottom_right_x, bottom_right_y) " +
+								"VALUES (?, ?, ?, ?, ?)"
+				);
+				// Set parameters
+				insertRoomStatement.setString(1, roomName);
+				insertRoomStatement.setInt(2, points[0]); // top_left_x
+				insertRoomStatement.setInt(3, points[1]); // top_left_y
+				insertRoomStatement.setInt(4, points[2]); // bottom_right_x
+				insertRoomStatement.setInt(5, points[3]); // bottom_right_y
+
+				System.out.println(insertRoomStatement);
+				// Execute the insert statement
+				rowsAffected = insertRoomStatement.executeUpdate();
+			}
+
 	
 			// Check if the insertion was successful (1 row affected)
 			return rowsAffected == 1;
@@ -260,9 +285,9 @@ public class ServerApplication {
 				"\"data\":[");
 		try {
 			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT username FROM users");
+			ResultSet rs = stmt.executeQuery("SELECT username,user_microbit FROM users");
 			while (rs.next()) {
-				output.append("{\"username\": \"" + rs.getString("username") + "\"}");
+				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit:\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
 					output.append(",");
 				}
@@ -283,7 +308,7 @@ public class ServerApplication {
 		try {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt
-					.executeQuery("SELECT username,user_microbit FROM users WHERE user_microbit IS NOT NULL");
+					.executeQuery("SELECT username,user_microbit FROM users WHERE user_microbit IS NOT NULL AND user_microbit != \"\"");
 			while (rs.next()) {
 				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
