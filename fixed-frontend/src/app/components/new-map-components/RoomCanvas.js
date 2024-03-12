@@ -134,8 +134,8 @@ const RoomCanvas = () => {
     
         let currentUserLocation = undefined;
         trackedName=getCookie("trackedUser");
-        // TEST get the location of the current selected user
-        console.log(trackedName)
+        
+        // console.log(trackedName)
         if(trackedName != undefined){
             //get the current location of the user
             currentUserLocation = await fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in

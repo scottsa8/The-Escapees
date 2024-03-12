@@ -80,7 +80,7 @@ const MapLoader = () => {
         }
     }
 
-
+    //Called when a csv is selected
     const handleFileChange = (e) =>{
 
         let rooms = [];
@@ -163,9 +163,6 @@ const MapLoader = () => {
             }
             
             let validData = checkValid(rooms, doors);
-            console.log(validData);
-            console.log(rooms);
-            console.log(doors);
 
             //if the uploaded data is valid, load it to the database
             if(validData == true){

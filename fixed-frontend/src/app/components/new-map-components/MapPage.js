@@ -1,23 +1,15 @@
 import RoomCanvas from "./RoomCanvas";
-import { useState } from "react";
 import SelectUserBox from "./SelectUserBox";
-import { fetchApi } from "../apiFetcher";
-import MapLoader from "./MapLoader";
 
-const MapPage = () => {
-
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [selectedFile, setSelectedFile] = useState(null);
-
-
-    
+//A container containing all containers used to show the map page
+const MapPage = () => {    
 
     return ( 
         <div className="MapPage card-container">
             <div className="flex mb-5">
-                { <SelectUserBox /> }
+                <h1 className="text-xl font-bold mb-4">Find User Location</h1>
+                <SelectUserBox />
             </div>
-            {/* <MapLoader></MapLoader> */}
             <RoomCanvas ></RoomCanvas>
         </div>
      );
