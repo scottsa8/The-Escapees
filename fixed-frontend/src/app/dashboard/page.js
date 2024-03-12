@@ -146,13 +146,13 @@ const Dashboard = () => {
               {notifications.length}
             </div>
           </button>
-            {showNotifications && (
-              <div className="notif-box absolute -ml-32 top-full mt-2 overflow-y-auto max-h-64 w-64">
+          {showNotifications && (
+              <div className="notif-box absolute -ml-32 top-full mt-2 overflow-y-auto max-h-64 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4">
                 {notifications.map((notification, index) => (
-                  <div className={`notif-card ml-6 p-4 mb-2 relative ${deleting === index ? 'deleting' : ''}`} key={index}>  
-                        <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1">X</button>
-                    <h1>{notification.title}</h1>
-                    <p>{notification.options}</p>
+                  <div className={`notif-card p-4 mb-4 relative bg-gray-100 dark:bg-gray-700 rounded-lg ${deleting === index ? 'deleting' : ''}`} key={index}>  
+                    <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1 text-gray-800 hover:text-red-500 rounded-full">X</button>
+                    <h1 className="text-lg font-bold">{notification.title}</h1>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{notification.options}</p>
                   </div>
                 ))}
               </div>
