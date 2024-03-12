@@ -145,7 +145,7 @@ export default function Settings({dashThemeHook,dashDomainChange}) {
                     <div className="text-right text-sm">{light}</div>
                 </div>
                 <div className="domains-container flex flex-wrap flex-row">
-                {domains.map((domain, index) => (
+                {Array.isArray(domains) && domains.length > 0 && domains.map((domain, index) => (
                     <motion.div key={index} onClick={() => selectDomain(domain)} className={`domain-dimensions card shadow-md m-4 p-4 ${domain === selectedDomain ? 'selected-color' : ''}`}
                         layoutId={domain.toLowerCase()} 
                         whileHover={{ scale: 1.05 }}

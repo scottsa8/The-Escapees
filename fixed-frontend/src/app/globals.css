@@ -21,13 +21,15 @@
 body {
   font-family: 'Roboto', sans-serif;
   /* background-color: #EAEAEB; */
-  background-color: var(--light-body-background);
   overflow-x: hidden;
+  background: linear-gradient(to right, var(--light-body-background), var(--light-sidebar));
+
 }
 
 .dark body{
   /* background-color: #22314f; */
   background-color: var(--dark-body-background);
+  background: linear-gradient(to right, var(--dark-body-background), var(--dark-sidebar-background));
 }
 
 .banner {
@@ -192,6 +194,10 @@ body {
 .domain-dimensions{
   width: 200px;
   height: 100px;
+}
+
+.microbit-container{
+  padding-left: 30px;
 }
 
 .card-container {
