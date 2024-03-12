@@ -111,7 +111,7 @@ describe("Click functionality", ()=>{
         expect(roomInstance.checkClick(2,2)).toBe(undefined);//null
     });
 });
-
+//tests for if the correct icons are added to the array, ready to be drawn
 describe("Chcking environmental icons", ()=>{
     test("Add icon for temperature", ()=>{
         const roomInstance = new Room("new room", [[1,1],[3,1],[3,3],[1,3]], null);
