@@ -306,7 +306,7 @@ public class ServerApplication {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT username,user_microbit FROM users");
 			while (rs.next()) {
-				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit:\": \""+rs.getString("user_microbit")+"\"}");
+				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
 					output.append(",");
 				}
@@ -438,12 +438,15 @@ public class ServerApplication {
 			@RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
 		int total = 0;
 
-		try (PreparedStatement selectStatement = connection.prepareStatement(
+		try {
+		PreparedStatement selectStatement = connection.prepareStatement(
 				"SELECT COUNT(*) AS total_people " +
 						"FROM roomOccupants ro " +
 						"JOIN rooms r ON ro.room_id = r.room_id " +
 						"JOIN users u ON ro.user_id = u.user_id " +
-						"WHERE r.room_name = ? AND u.user_type = ?")) {
+						"WHERE r.room_name = ? AND u.user_type = ?"
+		);
+
 
 			selectStatement.setString(1, loc);
 			selectStatement.setString(2, type);
