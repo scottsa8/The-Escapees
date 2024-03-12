@@ -84,7 +84,9 @@ const MapPage = () => {
     async function loadToDatabase(rooms, doors){
         for(let i=0;i<rooms.length;i++){
             const data = await fetchApi(`setupMap?roomName=${rooms[i].name}&points=${rooms[i].coords[0][0]},${rooms[i].coords[0][1]},${rooms[i].coords[2][0]},${rooms[i].coords[2][1]}`)
-            console.log(data)
+            for(let c=0;c<doors.length;c++){
+                const data2 = await fetchApi(`setupDoors?roomName=${rooms[i].name}&doorName=${doors[c].name}&xCoordinate=${parseInt(doors[c].location[0].split(",")[0])}&yCoordinate=${parseInt(doors[c].location[0].split(",")[1])}`)
+            }
         }
     }
 
