@@ -216,19 +216,40 @@ public class ServerApplication {
 			if (roomResultSet.next()) {
 				// Retrieve the room_id
 				int roomId = roomResultSet.getInt("room_id");
-	
-				// Insert the new door into the database
-				PreparedStatement insertDoorStatement = connection.prepareStatement(
-						"INSERT INTO doors (room_id, door_name, x_coordinate, y_coordinate) " +
-								"VALUES (?, ?, ?, ?)"
+
+				PreparedStatement checkDoor = connection.prepareStatement(
+						"SELECT door_name FROM doors WHERE door_name = ?"
 				);
-				insertDoorStatement.setInt(1, roomId);
-				insertDoorStatement.setString(2, doorName);
-				insertDoorStatement.setInt(3, xCoordinate);
-				insertDoorStatement.setInt(4, yCoordinate);
-				insertDoorStatement.executeUpdate();
-	
-				return true;
+				checkDoor.setString(1, doorName);
+				checkDoor.executeQuery();
+				ResultSet doorResult = selectRoomIdStatement.executeQuery();
+
+				if(doorResult.next()){
+					PreparedStatement insertDoorStatement = connection.prepareStatement(
+							"UPDATE doors SET x_coordinate=?, y_coordinate=? " +
+									"WHERE door_name = ?"
+					);
+					insertDoorStatement.setInt(1, xCoordinate);
+					insertDoorStatement.setInt(2, yCoordinate);
+					insertDoorStatement.setString(3, doorName);
+					insertDoorStatement.executeUpdate();
+
+					return true;
+				}else {
+
+					// Insert the new door into the database
+					PreparedStatement insertDoorStatement = connection.prepareStatement(
+							"INSERT INTO doors (room_id, door_name, x_coordinate, y_coordinate) " +
+									"VALUES (?, ?, ?, ?)"
+					);
+					insertDoorStatement.setInt(1, roomId);
+					insertDoorStatement.setString(2, doorName);
+					insertDoorStatement.setInt(3, xCoordinate);
+					insertDoorStatement.setInt(4, yCoordinate);
+					insertDoorStatement.executeUpdate();
+
+					return true;
+				}
 			} else {
 				// Handle the case when the roomName is not found
 				return false;
