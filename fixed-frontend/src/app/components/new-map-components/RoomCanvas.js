@@ -206,6 +206,7 @@ const RoomCanvas = () => {
 
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
+            loadRooms();
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
