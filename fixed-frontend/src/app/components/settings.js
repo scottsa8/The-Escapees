@@ -5,6 +5,7 @@ import {PlusIcon,CloseIcon,SettingsIcon} from './heroIcons'
 import { fetchApi } from './apiFetcher';
 import { useQuery } from 'react-query';
 import {motion} from 'framer-motion';
+import MapLoader from './new-map-components/MapLoader';
 
 //Hook to set if the light theme is active or not
 export default function Settings({dashThemeHook}) {
@@ -140,6 +141,10 @@ export default function Settings({dashThemeHook}) {
                         onChange={(e) => setLight(e.target.value)}
                     />
                     <div className="text-right text-sm">{light}</div>
+                </div>
+                <div className="settings-width flex-grow card shadow-md m-4 p-4">
+                <h1 className="text-xl font-bold mb-4">Upload New Map</h1>
+                    <MapLoader></MapLoader>
                 </div>
                 <div className="domains-container flex flex-wrap flex-row">
                 {Array.isArray(domains) && domains.length > 0 && domains.map((domain, index) => (

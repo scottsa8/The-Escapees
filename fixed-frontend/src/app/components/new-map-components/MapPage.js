@@ -17,7 +17,7 @@ const MapPage = () => {
             <div className="flex mb-5">
                 { <SelectUserBox /> }
             </div>
-            <MapLoader></MapLoader>
+            {/* <MapLoader></MapLoader> */}
             <RoomCanvas ></RoomCanvas>
         </div>
      );
