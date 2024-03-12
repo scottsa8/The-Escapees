@@ -161,8 +161,8 @@ const RoomCanvas = () => {
             if(rooms[i].doors != null){
                 for(let j=0; j<rooms[i].doors.length; j++){
                     //return is boolean
-                    //this.rooms[i].doors[j].doorLocked = fetchApi(doorname);
-                    console.log(rooms[i].doors[j].name+" locked = "+rooms[i].doors[j].doorLocked);
+                    rooms[i].doors[j].doorLocked = await fetchApi(`isDoorLocked?doorName=${rooms[i].doors[j].doorName}`);
+                    console.log(rooms[i].doors[j].doorName+" locked = "+rooms[i].doors[j].doorLocked);
                 }
             }
 
