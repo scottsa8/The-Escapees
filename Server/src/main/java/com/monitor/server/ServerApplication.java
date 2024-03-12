@@ -167,7 +167,6 @@ public class ServerApplication {
 				insertRoomStatement.setInt(3, points[2]); // bottom_right_x
 				insertRoomStatement.setInt(4, points[3]); // bottom_right_y
 				insertRoomStatement.setString(5, roomName);
-				System.out.println(insertRoomStatement);
 				// Execute the insert statement
 				rowsAffected = insertRoomStatement.executeUpdate();
 			}else{
@@ -184,7 +183,6 @@ public class ServerApplication {
 				insertRoomStatement.setInt(4, points[2]); // bottom_right_x
 				insertRoomStatement.setInt(5, points[3]); // bottom_right_y
 
-				System.out.println(insertRoomStatement);
 				// Execute the insert statement
 				rowsAffected = insertRoomStatement.executeUpdate();
 			}
