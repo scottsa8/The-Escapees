@@ -648,8 +648,10 @@ public class ServerApplication {
 				ResultSet rs = selectStatement.executeQuery();
 				if (rs.next()) {
 					storedName = rs.getString("room_microbit");
+				}else{
+					storedName="";
 				}
-				if (storedName.equals("") || overwrite) {
+				if (storedName==null|| overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
 							"UPDATE rooms SET room_microbit = ? WHERE room_name = ?");
 					insertStatement.setString(1, mbName);
@@ -666,8 +668,10 @@ public class ServerApplication {
 				ResultSet rs = selectStatement.executeQuery();
 				if (rs.next()) {
 					storedName = rs.getString("user_microbit");
+				}else{
+					storedName="";
 				}
-				if (storedName.equals("") || overwrite) {
+				if (storedName==null || overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
 							"UPDATE users SET user_microbit = ? WHERE username = ?");
 					insertStatement.setString(1, mbName);
