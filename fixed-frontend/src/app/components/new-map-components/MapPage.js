@@ -13,7 +13,7 @@ const MapPage = () => {
     
 
     return ( 
-        <div className="MapPage">
+        <div className="MapPage card-container">
             <div className="flex mb-5">
                 { <SelectUserBox /> }
             </div>
