@@ -182,7 +182,7 @@ const RoomCanvas = () => {
                 }
             }
 
-            //gets and sets the current door data???
+            //gets and sets the current door data
             if(rooms[i].doors != null){
                 for(let j=0; j<rooms[i].doors.length; j++){
                     //return is boolean

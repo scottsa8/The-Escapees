@@ -7,7 +7,7 @@ const MapPage = () => {
     return ( 
         <div className="MapPage card-container">
             <div className="flex mb-5">
-                <h1 className="text-xl font-bold mb-4">Find User Location</h1>
+                <h1 className="text-xl font-bold mb-4">Find User Location </h1>
                 <SelectUserBox />
             </div>
             <RoomCanvas ></RoomCanvas>
