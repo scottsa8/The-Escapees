@@ -3,56 +3,65 @@ import {fetchApi} from './apiFetcher';
 import {useQuery} from 'react-query';
 
 export default function MicroManager() {
-    const { data, isLoading, isError, refetch } = useQuery('getRoomInfo', () => fetchApi("getRoomInfo"));  
-    if (isLoading) {
+    const { data: roomData, isLoading: isRoomLoading, isError: isRoomError } = useQuery('getRoomInfo', () => fetchApi("getRoomInfo"));  
+    const { data: namesData, isLoading: isNamesLoading, isError: isNamesError } = useQuery('getAllNames', () => fetchApi("getAllNames"));  
+  
+    if (isRoomLoading || isNamesLoading) {
         return <div>Loading...</div>;
-    }
-
-    if (isError) {
+      }
+    
+      if (isRoomError || isNamesError) {
         return <div>Error fetching data</div>;
-    }
-
-    const testData = [{
-                "name": "Cell C",
-                "microbit": "null",
-                "maxTemp": "30",
-                "maxNoise": "30",
-                "maxLight": "30"
-        },
-        {
-                "name": "dawda",
-                "microbit": "awdaw",
-                "maxTemp": "50",
-                "maxNoise": "50",
-                "maxLight": "50"
-        }]
+      }
 
     return (
-        <div className="card-container">
-            <TableContainer component={Paper}>
-                <Table>
+        <div className="microbit-container flex justify-between flex-no-wrap">
+            <div className="w-1/2 m-2">
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Room</TableCell>
+                                <TableCell>Microbit</TableCell>
+                                <TableCell>Max Temperature</TableCell>
+                                <TableCell>Max Noise</TableCell>
+                                <TableCell>Max Light</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {roomData.rooms.data.map((item) => (
+                                <TableRow key={item.name}>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.microbit}</TableCell>
+                                    <TableCell>{item.maxTemp}</TableCell>
+                                    <TableCell>{item.maxNoise}</TableCell>
+                                    <TableCell>{item.maxLight}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </div>
+            <div className="w-1/2 m-2">
+                <TableContainer component={Paper} >
+                    <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Room</TableCell>
-                            <TableCell>Microbit</TableCell>
-                            <TableCell>Max Temperature</TableCell>
-                            <TableCell>Max Noise</TableCell>
-                            <TableCell>Max Light</TableCell>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Microbit</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {testData.map((item) => (
-                            <TableRow key={item.name}>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell>{item.microbit}</TableCell>
-                                <TableCell>{item.maxTemp}</TableCell>
-                                <TableCell>{item.maxNoise}</TableCell>
-                                <TableCell>{item.maxLight}</TableCell>
-                            </TableRow>
+                        {namesData.names.data.map((item, index) => (
+                        <TableRow key={index}>
+                            <TableCell>{item.username}</TableCell>
+                            <TableCell>{item.microbit}</TableCell>
+                        </TableRow>
                         ))}
                     </TableBody>
-                </Table>
-            </TableContainer>
+                    </Table>
+                </TableContainer>
+            </div>
         </div>
     );
 };
