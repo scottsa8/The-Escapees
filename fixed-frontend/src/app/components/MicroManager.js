@@ -52,6 +52,7 @@ export default function MicroManager() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
+                        {console.log(namesData.names.data)}
                         {namesData.names.data.map((item, index) => (
                         <TableRow key={index}>
                             <TableCell>{item.username}</TableCell>
