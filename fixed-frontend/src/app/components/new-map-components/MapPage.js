@@ -1,6 +1,7 @@
 import RoomCanvas from "./RoomCanvas";
 import { useState } from "react";
 import SelectUserBox from "./SelectUserBox";
+import { fetchApi } from "../apiFetcher";
 
 const MapPage = () => {
 
@@ -81,8 +82,11 @@ const MapPage = () => {
     }
 
     //loads the loaded rooms and the doors to the database
-    function loadToDatabase(rooms, doors){
-
+    async function loadToDatabase(rooms, doors){
+        for(let i=0;i<rooms.length;i++){
+            const data = await fetchApi(`setupMap?roomName=${rooms[i].name}&points=${rooms[i].coords[0][0]},${rooms[i].coords[0][1]},${rooms[i].coords[2][0]},${rooms[i].coords[2][1]}`)
+            console.log(data)
+        }
     }
 
 
