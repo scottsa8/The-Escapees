@@ -7,7 +7,7 @@ import { useQuery } from 'react-query';
 import {motion} from 'framer-motion';
 
 //Hook to set if the light theme is active or not
-export default function Settings({dashThemeHook}) {
+export default function Settings({dashThemeHook,dashDomainChange}) {
     const [temp, setTemp] = useState(30);
     const [noise, setNoise] = useState(30);
     const [light, setLight] = useState(30);
@@ -20,7 +20,10 @@ export default function Settings({dashThemeHook}) {
     const { data: domains, refetch: refetchDomains } = useQuery('domains', () => fetchApi("getDomains"), { initialData: ['Hotel', 'Prison'] });
     const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'Prison' });
 
+
+
     const selectDomain = async (domain) => {
+        dashDomainChange(domain)
         await fetchApi("setDomain?domain="+domain);
         refetchSelectedDomain();
     };

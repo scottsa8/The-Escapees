@@ -13,21 +13,26 @@ import { useNotification } from "../components/notifications";
 import { fetchApi } from "../components/apiFetcher";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useQuery } from "react-query";
 
 // Lists the pages for the navigation bar on the dashboard
 
 
 const brandImages = {
-  prison : {
+  Prison : {
     light: <Image src="/prison-logo.png" height={50} width={70} />,
     dark: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
   },
+  Hotel : {
+    light:<Image src="/hotel-logo.png" height={50} width={70} />,
+    dark: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />
+  }
 }
 
 
 
 const themes = {
-  prison: {
+  Prison: {
     cssRules:{
     "--light-body-background": "#EAEAEB",
     "--light-banner-colour": "#B7B6B7",
@@ -43,21 +48,21 @@ const themes = {
     lightImage: <Image src="/prison-logo.png" height={50} width={70} />,
     darkImage: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
   },
-  hotel: {
+  Hotel: {
     cssRules:{
-      "--light-body-background": "#EAEAEB",
-      "--light-banner-colour": "#B7B6B7",
-      "--light-sidebar": "#D9D9D9",
+      "--light-body-background": "#fffde3",
+      "--light-banner-colour": "#ffee97",
+      "--light-sidebar": "#ffee97",
       "--light-title-colour": "black",
 
       "--dark-body-background": "#22314f",
       "--dark-sidebar-background": "#1b2030",
       "--dark-sidebar-main": "#DBE9FE",
-      "--dark-banner-gradient": "linear-gradient(to right, #1d2232, #1b2030)",
+      "--dark-banner-gradient": "linear-gradient(to right, #5D2E0C, #5D2E0C)",
       "--dark-title-colour": "#dbeafe"
     },
-    lightImage: <Image src="/prison-logo.png" height={50} width={70} />,
-    darkImage: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
+    light:<Image src="/hotel-logo.png" height={50} width={70} />,
+    dark: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />,
   }
 }
 
@@ -66,24 +71,39 @@ const themes = {
 //It's the constant border around the main page
 const Dashboard = () => {
 
-
+  const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'Prison' });
   const [username, setUsername] = useState('');
   const { sendNotification, NotificationComponent } = useNotification();
   const [ showNotifications, setShowNotifications ] = useState(false); 
-  const [currentTheme,setTheme] = useState(themes.prison);
+  
   const [isLightTheme,setLightTheme] = useState(true)
   const [deleting, setDeleting] = useState(null);
+
+  const [currentDomain, setDomain] = useState("Prison")
+  // const [currentTheme,setTheme] = useState(themes[currentDomain]);
+
+  const changeDomainStyling = (domain) => {
+    if (typeof document !== 'undefined'){
+      setDomain(domain)
+      refetchSelectedDomain()
+      const root = document.querySelector(':root');
+      const setVariables = vars => Object.entries(vars).forEach(v => root.style.setProperty(v[0], v[1]));
+      setVariables(themes[currentDomain].cssRules)
+    }
+  }
 
   const views = {
     individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
     homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
     interactiveMap: {page: <MapPage/>, pageTitle: "Interactive Map"},
-    settings: {page: <Settings dashThemeHook={setLightTheme}/>, pageTitle: "Settings"},
+    settings: {page: <Settings dashThemeHook={setLightTheme}  dashDomainChange={changeDomainStyling}/>, pageTitle: "Settings"},
     charts: {page: <Chart/>, pageTitle: "Charts"},
     microManager: {page: <MicroManager/>, pageTitle: "Microbit Manager"}
   }
 
   const [currentView,setView] = useState(views.homePage);
+
+  
 
   var notifications = null;
   if (typeof window !== 'undefined') {
@@ -103,6 +123,7 @@ const Dashboard = () => {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
     setLightTheme(getCookie('theme') === 'light')
+    changeDomainStyling(selectedDomain);
     setUsername(getCookie("username"));
   }, []);
 
@@ -126,7 +147,7 @@ const Dashboard = () => {
         <div className="banner">
           <div className="flex px-4">
             {/* <Image src="/prison-logo.png" height={50} width={70} /> */}
-            {isLightTheme?currentTheme.lightImage:currentTheme.darkImage}
+            {isLightTheme?themes[currentDomain].lightImage:themes[currentDomain].darkImage}
             <div className="divider"></div>
             {/* margin-right: 1rem;border-right: 1px solid white;margin-left: 1rem; */}
             <h1 className="title">{currentView.pageTitle}</h1> 
