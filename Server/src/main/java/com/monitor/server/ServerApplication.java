@@ -752,7 +752,11 @@ public class ServerApplication {
 							
 			if (rs.next()) {
 				// Retrieve the status from the result set and return it
-				return rs.getBoolean("is_locked");
+				if(rs.getInt("is_locked")==1){
+					return true;
+				}else{
+					return false;
+				}
 			} else {
 				// Handle the case when the door name is not found
 				return false;
