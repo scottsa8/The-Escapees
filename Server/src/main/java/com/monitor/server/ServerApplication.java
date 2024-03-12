@@ -105,6 +105,8 @@ public class ServerApplication {
 		 //e.printStackTrace();
 		 }
 	}
+
+
 	@GetMapping("/getDomains")
 	private String getDomains() {
 		StringBuilder output = new StringBuilder();
@@ -306,7 +308,7 @@ public class ServerApplication {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT username,user_microbit FROM users");
 			while (rs.next()) {
-				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit:\": \""+rs.getString("user_microbit")+"\"}");
+				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
 					output.append(",");
 				}
@@ -438,12 +440,15 @@ public class ServerApplication {
 			@RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
 		int total = 0;
 
-		try (PreparedStatement selectStatement = connection.prepareStatement(
+		try {
+		PreparedStatement selectStatement = connection.prepareStatement(
 				"SELECT COUNT(*) AS total_people " +
 						"FROM roomOccupants ro " +
 						"JOIN rooms r ON ro.room_id = r.room_id " +
 						"JOIN users u ON ro.user_id = u.user_id " +
-						"WHERE r.room_name = ? AND u.user_type = ?")) {
+						"WHERE r.room_name = ? AND u.user_type = ?"
+		);
+
 
 			selectStatement.setString(1, loc);
 			selectStatement.setString(2, type);
@@ -645,8 +650,10 @@ public class ServerApplication {
 				ResultSet rs = selectStatement.executeQuery();
 				if (rs.next()) {
 					storedName = rs.getString("room_microbit");
+				}else{
+					storedName="";
 				}
-				if (storedName.equals("") || overwrite) {
+				if (storedName==null|| overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
 							"UPDATE rooms SET room_microbit = ? WHERE room_name = ?");
 					insertStatement.setString(1, mbName);
@@ -663,8 +670,10 @@ public class ServerApplication {
 				ResultSet rs = selectStatement.executeQuery();
 				if (rs.next()) {
 					storedName = rs.getString("user_microbit");
+				}else{
+					storedName="";
 				}
-				if (storedName.equals("") || overwrite) {
+				if (storedName==null || overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
 							"UPDATE users SET user_microbit = ? WHERE username = ?");
 					insertStatement.setString(1, mbName);
@@ -752,7 +761,11 @@ public class ServerApplication {
 							
 			if (rs.next()) {
 				// Retrieve the status from the result set and return it
-				return rs.getBoolean("is_locked");
+				if(rs.getInt("is_locked")==1){
+					return true;
+				}else{
+					return false;
+				}
 			} else {
 				// Handle the case when the door name is not found
 				return false;
