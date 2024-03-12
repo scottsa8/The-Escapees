@@ -27,6 +27,7 @@ export default function MicroManager() {
       const handleUpdateMB = async () => {
         await fetchApi(`updateMB?type=${type}&name=${name}&microbit=${microbit}&overwrite=${overwrite}`);
         refetchNames();
+        refetchRoom();
       };
 
       if (isRoomLoading || isNamesLoading) {
@@ -41,7 +42,7 @@ export default function MicroManager() {
         <div className="microbit-container flex justify-between flex-no-wrap">
         <div className="space-y-4">
             <div className="space-y-2">
-                <h2 className="text-lg font-bold">Add Room</h2>
+                <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Add Room</h2>
                 <input className="block w-full p-2 border rounded" value={roomName} onChange={e => setRoomName(e.target.value)} placeholder="Room Name" />
                 <input className="block w-full p-2 border rounded" value={mbName} onChange={e => setMbName(e.target.value)} placeholder="Microbit Name" />
                 <input className="block w-full p-2 border rounded" value={maxValues} onChange={e => setMaxValues(e.target.value)} placeholder="Max Values" />
@@ -49,14 +50,14 @@ export default function MicroManager() {
             </div>
 
             <div className="space-y-2">
-                <h2 className="text-lg font-bold">Update Max Values</h2>
+                <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Update Max Values</h2>
                 <input className="block w-full p-2 border rounded" value={roomName} onChange={e => setRoomName(e.target.value)} placeholder="Room Name" />
                 <input className="block w-full p-2 border rounded" value={maxValues} onChange={e => setMaxValues(e.target.value)} placeholder="Max Values" />
                 <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMax}>Update Max Values</button>
             </div>
 
             <div className="space-y-2">
-                <h2 className="text-lg font-bold">Update Microbit</h2>
+                <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Update Microbit</h2>
                 <input className="block w-full p-2 border rounded" value={type} onChange={e => setType(e.target.value)} placeholder="Type" />
                 <input className="block w-full p-2 border rounded" value={name} onChange={e => setName(e.target.value)} placeholder="Name" />
                 <input className="block w-full p-2 border rounded" value={microbit} onChange={e => setMicrobit(e.target.value)} placeholder="Microbit Name" />
