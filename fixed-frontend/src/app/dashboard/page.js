@@ -135,7 +135,7 @@ const Dashboard = () => {
           <div className="relative">
             <button onClick={() => setShowNotifications(!showNotifications)} className="rounded-md shadow-md p-2 bg-red-600"><NotificationIcon/></button>
             {showNotifications && (
-              <div className="notif-box absolute -ml-16 top-full mt-2 overflow-y-auto max-h-64 w-64">
+              <div className="notif-box absolute -ml-32 top-full mt-2 overflow-y-auto max-h-64 w-64">
                 {notifications.map((notification, index) => (
                   <div className={`notif-card ml-6 p-4 mb-2 relative ${deleting === index ? 'deleting' : ''}`} key={index}>  
                         <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1">X</button>
