@@ -1,14 +1,17 @@
 package com.monitor.server;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import com.fazecast.jSerialComm.*;
 import java.time.LocalDateTime;
 import java.math.RoundingMode;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 
 public class SerialMonitor {
@@ -16,6 +19,8 @@ public class SerialMonitor {
     private URL url = new URL("http://localhost:8080");
     private SerialPort microbit;
     private Connection connection;
+    private Map<String, String> messageMap = new HashMap<>(); // Map to store microbit name and corresponding message
+    private int packetSize = 10;
 
     public SerialMonitor(Connection connection) throws MalformedURLException {
         this.connection = connection;
@@ -295,7 +300,10 @@ public class SerialMonitor {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                }    
+                }  
+                else if (packetType == 5) { // Acknowledgement from the microbit that it received the last message packet
+                    sendNextPacket(data);
+                }
                 else{
                     System.out.println("someone elses shit");
                     data="";
@@ -328,60 +336,97 @@ public class SerialMonitor {
         }
     }
 
-    public void sendMessage(String microbitName, String message) {
-        // Preset packet size
-        int packetSize = 10; // Adjust the size as needed
-    
-        // Microbit truncates first packet so initialising with an opening message removes this issue
-        try {
-            microbit.writeBytes("rec".getBytes("UTF-8"), 3);
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public void sendMessage(String microbitName, String message) { 
+        // // Microbit truncates first packet, so initialize with an opening message to avoid this issue
+        // try {
+        //     microbit.writeBytes("rec".getBytes("UTF-8"), 3);
+        // } catch (UnsupportedEncodingException e) {
+        //     e.printStackTrace();
+        // }
 
         if (microbit != null && microbit.isOpen()) {
+            // Store the message in the map
+            messageMap.put(microbitName, message);
+
             try {
-                // Convert the message to bytes and calculate the total number of packets needed
+                // Convert the message to bytes
                 byte[] messageBytes = message.getBytes("UTF-8");
-                int totalPackets = (int) Math.ceil((double) messageBytes.length / packetSize);
     
-                // Send each packet separately
-                for (int packetNumber = 0; packetNumber < totalPackets; packetNumber++) {
-                    // Calculate the start and end indices for the current and use to extract relevant data
-                    int startIdx = packetNumber * packetSize;
-                    int endIdx = Math.min((packetNumber + 1) * packetSize, messageBytes.length);
-                    byte[] packetBytes = Arrays.copyOfRange(messageBytes, startIdx, endIdx);
+                // Send only the first packet
+                int packetNumber = 0;
+                int startIdx = packetNumber * packetSize;
+                int endIdx = Math.min((packetNumber + 1) * packetSize, messageBytes.length);
+                byte[] packetBytes = Arrays.copyOfRange(messageBytes, startIdx, endIdx);
     
-                    // Create a new packet with microbit name, packet number, and packet data
-                    String packetMessage = microbitName + "," + packetNumber + "," + new String(packetBytes, "UTF-8");
+                // Create a new packet with microbit name, packet number, and packet data
+                String packetMessage = microbitName + "," + packetNumber + "," + new String(packetBytes, "UTF-8");
+                System.out.println(packetMessage);
     
-                    // Print the packet message
-                    System.out.println(packetMessage);
-    
-                    // Send the full packet to the receiver microbit
-                    microbit.writeBytes(packetMessage.getBytes("UTF-8"), packetMessage.length());
-                    Thread.sleep(10000);
-    
-                    // Check if this is the last packet and break out of the loop
-                    if (endIdx == messageBytes.length) {
-                        break;
-                    }
-                }
-    
-                // Send the end of message indicator in the final packet
-                int eomPacketNumber = totalPackets;
-                String eomMessage = microbitName + "," + eomPacketNumber + ",/EOM/";
-                System.out.println(eomMessage);
-                microbit.writeBytes(eomMessage.getBytes("UTF-8"), eomMessage.length());
-    
+                // Send the full packet to the receiver microbit
+                microbit.writeBytes(packetMessage.getBytes("UTF-8"), packetMessage.length());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             System.out.println("Microbit not available or port not open.");
         }
-    }    
+    }
+    
+    public void sendNextPacket(String data) {
+        // Check if the data is not empty and starts with "5"
+        if (data != null && data.startsWith("5")) {
+            // Split the data into parts and ensure that there are enough parts
+            String[] parts = data.substring(1).split(",");
+            if (parts.length >= 2) {
+                // Extract microbit name and packet number
+                String microbitName = parts[0];
+                int packetNumber = Integer.parseInt(parts[1]);
+    
+                // Check if there's a stored message for the microbit
+                if (messageMap.containsKey(microbitName)) {
+                    // Retrieve the stored message
+                    String message = messageMap.get(microbitName);
+
+                    // Convert the message to bytes and calculate the total number of packets needed
+                    byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
+                    int totalPackets = (int) Math.ceil((double) messageBytes.length / packetSize);
+    
+                    // Check if the packet number is within the valid range
+                    if (packetNumber > 0 && packetNumber <= totalPackets) {
+                        // Calculate the start and end indices for the current packet
+                        int startIdx = (packetNumber - 1) * packetSize;
+                        int endIdx = Math.min(packetNumber * packetSize, messageBytes.length);
+                        byte[] packetBytes = Arrays.copyOfRange(messageBytes, startIdx, endIdx);
+
+                        // Create a new packet with microbit name, packet number, and packet data
+                        String packetMessage = microbitName + "," + packetNumber + "," + new String(packetBytes, StandardCharsets.UTF_8);
+                        System.out.println(packetMessage);
+
+                        // Send the full packet to the receiver microbit
+                        try {
+                            microbit.writeBytes(packetMessage.getBytes(StandardCharsets.UTF_8), packetMessage.length());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        // Check if this is the last packet and remove the message from the hashmap if so
+                        if (packetNumber == totalPackets) {
+                            messageMap.remove(microbitName);
+                        }
+                    } else {
+                        System.out.println("Invalid packet number: " + packetNumber);
+                    }
+                } else {
+                    System.out.println("No stored message for microbit: " + microbitName);
+                }
+            } else {
+                System.out.println("Invalid data format: " + data);
+            }
+        } else {
+            System.out.println("Invalid data: " + data);
+        }
+    }
+    
 
     public void stop(){
         try{

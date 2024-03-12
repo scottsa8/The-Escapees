@@ -156,13 +156,28 @@ def main():
             if "PANIC" in message_str and name in message_str:
                 panic()
 
-            display.scroll(message_str)
             # Split the message into components
             components = message_str.split(',')
+            display.scroll(message_str)
 
-            # Check if the name matches the microbit name
-            if len(components) > 1 and components[0] == name:
-                display.scroll(components[2])
+            # Ensure that there are enough components
+            if len(components) >= 3:
+                # Extract microbit name, packet number, and packet data
+                microbit_name = components[0]
+                packet_number = int(components[1])
+                packet_data = components[2]
+
+                # Check if the microbit name matches the packet microbit name
+                if microbit_name == name:
+                    # Read the message part and construct acknowledgment
+                    display.scroll(packet_data)
+                    acknowledgment = "5,{},{}".format(microbit_name, packet_number)
+                    # display.scroll(acknowledgment)  # Display acknowledgment (for testing)
+
+                    # Send acknowledgment back to the server
+                    radio.config(channel=21)  # Change to the appropriate channel
+                    radio.send(acknowledgment)
+                    radio.config(channel=22)  # Change back to the original channel
 
             # #update the list for the user's location
             # hasLocation = decodeMessage(message)

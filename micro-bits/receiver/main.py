@@ -7,16 +7,23 @@ arrivedTime = 0
 
 TIMEOUT = 2000
 PACKET_SIZE = 16
+uart_buffer = bytearray()
 
-# will check for any requests wanting to be sent from the server to other micro:bits
 def sendDataFromServer():
+    global uart_buffer  # Define a global buffer to store incomplete data
     if uart.any():
         radio.config(channel=22)
-        data = uart.read()
-        decodedMessage = data.decode('utf-8').strip()
-        # display.scroll(decodedMessage)
-        radio.send(decodedMessage)
+        uart_data = uart.read()
+        uart_buffer.extend(uart_data)
+
+        while b'\n' in uart_buffer:  # Process complete lines
+            line, uart_buffer = uart_buffer.split(b'\n', 1)
+            decodedMessage = line.decode('utf-8').strip()
+            print(decodedMessage)  # Print raw data for debugging
+            radio.send(decodedMessage)
+        
         radio.config(channel=21)
+
 
 def findEntries():
     global entriesLog
