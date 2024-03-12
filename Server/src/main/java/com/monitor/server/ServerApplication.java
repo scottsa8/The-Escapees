@@ -105,6 +105,8 @@ public class ServerApplication {
 		 //e.printStackTrace();
 		 }
 	}
+
+
 	@GetMapping("/getDomains")
 	private String getDomains() {
 		StringBuilder output = new StringBuilder();
