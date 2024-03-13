@@ -418,6 +418,8 @@ public class SerialMonitor {
             
                 String initMessage = "Recv";
                 microbit.writeBytes(initMessage.getBytes("UTF-8"), initMessage.length());
+
+                Thread.sleep(500);
     
                 // Send the full packet to the receiver microbit
                 microbit.writeBytes(packetMessage.getBytes("UTF-8"), packetMessage.length());

@@ -1,22 +1,25 @@
 import { useQuery } from "react-query";
 import { fetchApi } from "./apiFetcher";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
 
     const { data: types } = useQuery('getTypes', () => fetchApi(`getTypes`));
-    const fetchCounts = async () => {
-      const counts = {};
-      for (const type of types) {
-      const { data } = await fetchApi(`getPeople?loc=${roomName}&type=${type}`);
-      counts[type] = data;
-      
-      }
-      return counts;
-    };
-    const { data: counts = {}, isLoading: isLoadingCounts } = useQuery(['counts', roomName], fetchCounts);
+    const [counts, setCounts] = useState({});
+    useEffect(() => {
+      const fetchCounts = async () => {
+        let counts = {};
+        for (const type of types) {
+          let data = await fetchApi(`getPeople?loc=${roomName}&type=${type}`);
+          counts[type] = data;
+        }
+        setCounts(counts);
+      };
+      fetchCounts();
+    }, [types, roomName]);
 
-    if (isLoadingCounts) return 'Loading...';
+    const isLoadingCounts = !types || Object.keys(counts).length !== types.length;
 
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
