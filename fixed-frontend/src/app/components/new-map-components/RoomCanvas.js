@@ -241,7 +241,10 @@ const RoomCanvas = () => {
 
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
-            isFetching() ? loadRooms() : console.log("Data fetch ignored");
+            if(getCookie("newMapData") == true){
+                loadRooms();
+                setCookie("newMapData", false);
+            }
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
