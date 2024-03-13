@@ -137,6 +137,7 @@ body {
     /* Topbar code */
     .topbar{
       width: 100%;
+      background-color: var(--light-sidebar);
       display: flex;
       flex-direction: row;
       overflow: scroll;
