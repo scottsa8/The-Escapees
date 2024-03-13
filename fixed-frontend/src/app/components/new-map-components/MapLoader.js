@@ -1,3 +1,6 @@
+import { setCookie } from "../cookies";
+import { fetchApi } from "../apiFetcher";
+
 const MapLoader = () => {
 
     /**
@@ -167,6 +170,7 @@ const MapLoader = () => {
             //if the uploaded data is valid, load it to the database
             if(validData == true){
                 loadToDatabase(rooms, doors);
+                setCookie("newMapData",true);
             }else{
                 console.log("Invalid data, please check CSV format");
             }

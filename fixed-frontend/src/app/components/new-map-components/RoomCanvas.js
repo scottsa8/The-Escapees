@@ -2,8 +2,9 @@ import { useEffect, useRef, useState} from "react";
 import {fetchApi, getEnvData} from "../apiFetcher";
 import Room from "./Room";
 import Door from "./Door";
-import { getCookie } from "../cookies";
+
 import { useQuery } from "react-query";
+import { getCookie, setCookie } from "../cookies";
 
 const RoomCanvas = () => {
 

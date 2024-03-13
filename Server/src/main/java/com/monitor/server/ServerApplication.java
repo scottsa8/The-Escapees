@@ -91,6 +91,7 @@ public class ServerApplication {
 		}
 		// transmitMessage(1, "Hello testing sending a long message with a variety of different stuff in the message so that I know what is going on with the thing im working on");
 		// transmitMessage(1, "Message");
+		getPeople("Cell Block", "guard");
 	}
 
 	@Scheduled(cron = "0 */2 * ? * *")
@@ -448,9 +449,12 @@ public class ServerApplication {
 						"      FROM roomOccupants " +
 						"      GROUP BY user_id) latest ON ro.user_id = latest.user_id " +
 						"JOIN rooms r ON ro.room_id = r.room_id " +
-						"WHERE r.room_name = ? AND ro.entry_timestamp = latest.max_timestamp")) {
-	
+						"JOIN users u ON ro.user_id = u.user_id " +
+						"WHERE r.room_name = ? " +
+						"AND ro.entry_timestamp = latest.max_timestamp " +
+						"AND u.user_type = ?")) {
 			selectStatement.setString(1, loc);
+			selectStatement.setString(2, type);
 	
 			try (ResultSet rs = selectStatement.executeQuery()) {
 				// Retrieve the total count
@@ -464,6 +468,7 @@ public class ServerApplication {
 	
 		return total;
 	}
+	
 	
 	
 
