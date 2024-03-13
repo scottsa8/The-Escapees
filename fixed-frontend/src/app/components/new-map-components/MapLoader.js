@@ -1,3 +1,5 @@
+import { setCookie } from "next/headers";
+
 const MapLoader = () => {
 
     /**
