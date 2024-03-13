@@ -91,7 +91,6 @@ public class ServerApplication {
 		}
 		// transmitMessage(1, "Hello testing sending a long message with a variety of different stuff in the message so that I know what is going on with the thing im working on");
 		// transmitMessage(1, "Message");
-		getPeople("Cell Block", "guard");
 	}
 
 	@Scheduled(cron = "0 */2 * ? * *")
@@ -127,6 +126,24 @@ public class ServerApplication {
 		output.deleteCharAt(output.length() - 1);
 		output.append("]");
 		return output.toString();
+	}
+	@GetMapping("/getTypes")
+	public ArrayList<String> getTypes(){
+		try{
+			PreparedStatement stmt = connection.prepareStatement("SELECT DISTINCT user_type FROM users");
+			ResultSet rs = stmt.executeQuery();
+			if(rs.next()){
+				ArrayList<String> output = new ArrayList<>();
+				while (rs.next()){
+					output.add(rs.getString("user_type"));
+				}
+				return output;
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		return null;
+		}
+	return null;
 	}
 
 	@GetMapping("/setDomain")
@@ -439,7 +456,7 @@ public class ServerApplication {
 
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value = "loc") String loc,
-						  @RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
+						  @RequestParam(value = "type") String type) {
 		int total = 0;
 	
 		try (PreparedStatement selectStatement = connection.prepareStatement(
@@ -554,7 +571,7 @@ public class ServerApplication {
 
 	@GetMapping("/createAcc")
 	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value = "pass") String pass,
-			@RequestParam(value = "type", required = false) String type) {
+			@RequestParam(value = "type") String type) {
 		try {
 			PreparedStatement insertStatement = connection.prepareStatement(
 					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)");
@@ -911,7 +928,7 @@ public class ServerApplication {
 
 	@GetMapping("/transmitMessage")
 	private String transmitMessage(
-			@RequestParam(value = "personId") int personId,
+			@RequestParam(value = "username") String personId,
 			@RequestParam(value = "message") String message) {
 
 		try {
@@ -969,13 +986,13 @@ public class ServerApplication {
 		}
 	}
 
-	private String getMicrobitForPerson(int personId) throws SQLException {
+	private String getMicrobitForPerson(String username) throws SQLException {
 		// Retrieve the microbit linked to the person from the database
 		String microbitName = null;
 		try {
 			PreparedStatement selectMicrobitStatement = connection.prepareStatement(
-					"SELECT user_microbit FROM users WHERE user_id = ?");
-			selectMicrobitStatement.setInt(1, personId);
+					"SELECT user_microbit FROM users WHERE username = ?");
+			selectMicrobitStatement.setString(1, username);
 			ResultSet microbitResult = selectMicrobitStatement.executeQuery();
 
 			if (microbitResult.next()) {
