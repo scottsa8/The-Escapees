@@ -98,7 +98,7 @@ const Dashboard = () => {
   const [isLightTheme,setLightTheme] = useState(true)
   const [deleting, setDeleting] = useState(null);
 
-  const [currentDomain, setDomain] = useState(selectedDomain)
+  const [currentDomain, setDomain] = useState("prison")
   // const [currentTheme,setTheme] = useState(themes[currentDomain]);
 
   // const setVariables = () =>{ 
