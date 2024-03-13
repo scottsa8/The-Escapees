@@ -115,7 +115,12 @@ const RoomCanvas = () => {
                         tempRoomArr.push(room);
                     } 
                 }
-                rooms = tempRoomArr;
+
+                if(tempRoomArr != rooms){
+                    rooms = tempRoomArr;
+                }
+
+                
         }catch(e){
             //if you are unable to load rooms
             console.log("Unable to load rooms from database");
