@@ -133,6 +133,7 @@ const LocationTable = () => {
             <button onClick={() => {fetchApi(`transmitMessage?username=${user}&message=${message}`); setShowMessagePopup(false)}}>Send</button>
           </form>
       </div> 
+    </div>
   );
 }
  
