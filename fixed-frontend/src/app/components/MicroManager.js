@@ -33,7 +33,7 @@ export default function MicroManager() {
       };
     
       const handleUpdateMB = async () => {
-        await fetchApi(`updateMB?type=${type}&name=${name}&microbit=${microbit}&overwrite=${overwrite}`);
+        await fetchApi(`updateMB?type=${selectedOption}&name=${name}&microbit=${microbit}&overwrite=${overwrite}`);
         refetchNames();
         refetchRoom();
       };
@@ -67,7 +67,7 @@ export default function MicroManager() {
             <div className="space-y-2">
                 
                 <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Update Microbit</h2>
-                <select value={selectedOption} onChange={e => setSelectedOption(e.target.value)}>
+                <select class="flex mb-5 card-container border rounded"  value={selectedOption} onChange={e => setSelectedOption(e.target.value)}>
                 <option value={"initial"}disabled={true}>Select a Type</option>
                 <option value="user">User</option>
                 <option value="room">Room</option>
