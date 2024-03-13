@@ -40,7 +40,7 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
               <p
                 key={index}
                 className="text-gray-500 mt-2 dark:text-blue-100"
-              >{`${type.charAt(0).toUpperCase() + type.slice(1)}: ${userCounts[index]}`}</p>
+              >{`${type.charAt(0).toUpperCase() + type.slice(1)}: ${userCounts[index]?.data || 0}`}</p>
             ))}
             <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${Object.values(userCounts).reduce(
               (sum, count) => sum + count,
