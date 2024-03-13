@@ -16,7 +16,10 @@ const LocationTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [locations, setLocations] = useState([]);
-
+  const [setShowMessagePopup, ShowMessagePopup] = useState(false);
+  const [user, SelectUser] = useState("");
+  const [message, setMessage] = useState('');
+  
   const removeDuplicates = async (arr) => {
     arr.sort((x, y) => new Date(y.Timestamp) - new Date(x.Timestamp));
     let map = new Map();
@@ -100,8 +103,7 @@ const LocationTable = () => {
                 let locations = await getAllLocations(item.name);
                 setLocations(locations);
                 setShowPopup(true);
-                <MessageIcon className="w-6 h-6" />
-              }}>
+                <MessageIcon className="w-6 h-6" onClick={() => {setShowMessagePopup(true);SelectUser(item.name)}}/>}}>
                 <Cell>
                 {item.name}</Cell>
                 <Cell>{item.loc}</Cell>
@@ -120,10 +122,17 @@ const LocationTable = () => {
               </li>
             ))}
           </ul>
-        {/* <button onClick={() => setShowPopup(false)}>Close</button> */}
+        <button onClick={() => setShowPopup(false)}>Close</button>
       </div>
       )}
-    </div> 
+
+    ShowMessagePopup && (
+        <div className="absolute bottom-10 rounded-lg shadow-lg left-20 p-4 z-20 bg-sky-500 ">
+          <form>
+            <input type="text" placeholder="Enter your message" value={message} onChange={e => setMessage(e.target.value)}/>
+            <button onClick={() => {fetchApi(`transmitMessage?username=${user}&message=${message}`); setShowMessagePopup(false)}}>Send</button>
+          </form>
+      </div> 
   );
 }
  
