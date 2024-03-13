@@ -168,22 +168,25 @@ def main():
             if(components[0] == "Recv"):
                 print("")
             elif len(components) >= 3:
-                # Extract microbit name, packet number, and packet data
-                microbit_name = components[0][1:]
-                packet_number = int(components[1])
-                packet_data = components[2]
+                try:
+                    # Extract microbit name, packet number, and packet data
+                    microbit_name = components[0][1:]
+                    packet_number = int(components[1])
+                    packet_data = components[2]
 
-                # Check if the microbit name matches the packet microbit name
-                if microbit_name == name:
-                    # Read the message part and construct acknowledgment
-                    display.scroll(packet_data)
-                    acknowledgment = "5,{},{}".format(microbit_name, packet_number)
-                    # display.scroll(acknowledgment)  # Display acknowledgment (for testing)
+                    # Check if the microbit name matches the packet microbit name
+                    if microbit_name == name:
+                        # Read the message part and construct acknowledgment
+                        display.scroll(packet_data)
+                        acknowledgment = "5,{},{}".format(microbit_name, packet_number)
+                        # display.scroll(acknowledgment)  # Display acknowledgment (for testing)
 
-                    # Send acknowledgment back to the server
-                    radio.config(channel=21)  # Change to the appropriate channel
-                    radio.send(acknowledgment)
-                    radio.config(channel=22)  # Change back to the original channel
+                        # Send acknowledgment back to the server
+                        radio.config(channel=21)  # Change to the appropriate channel
+                        radio.send(acknowledgment)
+                        radio.config(channel=22)  # Change back to the original channel
+                except:
+                    continue
             elif hasLocation:
                 updateCounts()
                 locationNodeName = findLocation()
