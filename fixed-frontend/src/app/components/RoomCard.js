@@ -19,7 +19,7 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
 
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
-      : (guardCount <= inmateCount * 0.25 && inmateCount !== 0)
+      : (counts[0] <= counts[1] * 0.25 && counts[1] !== 0 && fetchApi('getDomain') === 'Prison')
           ? "bg-red-500 dark:bg-red-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
           : "bg-white dark:bg-gray-700 text-gray-600 dark:text-blue-100 shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer";
 
