@@ -73,10 +73,10 @@ const RoomCanvas = () => {
     /**
      * Fetches the rooms from the database and creates corresponding objects ready to be drawn
      */
-    const { data: roomData, isError, refetch, isFetching } = useQuery('AllRoomData', async () => {const data = fetchApi('getAllRoomData'); return data;});
+    
 
     async function loadRooms(){
-
+        let roomData = await fetchApi('getAllRoomData'); 
         let tempRoomArr = [];//tempoary array to store created rooms in.
 
         //FETCH ROOMS FROM DB
