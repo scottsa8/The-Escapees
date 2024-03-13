@@ -103,7 +103,7 @@ const LocationTable = () => {
                 let locations = await getAllLocations(item.name);
                 setLocations(locations);
                 setShowPopup(true);
-              }}>
+                }}>
                 <MessageIcon className="w-6 h-6" onClick={() => {setShowMessagePopup(true);SelectUser(item.name)}}/>
                 <Cell>
                 {item.name}</Cell>
