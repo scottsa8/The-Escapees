@@ -81,7 +81,9 @@ const themes = {
 //Used by the user to navigate through pages
 //It's the constant border around the main page
 const Dashboard = () => {
-
+  const { data: notification, isError, isLoading } = useQuery('getNoti', () => fetchApi(`getNoti`), {
+    refetchInterval: 1000,
+  });
   const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'prison' });
   const [username, setUsername] = useState('');
   const { sendNotification, NotificationComponent } = useNotification();
@@ -99,6 +101,20 @@ const Dashboard = () => {
     Object.entries(themes[currentDomain].cssRules).forEach(v => rootStyles.setProperty(v[0], v[1]));
 
   }
+
+  useEffect(() => {
+    if (notification) {
+      if (notification.noti.data.maxTemp) {
+        sendNotification("Max Value Reached", notification.noti.data.roomName + " has reached its max Temperature"+notification.noti.data.timestamp);
+      }
+      if (notification.noti.data.maxNL) {
+        sendNotification("Max Value Reached", notification.noti.data.roomName + " has reached its max Noise"+notification.noti.data.timestamp);
+      }
+      if (notification.noti.data.maxLL) {
+        sendNotification("Max Value Reached", notification.noti.data.roomName + " has reached its max Light"+notification.noti.data.timestamp);
+      }
+    }
+  }, [notification]);
   
   const changeDomainStyling = (domain) => {
     if (typeof document !== 'undefined'){
