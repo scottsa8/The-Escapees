@@ -128,6 +128,24 @@ public class ServerApplication {
 		output.append("]");
 		return output.toString();
 	}
+	@GetMapping("/getTypes")
+	public ArrayList<String> getTypes(){
+		try{
+			PreparedStatement stmt = connection.prepareStatement("SELECT DISTINCT user_type FROM users");
+			ResultSet rs = stmt.executeQuery();
+			if(rs.next()){
+				ArrayList<String> output = new ArrayList<>();
+				while (rs.next()){
+					output.add(rs.getString("user_type"));
+				}
+				return output;
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		return null;
+		}
+	return null;
+	}
 
 	@GetMapping("/setDomain")
 	public boolean setDomain(@RequestParam(value = "domain") String d) {
@@ -439,20 +457,21 @@ public class ServerApplication {
 
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value = "loc") String loc,
-						  @RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
+						  @RequestParam(value = "type") String type) {
 		int total = 0;
 	
 		try (PreparedStatement selectStatement = connection.prepareStatement(
-				"SELECT COUNT(DISTINCT ro.user_id) AS total_people " +
-						"FROM roomOccupants ro " +
-						"JOIN (SELECT user_id, MAX(entry_timestamp) AS max_timestamp " +
-						"      FROM roomOccupants " +
-						"      GROUP BY user_id) latest ON ro.user_id = latest.user_id " +
-						"JOIN rooms r ON ro.room_id = r.room_id " +
-						"JOIN users u ON ro.user_id = u.user_id " +
-						"WHERE r.room_name = ? " +
-						"AND ro.entry_timestamp = latest.max_timestamp " +
-						"AND u.user_type = ?")) {
+//				"SELECT COUNT(DISTINCT ro.user_id) AS total_people " +
+//						"FROM roomOccupants ro " +
+//						"JOIN (SELECT user_id, MAX(entry_timestamp) AS max_timestamp " +
+//						"      FROM roomOccupants " +
+//						"      GROUP BY user_id) latest ON ro.user_id = latest.user_id " +
+//						"JOIN rooms r ON ro.room_id = r.room_id " +
+//						"JOIN users u ON ro.user_id = u.user_id " +
+//						"WHERE r.room_name = ? " +
+//						"AND ro.entry_timestamp = latest.max_timestamp " +
+//						"AND u.user_type = ?"))
+		"")	)			{
 			selectStatement.setString(1, loc);
 			selectStatement.setString(2, type);
 	
@@ -554,7 +573,7 @@ public class ServerApplication {
 
 	@GetMapping("/createAcc")
 	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value = "pass") String pass,
-			@RequestParam(value = "type", required = false) String type) {
+			@RequestParam(value = "type") String type) {
 		try {
 			PreparedStatement insertStatement = connection.prepareStatement(
 					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)");
@@ -911,7 +930,7 @@ public class ServerApplication {
 
 	@GetMapping("/transmitMessage")
 	private String transmitMessage(
-			@RequestParam(value = "personId") int personId,
+			@RequestParam(value = "username") String personId,
 			@RequestParam(value = "message") String message) {
 
 		try {
@@ -969,13 +988,13 @@ public class ServerApplication {
 		}
 	}
 
-	private String getMicrobitForPerson(int personId) throws SQLException {
+	private String getMicrobitForPerson(String username) throws SQLException {
 		// Retrieve the microbit linked to the person from the database
 		String microbitName = null;
 		try {
 			PreparedStatement selectMicrobitStatement = connection.prepareStatement(
-					"SELECT user_microbit FROM users WHERE user_id = ?");
-			selectMicrobitStatement.setInt(1, personId);
+					"SELECT user_microbit FROM users WHERE username = ?");
+			selectMicrobitStatement.setString(1, username);
 			ResultSet microbitResult = selectMicrobitStatement.executeQuery();
 
 			if (microbitResult.next()) {
