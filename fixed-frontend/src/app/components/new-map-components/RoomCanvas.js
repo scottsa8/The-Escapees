@@ -2,7 +2,7 @@ import { useEffect, useRef, useState} from "react";
 import {fetchApi, getEnvData} from "../apiFetcher";
 import Room from "./Room";
 import Door from "./Door";
-import { getCookie } from "../cookies";
+import { getCookie, setCookie } from "../cookies";
 
 const RoomCanvas = () => {
 
@@ -231,7 +231,10 @@ const RoomCanvas = () => {
 
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
-            loadRooms();
+            if(getCookie("newMapData") == true){
+                loadRooms();
+                setCookie("newMapData",false);
+            }
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
