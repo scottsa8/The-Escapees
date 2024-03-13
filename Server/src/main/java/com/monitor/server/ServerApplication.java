@@ -440,31 +440,16 @@ public class ServerApplication {
 	private int getPeople(@RequestParam(value = "loc") String loc,
 						  @RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
 		int total = 0;
-<<<<<<< HEAD
 	
 		try (PreparedStatement selectStatement = connection.prepareStatement(
 				"SELECT COUNT(DISTINCT ro.user_id) AS total_people " +
-=======
-
-		try {
-		PreparedStatement selectStatement = connection.prepareStatement(
-				"SELECT COUNT(*) AS total_people " +
->>>>>>> 672b832601d25bbd691f6057bd96a1d707e57b44
 						"FROM roomOccupants ro " +
 						"JOIN (SELECT user_id, MAX(entry_timestamp) AS max_timestamp " +
 						"      FROM roomOccupants " +
 						"      GROUP BY user_id) latest ON ro.user_id = latest.user_id " +
 						"JOIN rooms r ON ro.room_id = r.room_id " +
-<<<<<<< HEAD
 						"WHERE r.room_name = ? AND ro.entry_timestamp = latest.max_timestamp")) {
 	
-=======
-						"JOIN users u ON ro.user_id = u.user_id " +
-						"WHERE r.room_name = ? AND u.user_type = ?"
-		);
-
-
->>>>>>> 672b832601d25bbd691f6057bd96a1d707e57b44
 			selectStatement.setString(1, loc);
 	
 			try (ResultSet rs = selectStatement.executeQuery()) {
