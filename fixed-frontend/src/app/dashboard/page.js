@@ -71,7 +71,7 @@ const themes = {
     },
     lightBrand:<Image src="/hotel-logo.png" height={50} width={70} />,
     darkBrand: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />,
-    lightBg: <Image src="/Hotel-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>,
+    lightBg: <Image src="/Hotel-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
     darkBg: <Image src="/Hotel-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
 
   }
@@ -145,7 +145,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
-    setLightTheme(getCookie('theme') === 'light')
+    console.log(getCookie("theme")===null)
+    setLightTheme(getCookie('theme') === null?true:getCookie('theme') === 'light')
     changeDomainStyling(selectedDomain);
     setUsername(getCookie("username"));
   }, []);
