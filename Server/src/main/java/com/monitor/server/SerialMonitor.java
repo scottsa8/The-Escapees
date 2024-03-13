@@ -220,7 +220,7 @@ public class SerialMonitor {
                             insertStatement.setInt(5, scaledLightLevel);
                             insertStatement.executeUpdate();
                             PreparedStatement getRoom = connection.prepareStatement(
-                                    "SELECT room_name FROM rooms WHERE microbit_name=?"
+                                    "SELECT room_name FROM rooms WHERE room_microbit=?"
                             );
                             getRoom.setString(1, microbitName);
                             ResultSet rs = getRoom.executeQuery();
@@ -338,6 +338,7 @@ public class SerialMonitor {
         int maxTemp=0;int maxNL=0;int maxLL=0;
         int currTemp=0;int currNL=0;int currLL=0;
         boolean overTemp=false; boolean overNL=false; boolean overLL=false;
+        Timestamp timestamp = null;
         try {
             PreparedStatement selectData = connection.prepareStatement(
                     "SELECT max_temperature, max_noise_level, max_light_level FROM rooms WHERE room_name=?"
@@ -351,14 +352,15 @@ public class SerialMonitor {
             }
 
             PreparedStatement getMostRecent = connection.prepareStatement(
-                    "SELECT temperature,noise_level,light_level FROM roomsenvironment WHERE room_id=? ORDER BY timestamp DESC"
+                    "SELECT temperature,noise_level,light_level,timestamp FROM roomenvironment WHERE room_id=? ORDER BY timestamp DESC"
             );
-            selectData.setInt(1,roomID);
+            getMostRecent.setInt(1,roomID);
             ResultSet mostRecent = getMostRecent.executeQuery();
             if(mostRecent.next()){
                 currTemp=mostRecent.getInt("temperature");
                 currNL=mostRecent.getInt("noise_level");
                 currLL=mostRecent.getInt("light_level");
+                timestamp=mostRecent.getTimestamp("timestamp");
             }
             if(currTemp>maxTemp){
                 overTemp=true;
@@ -369,10 +371,10 @@ public class SerialMonitor {
             if(currLL>maxLL){
                 overLL=true;
             }
-
+            ServerApplication.setNoti(roomName, String.valueOf(timestamp).substring(0,String.valueOf(timestamp).length()-5),overTemp,overNL,overLL);
 
         }catch (Exception e){
-
+            e.printStackTrace();
         }
     }
     public void panic() {
