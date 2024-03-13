@@ -106,6 +106,8 @@ public class ServerApplication {
 		 //e.printStackTrace();
 		 }
 	}
+
+
 	@GetMapping("/getDomains")
 	private String getDomains() {
 		StringBuilder output = new StringBuilder();
@@ -307,7 +309,7 @@ public class ServerApplication {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT username,user_microbit FROM users");
 			while (rs.next()) {
-				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit:\": \""+rs.getString("user_microbit")+"\"}");
+				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
 					output.append(",");
 				}
@@ -438,16 +440,31 @@ public class ServerApplication {
 	private int getPeople(@RequestParam(value = "loc") String loc,
 						  @RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
 		int total = 0;
+<<<<<<< HEAD
 	
 		try (PreparedStatement selectStatement = connection.prepareStatement(
 				"SELECT COUNT(DISTINCT ro.user_id) AS total_people " +
+=======
+
+		try {
+		PreparedStatement selectStatement = connection.prepareStatement(
+				"SELECT COUNT(*) AS total_people " +
+>>>>>>> 672b832601d25bbd691f6057bd96a1d707e57b44
 						"FROM roomOccupants ro " +
 						"JOIN (SELECT user_id, MAX(entry_timestamp) AS max_timestamp " +
 						"      FROM roomOccupants " +
 						"      GROUP BY user_id) latest ON ro.user_id = latest.user_id " +
 						"JOIN rooms r ON ro.room_id = r.room_id " +
+<<<<<<< HEAD
 						"WHERE r.room_name = ? AND ro.entry_timestamp = latest.max_timestamp")) {
 	
+=======
+						"JOIN users u ON ro.user_id = u.user_id " +
+						"WHERE r.room_name = ? AND u.user_type = ?"
+		);
+
+
+>>>>>>> 672b832601d25bbd691f6057bd96a1d707e57b44
 			selectStatement.setString(1, loc);
 	
 			try (ResultSet rs = selectStatement.executeQuery()) {
@@ -649,8 +666,10 @@ public class ServerApplication {
 				ResultSet rs = selectStatement.executeQuery();
 				if (rs.next()) {
 					storedName = rs.getString("room_microbit");
+				}else{
+					storedName="";
 				}
-				if (storedName.equals("") || overwrite) {
+				if (storedName==null|| overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
 							"UPDATE rooms SET room_microbit = ? WHERE room_name = ?");
 					insertStatement.setString(1, mbName);
@@ -667,8 +686,10 @@ public class ServerApplication {
 				ResultSet rs = selectStatement.executeQuery();
 				if (rs.next()) {
 					storedName = rs.getString("user_microbit");
+				}else{
+					storedName="";
 				}
-				if (storedName.equals("") || overwrite) {
+				if (storedName==null || overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
 							"UPDATE users SET user_microbit = ? WHERE username = ?");
 					insertStatement.setString(1, mbName);
@@ -756,7 +777,11 @@ public class ServerApplication {
 							
 			if (rs.next()) {
 				// Retrieve the status from the result set and return it
-				return rs.getBoolean("is_locked");
+				if(rs.getInt("is_locked")==1){
+					return true;
+				}else{
+					return false;
+				}
 			} else {
 				// Handle the case when the door name is not found
 				return false;

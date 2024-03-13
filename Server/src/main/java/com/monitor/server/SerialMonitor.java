@@ -214,6 +214,17 @@ public class SerialMonitor {
                             insertStatement.setInt(4, scaledNoiseLevel);
                             insertStatement.setInt(5, scaledLightLevel);
                             insertStatement.executeUpdate();
+                            PreparedStatement getRoom = connection.prepareStatement(
+                                    "SELECT room_name FROM rooms WHERE microbit_name=?"
+                            );
+                            getRoom.setString(1, microbitName);
+                            ResultSet rs = getRoom.executeQuery();
+                            String roomName = "";
+                            if(rs.next()){
+                                roomName=rs.getString("room_name");
+                            }
+                            checkForNoti(roomName,roomID);
+
                         } else {
                             // Handle the case where the microbitName does not correspond to any room
                             System.out.println("No room found for microbitName: " + microbitName);
@@ -315,7 +326,47 @@ public class SerialMonitor {
             }
         });
     }
+    public void checkForNoti(String roomName,int roomID){
+        int maxTemp=0;int maxNL=0;int maxLL=0;
+        int currTemp=0;int currNL=0;int currLL=0;
+        boolean overTemp=false; boolean overNL=false; boolean overLL=false;
+        try {
+            PreparedStatement selectData = connection.prepareStatement(
+                    "SELECT max_temperature, max_noise_level, max_light_level FROM rooms WHERE room_name=?"
+            );
+            selectData.setString(1,roomName);
+            ResultSet maxResults = selectData.executeQuery();
+            if(maxResults.next()){
+                maxTemp=maxResults.getInt("max_Temperature");
+                maxNL=maxResults.getInt("max_noise_level");
+                maxLL=maxResults.getInt("max_light_level");
+            }
 
+            PreparedStatement getMostRecent = connection.prepareStatement(
+                    "SELECT temperature,noise_level,light_level FROM roomsenvironment WHERE room_id=? ORDER BY timestamp DESC"
+            );
+            selectData.setInt(1,roomID);
+            ResultSet mostRecent = getMostRecent.executeQuery();
+            if(mostRecent.next()){
+                currTemp=mostRecent.getInt("temperature");
+                currNL=mostRecent.getInt("noise_level");
+                currLL=mostRecent.getInt("light_level");
+            }
+            if(currTemp>maxTemp){
+                overTemp=true;
+            }
+            if(currNL>maxNL){
+                overNL=true;
+            }
+            if(currLL>maxLL){
+                overLL=true;
+            }
+
+
+        }catch (Exception e){
+
+        }
+    }
     public void panic() {
         try {
             // Retrieve all users with type "guard"
