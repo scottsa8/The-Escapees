@@ -9,7 +9,8 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
       const counts = {};
       for (const type of types) {
       const { data } = await fetchApi(`getPeople?loc=${roomName}&type=${type}`);
-      counts[type] = data.length;
+      counts[type] = data;
+      
       }
       return counts;
     };
@@ -29,7 +30,6 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}>
         <h2 className="text-xl font-semibold text-gray-600 dark:text-blue-300">{`${roomName}`}</h2>
-        {console.log(types, counts)}
         {types.map((type, index) => (
           <p key={index} className="text-gray-500 mt-2 dark:text-blue-100">{`${type}: ${counts[type]}`}</p>
         ))}
