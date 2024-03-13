@@ -9,7 +9,6 @@ export default function MicroManager() {
     const [type, setType] = useState('');
     const [name, setName] = useState('');
     const [microbit, setMicrobit] = useState('');
-    const [overwrite, setOverwrite] = useState('');
     const [roomName, setRoomName] = useState('');
     const [mbName, setMbName] = useState('');
     const [maxValues, setMaxValues] = useState('');
@@ -33,7 +32,7 @@ export default function MicroManager() {
       };
     
       const handleUpdateMB = async () => {
-        await fetchApi(`updateMB?type=${selectedOption}&name=${name}&microbit=${microbit}&overwrite=${overwrite}`);
+        await fetchApi(`updateMB?type=${selectedOption}&name=${name}&microbit=${microbit}&overwrite=true`);
         refetchNames();
         refetchRoom();
       };
@@ -74,7 +73,6 @@ export default function MicroManager() {
                 </select>
                 <input className="block w-full p-2 border rounded" value={name} onChange={e => setName(e.target.value)} placeholder="Name" />
                 <input className="block w-full p-2 border rounded" value={microbit} onChange={e => setMicrobit(e.target.value)} placeholder="Microbit Name" />
-                <input className="block w-full p-2 border rounded" value={overwrite} onChange={e => setOverwrite(e.target.value)} placeholder="Overwrite" />
                 <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMB}>Update Microbit</button>
             </div>
             <div className="space-y-2">
