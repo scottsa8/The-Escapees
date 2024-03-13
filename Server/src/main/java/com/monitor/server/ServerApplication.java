@@ -245,7 +245,7 @@ public class ServerApplication {
 				checkDoor.setString(1, doorName);
 				checkDoor.executeQuery();
 				ResultSet doorResult = selectRoomIdStatement.executeQuery();
-
+				System.out.println(doorResult.next());
 				if(doorResult.next()){
 					PreparedStatement insertDoorStatement = connection.prepareStatement(
 							"UPDATE doors SET x_coordinate=?, y_coordinate=? " +
@@ -255,9 +255,11 @@ public class ServerApplication {
 					insertDoorStatement.setInt(2, yCoordinate);
 					insertDoorStatement.setString(3, doorName);
 					insertDoorStatement.executeUpdate();
+					System.out.println("updating");
 
 					return true;
 				}else {
+					System.out.println("inserting");
 
 					// Insert the new door into the database
 					PreparedStatement insertDoorStatement = connection.prepareStatement(
@@ -274,6 +276,7 @@ public class ServerApplication {
 				}
 			} else {
 				// Handle the case when the roomName is not found
+				System.out.println("no room");
 				return false;
 			}
 		} catch (Exception e) {

@@ -45,7 +45,7 @@ const MapLoader = () => {
                                 //valid door
                                 doorsFound = doorsFound + 1;
                                 found = true
-                                break;
+                                //break;
                             }
                         }
                         
@@ -55,6 +55,7 @@ const MapLoader = () => {
                     if(doorsFound == rooms[i].doors.length){
                         validRooms = validRooms + 1;
                     }else{
+                        console.log(rooms[i].doors)
                         console.log("Invalid door found");
                     }
 
@@ -80,6 +81,11 @@ const MapLoader = () => {
         for(let i=0;i<rooms.length;i++){
             const data = await fetchApi(`setupMap?roomName=${rooms[i].name}&points=${rooms[i].coords[0][0]},${rooms[i].coords[0][1]},${rooms[i].coords[2][0]},${rooms[i].coords[2][1]}`)
             console.log(data)
+            for(let c=0;c<doors.length;c++){
+                console.log(`setupDoors?roomName=${rooms[i].name}&doorName=${doors[c].name}&xCoordinate=${parseInt(doors[c].location[0].split(",")[0])}&yCoordinate=${parseInt(doors[c].location[0].split(",")[1])}`)
+                const data2 = await fetchApi(`setupDoors?roomName=${rooms[i].name}&doorName=${doors[c].name}&xCoordinate=${parseInt(doors[c].location[0].split(",")[0])}&yCoordinate=${parseInt(doors[c].location[0].split(",")[1])}`)
+                console.log(data2)
+            }
         }
     }
 
