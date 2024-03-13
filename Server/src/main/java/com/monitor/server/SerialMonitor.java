@@ -94,12 +94,32 @@ public class SerialMonitor {
                 String data = new String(delimitedMessage);
                 data = data.strip();
                 System.out.println("INPUT:" + data);
-                 if(data == "PANIC"){
-                    System.out.println("Panicking");
-                    panic();
-                }
                 String[] sensorData = data.split(",");
                 int packetType;
+                if(sensorData[0].equals("PANIC")){
+                    System.out.println("Panicking");
+                    PreparedStatement getRoom;
+                    try {
+                        getRoom = connection.prepareStatement(
+                            "SELECT r.room_name " +
+                            "FROM users u " +
+                            "JOIN roomOccupants ro ON u.user_id = ro.user_id " +
+                            "JOIN rooms r ON ro.room_id = r.room_id " +
+                            "WHERE u.user_microbit=?"
+                        );
+
+                        getRoom.setString(1, sensorData[1]);
+                        ResultSet rs = getRoom.executeQuery();
+                        String roomName = "";
+                        if(rs.next()){
+                            roomName=rs.getString("room_name");
+                            System.out.println(roomName);
+                            panic(roomName);
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
                 try{
                     packetType= Integer.parseInt(sensorData[0]);
                 }catch (Exception e){
@@ -377,7 +397,7 @@ public class SerialMonitor {
             e.printStackTrace();
         }
     }
-    public void panic() {
+    public void panic(String fromRoom) {
         try {
             // Retrieve all users with type "guard"
             PreparedStatement selectGuardsStatement = connection.prepareStatement(
@@ -393,7 +413,7 @@ public class SerialMonitor {
 
             // Send "PANIC" message to all guard microbits
             for (String guardMicrobit : guardMicrobits) {
-                sendMessage(guardMicrobit, "PANIC");
+                sendMessage(guardMicrobit, "PANIC:"+fromRoom);
             }
         } catch (SQLException e) {
             e.printStackTrace();
