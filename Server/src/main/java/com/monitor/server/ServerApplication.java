@@ -92,7 +92,7 @@ public class ServerApplication {
 		} catch (Exception e) {
 			System.out.println("no Microbit detected");
 		}
-		transmitMessage("Ethan", "Hello testing sending a long message with a variety of different stuff in the message so that I know what is going on with the thing im working on");
+		// transmitMessage("Ethan", "Hello testing sending a long message with a variety of different stuff in the message so that I know what is going on with the thing im working on");
 		// transmitMessage(1, "Message");
 		// getPeople("Cell Block", "guard");
 	}
