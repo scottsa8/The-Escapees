@@ -47,7 +47,7 @@ export default function MicroManager() {
       }
 
     return (
-        getCookie("username") ?
+        getCookie("username") == "Admin"?
             <div className="microbit-container flex justify-between flex-no-wrap">
             <div className="space-y-4">
                 <div className="space-y-2">
