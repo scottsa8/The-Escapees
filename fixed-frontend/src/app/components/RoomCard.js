@@ -1,30 +1,24 @@
-import { useQuery } from "react-query";
+import { useQuery, useQueries } from "react-query";
 import { fetchApi } from "./apiFetcher";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import {getCookie,setCookie} from "./cookies";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
+    const { data: types, isError, isLoading } = useQuery('getTypes', () => fetchApi(`getTypes`));
+    const userCounts = useQueries(types.map(type => ({
+      queryKey: ['getPeople', roomName, type],
+      queryFn: () => fetchApi(`getPeople?loc=${roomName}&type=${type}`),
+    })));
 
-    let types=getCookie("types").split(",");
-    const [counts, setCounts] = useState({});
+    
     useEffect(() => {
-      const fetchCounts = async () => {
-        let counts = {};
-        for (const type of types) {
-          let data = await fetchApi(`getPeople?loc=${roomName}&type=${type}`);
-          counts[type] = data;
-        }
-        setCounts(counts);
-      };
-      fetchCounts();
-    }, [types, roomName]);
+      if (!isLoading && !typesLoading) {
+        console.log(userCounts);
+        console.log(types);
+      }
+    }, [isLoading, typesLoading, userCounts, types]);
 
-    async function getTypes(){
-      let d = await fetchApi(`getTypes`);
-      setCookie("types",d);
-  }
-  getTypes();
   
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
