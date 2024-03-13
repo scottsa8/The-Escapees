@@ -5,16 +5,19 @@ import { useState, useEffect } from "react";
 import {getCookie,setCookie} from "./cookies";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
-    const { data: types, isError, isLoading } = useQuery('getTypes', () => fetchApi(`getTypes`)).filter(type => type !== 'admin');
-    const [userCounts, setUserCounts] = useState([]);
+    const { data: types, isError, isLoading } = useQuery('getTypes', () => fetchApi(`getTypes`));
+    const [typeQueries, setTypeQueries] = useState([]);
+    
     useEffect(() => {
-      if (!isLoading) {
-        setUserCounts(useQueries(types.map(type => ({
+      if (types) {
+        setTypeQueries(types.map(type => ({
           queryKey: ['getPeople', roomName, type],
           queryFn: () => fetchApi(`getPeople?loc=${roomName}&type=${type}`),
-        }))));
+        })));
       }
-    }, [isLoading, types]);
+    }, [types, roomName]);
+    
+    const userCounts = useQueries(typeQueries);
   
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
