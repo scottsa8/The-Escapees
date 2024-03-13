@@ -1,4 +1,5 @@
 import { setCookie } from "../cookies";
+import { fetchApi } from "../apiFetcher";
 
 const MapLoader = () => {
 
