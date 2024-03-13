@@ -14,7 +14,14 @@ export default function MicroManager() {
     const [mbName, setMbName] = useState('');
     const [maxValues, setMaxValues] = useState('');
     const [selectedOption, setSelectedOption] = useState('initial');
- 
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [userType, setUserType] = useState('');
+   
+    const handleCreateAccount = async () => {
+        await fetchApi(`createAcc?user=${username}&pass=${password}&type=${type}`);
+      };
+      
     const handleAddRoom = async () => {
         await fetchApi(`addNode?roomName=${roomName}&mb=${mbName}&maxes=${maxValues}`);
         refetchRoom();
@@ -70,7 +77,16 @@ export default function MicroManager() {
                 <input className="block w-full p-2 border rounded" value={overwrite} onChange={e => setOverwrite(e.target.value)} placeholder="Overwrite" />
                 <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMB}>Update Microbit</button>
             </div>
-           
+            <div className="space-y-2">
+                <input className="block w-full p-2 border rounded" type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username"/>
+                <input className="block w-full p-2 border rounded" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password"/>
+                <input className="block w-full p-2 border rounded" type="text" value={userType} onChange={e => setUserType(e.target.value)} placeholder="Type"/>
+                <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" type="submit">Create Account</button>
+            </div>
+
+
+
+
         </div>
         <div className="w-1/2 m-2">
             <TableContainer component={Paper}>
