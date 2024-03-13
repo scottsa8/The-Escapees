@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import {getCookie,setCookie} from "./cookies";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
-
+  getTypes();
     let types=getCookie("types").split(",");
     const [counts, setCounts] = useState({});
     useEffect(() => {
@@ -24,7 +24,7 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
       let d = await fetchApi(`getTypes`);
       setCookie("types",d);
   }
-  getTypes();
+  
   
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
