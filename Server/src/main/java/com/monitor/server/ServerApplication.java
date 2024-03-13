@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Guard;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -437,22 +438,20 @@ public class ServerApplication {
 
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value = "loc") String loc,
-			@RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
+						  @RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
 		int total = 0;
-
-		try {
-		PreparedStatement selectStatement = connection.prepareStatement(
-				"SELECT COUNT(*) AS total_people " +
+	
+		try (PreparedStatement selectStatement = connection.prepareStatement(
+				"SELECT COUNT(DISTINCT ro.user_id) AS total_people " +
 						"FROM roomOccupants ro " +
+						"JOIN (SELECT user_id, MAX(entry_timestamp) AS max_timestamp " +
+						"      FROM roomOccupants " +
+						"      GROUP BY user_id) latest ON ro.user_id = latest.user_id " +
 						"JOIN rooms r ON ro.room_id = r.room_id " +
-						"JOIN users u ON ro.user_id = u.user_id " +
-						"WHERE r.room_name = ? AND u.user_type = ?"
-		);
-
-
+						"WHERE r.room_name = ? AND ro.entry_timestamp = latest.max_timestamp")) {
+	
 			selectStatement.setString(1, loc);
-			selectStatement.setString(2, type);
-
+	
 			try (ResultSet rs = selectStatement.executeQuery()) {
 				// Retrieve the total count
 				if (rs.next()) {
@@ -462,9 +461,11 @@ public class ServerApplication {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+	
 		return total;
 	}
+	
+	
 
 	@GetMapping("/getRooms")
 	private String getRooms() {
@@ -768,7 +769,7 @@ public class ServerApplication {
 				}
 			} else {
 				// Handle the case when the door name is not found
-				return false;
+				return true;
 			}
 
 		} catch (SQLException e) {

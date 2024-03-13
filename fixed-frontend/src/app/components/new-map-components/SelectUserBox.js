@@ -18,8 +18,8 @@ const SelectUserBox = () => {
         }else{
             console.log(data)
 
-            ///THIS NEEDS TO BE FINISHED, COMPARE TO ROOMSELECTOR.JS
-            const trackedNames = data.names.data//This will need checking idk if '.names' is correct
+            //maps the data to get an array of trackedNames
+            const trackedNames = data.names.data
             .map(roomObj => roomObj.username);
             setTrackedUsers(trackedNames);
             console.log(trackedNames)
