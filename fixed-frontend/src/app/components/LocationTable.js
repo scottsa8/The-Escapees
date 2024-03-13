@@ -126,15 +126,14 @@ const LocationTable = () => {
       </div>
       )}
 
-    ShowMessagePopup && (
+    {ShowMessagePopup && (
         <div className="absolute bottom-10 rounded-lg shadow-lg left-20 p-4 z-20 bg-sky-500 ">
           <form>
             <input type="text" placeholder="Enter your message" value={message} onChange={e => setMessage(e.target.value)}/>
             <button onClick={() => {fetchApi(`transmitMessage?username=${user}&message=${message}`); setShowMessagePopup(false)}}>Send</button>
           </form>
       </div> 
-    </div>
-  );
+    )};
+</div>)
 }
- 
 export default LocationTable;
