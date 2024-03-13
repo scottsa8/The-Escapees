@@ -13,7 +13,8 @@ export default function MicroManager() {
     const [roomName, setRoomName] = useState('');
     const [mbName, setMbName] = useState('');
     const [maxValues, setMaxValues] = useState('');
-
+    const [selectedOption, setSelectedOption] = useState('user');
+ 
     const handleAddRoom = async () => {
         await fetchApi(`addNode?roomName=${roomName}&mb=${mbName}&maxes=${maxValues}`);
         refetchRoom();
@@ -66,6 +67,11 @@ export default function MicroManager() {
             </div>
             <div className="space-y-2">
                 <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100"></h2>
+                <select value={selectedOption} onChange={e => setSelectedOption(e.target.value)}>
+                <option value="user">User</option>
+                <option value="room">Room</option>
+                </select>
+                   
                 <input className="block w-full p-2 border rounded" value={type} onChange={e => setType(e.target.value)} placeholder="Type" />
                 <input className="block w-full p-2 border rounded" value={name} onChange={e => setName(e.target.value)} placeholder="Name" />
                 <input className="block w-full p-2 border rounded" value={microbit} onChange={e => setMicrobit(e.target.value)} placeholder="Microbit Name" />
