@@ -13,7 +13,7 @@ export default function MicroManager() {
     const [roomName, setRoomName] = useState('');
     const [mbName, setMbName] = useState('');
     const [maxValues, setMaxValues] = useState('');
-    const [selectedOption, setSelectedOption] = useState('user');
+    const [selectedOption, setSelectedOption] = useState('initial');
  
     const handleAddRoom = async () => {
         await fetchApi(`addNode?roomName=${roomName}&mb=${mbName}&maxes=${maxValues}`);
@@ -58,26 +58,19 @@ export default function MicroManager() {
             </div>
 
             <div className="space-y-2">
+                
                 <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Update Microbit</h2>
-                <input className="block w-full p-2 border rounded" value={type} onChange={e => setType(e.target.value)} placeholder="Type" />
-                <input className="block w-full p-2 border rounded" value={name} onChange={e => setName(e.target.value)} placeholder="Name" />
-                <input className="block w-full p-2 border rounded" value={microbit} onChange={e => setMicrobit(e.target.value)} placeholder="Microbit Name" />
-                <input className="block w-full p-2 border rounded" value={overwrite} onChange={e => setOverwrite(e.target.value)} placeholder="Overwrite" />
-                <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMB}>Update Microbit</button>
-            </div>
-            <div className="space-y-2">
-                <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100"></h2>
                 <select value={selectedOption} onChange={e => setSelectedOption(e.target.value)}>
+                <option value={"initial"}disabled={true}>Select a Type</option>
                 <option value="user">User</option>
                 <option value="room">Room</option>
                 </select>
-                   
-                <input className="block w-full p-2 border rounded" value={type} onChange={e => setType(e.target.value)} placeholder="Type" />
                 <input className="block w-full p-2 border rounded" value={name} onChange={e => setName(e.target.value)} placeholder="Name" />
                 <input className="block w-full p-2 border rounded" value={microbit} onChange={e => setMicrobit(e.target.value)} placeholder="Microbit Name" />
                 <input className="block w-full p-2 border rounded" value={overwrite} onChange={e => setOverwrite(e.target.value)} placeholder="Overwrite" />
                 <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMB}>Update Microbit</button>
             </div>
+           
         </div>
         <div className="w-1/2 m-2">
             <TableContainer component={Paper}>

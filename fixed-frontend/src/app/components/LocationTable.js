@@ -6,7 +6,7 @@ import { useTheme } from '@table-library/react-table-library/theme';
 import { DEFAULT_OPTIONS, getTheme } from '@table-library/react-table-library/mantine';
 import { fetchApi } from "./apiFetcher";
 import { useQuery } from 'react-query';
-import { MessageIcon } from './heroIcons'
+import  {MesssageIcon}  from './heroIcons';
 
 //Table containing the locations of users
 const LocationTable = () => { 
@@ -16,7 +16,7 @@ const LocationTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [locations, setLocations] = useState([]);
-  const [setShowMessagePopup, ShowMessagePopup] = useState(false);
+  const [ShowMessagePopup, setShowMessagePopup] = useState(false);
   const [user, SelectUser] = useState("");
   const [message, setMessage] = useState('');
   
@@ -104,9 +104,9 @@ const LocationTable = () => {
                 setLocations(locations);
                 setShowPopup(true);
               }}>
-                <MessageIcon className="w-6 h-6" onClick={() => {setShowMessagePopup(true);SelectUser(item.name)}}/>
                 <Cell>
-                {item.name}</Cell>
+                {item.name}<button onClick={() => {setShowMessagePopup(true);SelectUser(item.name)}}><MesssageIcon className="w-6 h-6"/></button>
+                </Cell>
                 <Cell>{item.loc}</Cell>
               </Row>
           ))}
@@ -119,7 +119,7 @@ const LocationTable = () => {
           <ul>
             {locations.map((location, index) => (
               <li key={index}>
-                {location.loc} -- {location.time}
+                {location.loc} "-- {location.time}
               </li>
             ))}
           </ul>
