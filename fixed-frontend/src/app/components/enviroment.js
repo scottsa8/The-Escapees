@@ -33,9 +33,9 @@ export default function EnviromentContainer(){
         const data = await fetchApi(`getEnv?loc=${selectedLocation}&order=DESC`);
         let realData = data.environment.data[0]; //index of the data 
         if(realData==undefined){
-            throw new Error("no room in DB")
+            // throw new Error("no room in DB")
         }else if(realData.error =="Room not found"){
-            throw new Error("no room in DB")
+            // throw new Error("no room in DB")
         }else{
             let newValues = {
               temp: realData.Temperature,

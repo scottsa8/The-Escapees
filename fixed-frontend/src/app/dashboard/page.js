@@ -110,13 +110,13 @@ const Dashboard = () => {
     if (notification) {
       console.log(notification.noti.data[0].maxTemp)
       if (notification.noti.data[0].maxTemp==="true") {
-        sendNotification("Max Value Reached", notification.noti.data[0].roomName + " has reached its max Temperature" +notification.noti.data[0].timestamp);
+        sendNotification(notification.noti.data[0].roomName + " has reached its max Temperature at " +notification.noti.data[0].timestamp);
       }
       if (notification.noti.data[0].maxNL==="true") {
-        sendNotification("Max Value Reached", notification.noti.data[0].roomName + " has reached its max Noise "+notification.noti.data[0].timestamp);
+        sendNotification(notification.noti.data[0].roomName + " has reached its max Noise at "+notification.noti.data[0].timestamp);
       }
       if (notification.noti.data[0].maxLL==="true") {
-        sendNotification("Max Value Reached", notification.noti.data[0].roomName + " has reached its max Light "+notification.noti.data[0].timestamp);
+        sendNotification(notification.noti.data[0].roomName + " has reached its max Light at "+notification.noti.data[0].timestamp);
       }
     }
   }, [notification]);
@@ -219,7 +219,8 @@ const Dashboard = () => {
                   <div className={`notif-card p-4 mb-4 relative bg-gray-100 dark:bg-gray-700 rounded-lg ${deleting === index ? 'deleting' : ''}`} key={index}>  
                     <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1 text-gray-800 hover:text-red-500 rounded-full">X</button>
                     <h1 className="text-lg font-bold">{notification.title}</h1>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{notification.options}</p>
+                    {console.log(notification.options)}
+                    <p className="mt-2 text-sm text-gray-300 dark:text-gray-600">{notification.options}</p>
                   </div>
                 ))}
               </div>
@@ -247,7 +248,7 @@ const Dashboard = () => {
           onClick={async () => {
             try {
               await fetchApi('panic');
-              sendNotification("Panic Button Pressed", "A panic button has been pressed in the prison system");
+              sendNotification("Panic Button Pressed", "A panic button has been pressed in the "+await fetchApi("getDomain")+ " system at "+new Date().toUTCString());
             } catch (error) {
               console.error('Error:', error);
             }
