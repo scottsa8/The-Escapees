@@ -179,6 +179,8 @@ def main():
                     radio.config(channel=21)  # Change to the appropriate channel
                     radio.send(acknowledgment)
                     radio.config(channel=22)  # Change back to the original channel
+            if(components[1] == "Recv"):
+                print("dropped recv packet")
 
             # #update the list for the user's location
             hasLocation = decodeMessage(message)

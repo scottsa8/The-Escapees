@@ -372,6 +372,9 @@ public class SerialMonitor {
                 // Create a new packet with microbit name, packet number, and packet data
                 String packetMessage = microbitName + "," + packetNumber + "," + new String(packetBytes, "UTF-8");
                 System.out.println(packetMessage);
+            
+                String initMessage = microbitName + "," + "Recv";
+                microbit.writeBytes(initMessage.getBytes("UTF-8"), initMessage.length());
     
                 // Send the full packet to the receiver microbit
                 microbit.writeBytes(packetMessage.getBytes("UTF-8"), packetMessage.length());

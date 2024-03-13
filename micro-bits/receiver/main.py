@@ -20,6 +20,7 @@ def sendDataFromServer():
             line, uart_buffer = uart_buffer.split(b'\n', 1)
             decodedMessage = line.decode('utf-8').strip()
             print(decodedMessage)  # Print raw data for debugging
+            display.scroll(decodedMessage)
             radio.send(decodedMessage)
         
         radio.config(channel=21)
