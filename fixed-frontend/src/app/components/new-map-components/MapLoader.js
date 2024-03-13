@@ -1,4 +1,4 @@
-import { setCookie } from "next/headers";
+import { setCookie } from "../cookies";
 
 const MapLoader = () => {
 
