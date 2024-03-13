@@ -371,7 +371,7 @@ public class SerialMonitor {
             if(currLL>maxLL){
                 overLL=true;
             }
-            ServerApplication.setNoti(roomName, String.valueOf(timestamp),overTemp,overNL,overLL);
+            ServerApplication.setNoti(roomName, String.valueOf(timestamp).substring(0,String.valueOf(timestamp).length()-5),overTemp,overNL,overLL);
 
         }catch (Exception e){
             e.printStackTrace();

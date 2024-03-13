@@ -108,14 +108,15 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (notification) {
-      if (notification.noti.data.maxTemp) {
-        sendNotification("Max Value Reached", notification.noti.data.roomName + " has reached its max Temperature"+notification.noti.data.timestamp);
+      console.log(notification.noti.data[0].maxTemp)
+      if (notification.noti.data[0].maxTemp==="true") {
+        sendNotification("Max Value Reached", notification.noti.data[0].roomName + " has reached its max Temperature" +notification.noti.data[0].timestamp);
       }
-      if (notification.noti.data.maxNL) {
-        sendNotification("Max Value Reached", notification.noti.data.roomName + " has reached its max Noise"+notification.noti.data.timestamp);
+      if (notification.noti.data[0].maxNL==="true") {
+        sendNotification("Max Value Reached", notification.noti.data[0].roomName + " has reached its max Noise "+notification.noti.data[0].timestamp);
       }
-      if (notification.noti.data.maxLL) {
-        sendNotification("Max Value Reached", notification.noti.data.roomName + " has reached its max Light"+notification.noti.data.timestamp);
+      if (notification.noti.data[0].maxLL==="true") {
+        sendNotification("Max Value Reached", notification.noti.data[0].roomName + " has reached its max Light "+notification.noti.data[0].timestamp);
       }
     }
   }, [notification]);
