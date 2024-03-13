@@ -64,6 +64,14 @@ export default function MicroManager() {
                 <input className="block w-full p-2 border rounded" value={overwrite} onChange={e => setOverwrite(e.target.value)} placeholder="Overwrite" />
                 <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMB}>Update Microbit</button>
             </div>
+            <div className="space-y-2">
+                <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100"></h2>
+                <input className="block w-full p-2 border rounded" value={type} onChange={e => setType(e.target.value)} placeholder="Type" />
+                <input className="block w-full p-2 border rounded" value={name} onChange={e => setName(e.target.value)} placeholder="Name" />
+                <input className="block w-full p-2 border rounded" value={microbit} onChange={e => setMicrobit(e.target.value)} placeholder="Microbit Name" />
+                <input className="block w-full p-2 border rounded" value={overwrite} onChange={e => setOverwrite(e.target.value)} placeholder="Overwrite" />
+                <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMB}>Update Microbit</button>
+            </div>
         </div>
         <div className="w-1/2 m-2">
             <TableContainer component={Paper}>
