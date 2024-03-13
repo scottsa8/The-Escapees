@@ -1,11 +1,12 @@
 import { useQuery } from "react-query";
 import { fetchApi } from "./apiFetcher";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {getCookie,setCookie} from "./cookies";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
 
-    const { data: types } = useQuery('getTypes', () => fetchApi(`getTypes`));
+    let types=getCookie("types").split(",");
     const [counts, setCounts] = useState({});
     useEffect(() => {
       const fetchCounts = async () => {
@@ -19,8 +20,12 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
       fetchCounts();
     }, [types, roomName]);
 
-    const isLoadingCounts = !types || Object.keys(counts).length !== types.length;
-
+    async function getTypes(){
+      let d = await fetchApi(`getTypes`);
+      setCookie("types",d);
+  }
+  getTypes();
+  
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
       : (counts[0] <= counts[1] * 0.25 && counts[1] !== 0 && fetchApi('getDomain') === 'Prison')
@@ -34,7 +39,7 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
         transition={{ type: "spring", stiffness: 400, damping: 17 }}>
         <h2 className="text-xl font-semibold text-gray-600 dark:text-blue-300">{`${roomName}`}</h2>
         {types.map((type, index) => (
-          <p key={index} className="text-gray-500 mt-2 dark:text-blue-100">{`${type}: ${counts[type]}`}</p>
+          <p key={index} className="text-gray-500 mt-2 dark:text-blue-100">{`${type.charAt(0).toUpperCase() + type.slice(1)}: ${counts[type]}`}</p>
         ))}
         <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${Object.values(counts).reduce((sum, count) => sum + count, 0)}`}</p>
       </motion.div>

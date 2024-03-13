@@ -8,7 +8,7 @@ const HomePage = () => {
             <EnviromentContainer/>
             {/* <LocationCountBox/> */}
         </>
-    );
+    );    
 }
  
 export default HomePage;
