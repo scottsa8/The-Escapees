@@ -5,13 +5,12 @@ import { useState, useEffect } from "react";
 import {getCookie,setCookie} from "./cookies";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
-    const { data: types, isError, isLoading } = useQuery('getTypes', () => fetchApi(`getTypes`));
+    const { data: types, isError, isLoading } = useQuery('getTypes', () => fetchApi(`getTypes`)).filter(type => type !== 'admin');
     const userCounts = useQueries(types.map(type => ({
       queryKey: ['getPeople', roomName, type],
       queryFn: () => fetchApi(`getPeople?loc=${roomName}&type=${type}`),
     })));
 
-    
     useEffect(() => {
       if (!isLoading && !typesLoading) {
         console.log(userCounts);
