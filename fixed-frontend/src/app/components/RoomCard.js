@@ -6,18 +6,19 @@ import {getCookie,setCookie} from "./cookies";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
     const { data: types, isError, isLoading } = useQuery('getTypes', () => fetchApi(`getTypes`)).filter(type => type !== 'admin');
+    const [userCounts, setUserCounts] = useState([]);
     useEffect(() => {
       if (!isLoading) {
-        const userCounts = useQueries(types.map(type => ({
+        setUserCounts(useQueries(types.map(type => ({
           queryKey: ['getPeople', roomName, type],
           queryFn: () => fetchApi(`getPeople?loc=${roomName}&type=${type}`),
-        })));
+        }))));
       }
-    }, [isLoading, userCounts, types]);
+    }, [isLoading, types]);
   
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
-      : (counts[0] <= counts[1] * 0.25 && counts[1] !== 0 && fetchApi('getDomain') === 'Prison')
+      : (userCounts[0] <= userCounts[1] * 0.25 && userCounts[1] !== 0 && fetchApi('getDomain') === 'Prison')
           ? "bg-red-500 dark:bg-red-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
           : "bg-white dark:bg-gray-700 text-gray-600 dark:text-blue-100 shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer";
 
