@@ -123,16 +123,6 @@ def decodeMessage(message):
         hasLocation = True
     return hasLocation
 
-def check_double_press(button_pin):
-    first_press = button_pin.is_pressed()
-    sleep(DOUBLE_PRESS_DELAY)
-    second_press = button_pin.is_pressed()
-    return first_press and second_press
-
-def panic():
-    music.play(['F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6'])
-    display.scroll("PANIC")
-
 def main():
     global name
     radio.on()
@@ -147,19 +137,27 @@ def main():
             #scroll name of microbit
             display.scroll(name)
 
-        if(button_b.is_pressed()):
-            panic()
-            radio.config(channel=21)
-            radio.send("PANIC")
+        if button_b.is_pressed():
+            while True:
+                music.play(['F#5:1'])
+                sleep(100)
+                if button_b.is_pressed():
+                    break
+                elif button_a.is_pressed():
+                    music.play(['F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6'])
+                    display.scroll("PANIC")
+                    radio.config(channel=21)
+                    radio.send("PANIC,"+name)
+                    break
 
         if message:
             message_str = message[0][3:].decode('utf-8')
-            if "PANIC" in message_str and name in message_str:
-                panic()
-
             # Split the message into components
             components = message_str.split(',')
             # display.scroll(message_str)
+            if "PANIC" in message_str and name in message_str:
+                music.play(['F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6'])
+                display.scroll(components[1])
 
             # #update the list for the user's location
             hasLocation = decodeMessage(message)
