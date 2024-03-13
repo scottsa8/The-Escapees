@@ -3,6 +3,7 @@ import {fetchApi, getEnvData} from "../apiFetcher";
 import Room from "./Room";
 import Door from "./Door";
 import { getCookie } from "../cookies";
+import { useQuery } from "react-query";
 
 const RoomCanvas = () => {
 
@@ -71,12 +72,13 @@ const RoomCanvas = () => {
     /**
      * Fetches the rooms from the database and creates corresponding objects ready to be drawn
      */
+    const { data: roomData, isError, refetch, isFetching } = useQuery('AllRoomData', async () => {const data = fetchApi('getAllRoomData'); return data;});
+
     async function loadRooms(){
 
         let tempRoomArr = [];//tempoary array to store created rooms in.
 
         //FETCH ROOMS FROM DB
-        let roomData = await fetchApi("getAllRoomData");
         if(roomData!=undefined){
             roomData = roomData.rooms.data;
         }
@@ -238,7 +240,7 @@ const RoomCanvas = () => {
 
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
-            loadRooms();
+            isFetching() ? loadRooms() : console.log("Data fetch ignored");
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
