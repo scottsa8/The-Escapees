@@ -39,20 +39,19 @@ const themes = {
     "--light-banner-colour": "#B7B6B7",
     "--light-sidebar": "#D9D9D9",
     "--light-title-colour": "black",
+    "--light-card": "#BDBDBC",
 
     "--dark-body-background": "#22314f",
     "--dark-sidebar-background": "#1b2030",
     "--dark-sidebar-main": "#DBE9FE",
     "--dark-banner-gradient": "linear-gradient(to right, #1d2232, #1b2030)",
-    "--dark-title-colour": "#dbeafe"
+    "--dark-title-colour": "#dbeafe",
+    "--dark-card": "#374151",
     },
     lightBrand: <Image src="/prison-logo.png" height={50} width={70} />,
     darkBrand: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />,
-    darkBg: <Image
-            src="/prison-background.png"
-            layout="fill"
-            objectFit="cover"
-            quality={100}/>
+    lightBg: <Image src="/Prison-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
+    darkBg: <Image src="/Prison-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
   },
   hotel: {
     title: "SCC Luxury",
@@ -61,20 +60,20 @@ const themes = {
       "--light-banner-colour": "#ffee97",
       "--light-sidebar": "#ffee97",
       "--light-title-colour": "black",
+      "--light-card": "#fffde3",
 
       "--dark-body-background": "#22314f",
       "--dark-sidebar-background": "#1b2030",
       "--dark-sidebar-main": "#DBE9FE",
       "--dark-banner-gradient": "linear-gradient(to right, #5D2E0C, #5D2E0C)",
-      "--dark-title-colour": "#dbeafe"
+      "--dark-title-colour": "#dbeafe",
+      "--dark-card": "#846656"
     },
     lightBrand:<Image src="/hotel-logo.png" height={50} width={70} />,
     darkBrand: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />,
-    darkBg: <Image
-            src="/hotel-background.png"
-            layout="fill"
-            objectFit="cover"
-            quality={100}/>
+    lightBg: <Image src="/Hotel-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>,
+    darkBg: <Image src="/Hotel-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
+
   }
 }
 
@@ -173,7 +172,7 @@ const Dashboard = () => {
       {/* <title>{currentView.pageTitle} - Prison System</title> */}
       <body>
         <div className="h-full fixed w-full overflow-hidden -z-10">
-                    {themes[currentDomain].darkBg}
+          {isLightTheme?themes[currentDomain].lightBg:themes[currentDomain].darkBg}
         </div>
         <div className="banner">
           <div className="flex px-4">
