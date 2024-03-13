@@ -6,6 +6,7 @@ import { useTheme } from '@table-library/react-table-library/theme';
 import { DEFAULT_OPTIONS, getTheme } from '@table-library/react-table-library/mantine';
 import { fetchApi } from "./apiFetcher";
 import { useQuery } from 'react-query';
+import { MessageIcon } from './heroIcons'
 
 //Table containing the locations of users
 const LocationTable = () => { 
@@ -99,6 +100,7 @@ const LocationTable = () => {
                 let locations = await getAllLocations(item.name);
                 setLocations(locations);
                 setShowPopup(true);
+                <MessageIcon className="w-6 h-6" />
               }}>
                 <Cell>
                 {item.name}</Cell>
