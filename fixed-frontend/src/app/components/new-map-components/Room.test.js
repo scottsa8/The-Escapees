@@ -111,3 +111,91 @@ describe("Click functionality", ()=>{
         expect(roomInstance.checkClick(2,2)).toBe(undefined);//null
     });
 });
+//tests for if the correct icons are added to the array, ready to be drawn
+describe("Chcking environmental icons", ()=>{
+    test("Add icon for temperature", ()=>{
+        const roomInstance = new Room("new room", [[1,1],[3,1],[3,3],[1,3]], null);
+        Room.maxValues.temp = 30;
+
+        //on boundary
+        roomInstance.setAndCheckEnvironmentalData(30,0,0);
+        expect(roomInstance.toShow).not.toContain(Room.tempIcon);
+
+        //below threshold
+        roomInstance.setAndCheckEnvironmentalData(0,0,0);
+        expect(roomInstance.toShow).not.toContain(Room.tempIcon);
+
+        //above threshold
+        roomInstance.setAndCheckEnvironmentalData(31,0,0);
+        expect(roomInstance.toShow).toContain(Room.tempIcon);
+
+    });
+    test("Add icon for light level", ()=>{
+        const roomInstance = new Room("new room", [[1,1],[3,1],[3,3],[1,3]], null);
+        Room.maxValues.light = 30;
+
+        //on boundary
+        roomInstance.setAndCheckEnvironmentalData(0,0,30);
+        expect(roomInstance.toShow).not.toContain(Room.lightIcon);
+
+        //below threshold
+        roomInstance.setAndCheckEnvironmentalData(0,0,0);
+        expect(roomInstance.toShow).not.toContain(Room.lightIcon);
+
+        //above threshold
+        roomInstance.setAndCheckEnvironmentalData(0,0,31);
+        expect(roomInstance.toShow).toContain(Room.lightIcon);
+
+    });
+    test("Add icon for noise level", ()=>{
+        const roomInstance = new Room("new room", [[1,1],[3,1],[3,3],[1,3]], null);
+        Room.maxValues.noise = 30;
+
+        //on boundary
+        roomInstance.setAndCheckEnvironmentalData(0,30,0);
+        expect(roomInstance.toShow).not.toContain(Room.noiseIcon);
+
+        //below threshold
+        roomInstance.setAndCheckEnvironmentalData(0,0,0);
+        expect(roomInstance.toShow).not.toContain(Room.noiseIcon);
+
+        //above threshold
+        roomInstance.setAndCheckEnvironmentalData(0,31,0);
+        expect(roomInstance.toShow).toContain(Room.noiseIcon);
+
+    });
+    test("Icons for two environmental notifications added", () =>{
+        const roomInstance = new Room("new room", [[1,1],[3,1],[3,3],[1,3]], null);
+        Room.maxValues.noise = 30;
+        Room.maxValues.light = 30;
+        Room.maxValues.temp = 30;
+
+        //Temperature and Noise
+        roomInstance.setAndCheckEnvironmentalData(31,31,0);
+        expect(roomInstance.toShow).toEqual([Room.tempIcon, Room.noiseIcon]);
+
+        //Temperature and Light
+        roomInstance.setAndCheckEnvironmentalData(31,0,31);
+        expect(roomInstance.toShow).toEqual([Room.tempIcon, Room.lightIcon]);
+
+        //Noise and Light
+        roomInstance.setAndCheckEnvironmentalData(0,31,31);
+        expect(roomInstance.toShow).toEqual([Room.noiseIcon,Room.lightIcon]);
+    });
+    test("All icons for environmental notifications added", () =>{
+        const roomInstance = new Room("new room", [[1,1],[3,1],[3,3],[1,3]], null);
+        Room.maxValues.noise = 30;
+        Room.maxValues.light = 30;
+        Room.maxValues.temp = 30;
+
+        //All 3 environmental inputs are over the limit
+        roomInstance.setAndCheckEnvironmentalData(31,31,31);
+        expect(roomInstance.toShow).toEqual([Room.tempIcon, Room.noiseIcon, Room.lightIcon]);
+
+        //None of the environmental inputs are over the limit
+        roomInstance.setAndCheckEnvironmentalData(0,0,0);
+        expect(roomInstance.toShow).toEqual([]);
+
+    });
+
+})

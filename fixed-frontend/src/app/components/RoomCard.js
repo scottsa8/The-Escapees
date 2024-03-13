@@ -13,13 +13,13 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
     if (isLoadingInmateCount || isLoadingGuardCount) return 'Loading...';
 
       const cardStyle = isSelected 
-      ? {color: 'DBE9FE', backgroundColor: '#1B2030', cursor: 'pointer' } 
+      ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
       : (guardCount <= inmateCount * 0.25 && inmateCount !== 0)
-          ? { backgroundColor: '#5c251a', cursor: 'pointer' } 
-          : { cursor: 'pointer' };
+          ? "bg-red-500 dark:bg-red-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
+          : "bg-white dark:bg-gray-700 text-gray-600 dark:text-blue-100 shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer";
 
     return (
-      <motion.div onClick={onClick} style={cardStyle} className="bg-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 dark:bg-gray-700 dark:text-blue-100"
+      <motion.div onClick={onClick} className={cardStyle}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}>

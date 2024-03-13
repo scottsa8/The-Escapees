@@ -5,9 +5,10 @@ import {PlusIcon,CloseIcon,SettingsIcon} from './heroIcons'
 import { fetchApi } from './apiFetcher';
 import { useQuery } from 'react-query';
 import {motion} from 'framer-motion';
+import MapLoader from './new-map-components/MapLoader';
 
 //Hook to set if the light theme is active or not
-export default function Settings({dashThemeHook}) {
+export default function Settings({dashThemeHook,dashDomainChange}) {
     const [temp, setTemp] = useState(30);
     const [noise, setNoise] = useState(30);
     const [light, setLight] = useState(30);
@@ -20,7 +21,10 @@ export default function Settings({dashThemeHook}) {
     const { data: domains, refetch: refetchDomains } = useQuery('domains', () => fetchApi("getDomains"), { initialData: ['Hotel', 'Prison'] });
     const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'Prison' });
 
+
+
     const selectDomain = async (domain) => {
+        dashDomainChange(domain)
         await fetchApi("setDomain?domain="+domain);
         refetchSelectedDomain();
     };
@@ -141,8 +145,12 @@ export default function Settings({dashThemeHook}) {
                     />
                     <div className="text-right text-sm">{light}</div>
                 </div>
+                <div className="settings-width flex-grow card shadow-md m-4 p-4">
+                <h1 className="text-xl font-bold mb-4">Upload New Map</h1>
+                    <MapLoader></MapLoader>
+                </div>
                 <div className="domains-container flex flex-wrap flex-row">
-                {domains.map((domain, index) => (
+                {Array.isArray(domains) && domains.length > 0 && domains.map((domain, index) => (
                     <motion.div key={index} onClick={() => selectDomain(domain)} className={`domain-dimensions card shadow-md m-4 p-4 ${domain === selectedDomain ? 'selected-color' : ''}`}
                         layoutId={domain.toLowerCase()} 
                         whileHover={{ scale: 1.05 }}
