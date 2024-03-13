@@ -31,8 +31,7 @@ export default function EnviromentContainer(){
 
     const { data: envData, isError: envError, refetch } = useQuery(['environmentData', selectedLocation], async () => {
         const data = await fetchApi(`getEnv?loc=${selectedLocation}&order=DESC`);
-        console.log(data)
-        let realData = data.environment.data[0]; //index of the data you want from array 0 = most recent      
+        let realData = data.environment.data[0]; //index of the data 
         if(realData==undefined){
             throw new Error("no room in DB")
         }else if(realData.error =="Room not found"){
