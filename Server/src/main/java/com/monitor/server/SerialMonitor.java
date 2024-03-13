@@ -348,17 +348,9 @@ public class SerialMonitor {
     }
 
     public void sendMessage(String microbitName, String message) { 
-        // // Microbit truncates first packet, so initialize with an opening message to avoid this issue
-        // try {
-        //     microbit.writeBytes("rec".getBytes("UTF-8"), 3);
-        // } catch (UnsupportedEncodingException e) {
-        //     e.printStackTrace();
-        // }
-
         if (microbit != null && microbit.isOpen()) {
             // Store the message in the map
             messageMap.put(microbitName, message);
-
             try {
                 // Convert the message to bytes
                 byte[] messageBytes = message.getBytes("UTF-8");
@@ -370,10 +362,10 @@ public class SerialMonitor {
                 byte[] packetBytes = Arrays.copyOfRange(messageBytes, startIdx, endIdx);
     
                 // Create a new packet with microbit name, packet number, and packet data
-                String packetMessage = microbitName + "," + packetNumber + "," + new String(packetBytes, "UTF-8");
+                String packetMessage ="."+microbitName+","+packetNumber+","+new String(packetBytes, "UTF-8");
                 System.out.println(packetMessage);
             
-                String initMessage = microbitName + "," + "Recv";
+                String initMessage = "Recv";
                 microbit.writeBytes(initMessage.getBytes("UTF-8"), initMessage.length());
     
                 // Send the full packet to the receiver microbit
@@ -393,9 +385,15 @@ public class SerialMonitor {
             String[] parts = data.substring(1).split(",");
             if (parts.length >= 2) {
                 // Extract microbit name and packet number
-                String microbitName = parts[0];
-                int packetNumber = Integer.parseInt(parts[1]);
-    
+                String microbitName = parts[1];
+                int packetNumber = Integer.parseInt(parts[2]) + 1; // Get the packet after the one acknowledged
+
+
+                // Iterate over the entry set and print each entry
+                for (Map.Entry<String, String> entry : messageMap.entrySet()) {
+                    System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+                }
+
                 // Check if there's a stored message for the microbit
                 if (messageMap.containsKey(microbitName)) {
                     // Retrieve the stored message
@@ -408,12 +406,12 @@ public class SerialMonitor {
                     // Check if the packet number is within the valid range
                     if (packetNumber > 0 && packetNumber <= totalPackets) {
                         // Calculate the start and end indices for the current packet
-                        int startIdx = (packetNumber - 1) * packetSize;
-                        int endIdx = Math.min(packetNumber * packetSize, messageBytes.length);
+                        int startIdx = (packetNumber) * packetSize;
+                        int endIdx = startIdx + packetSize;
                         byte[] packetBytes = Arrays.copyOfRange(messageBytes, startIdx, endIdx);
 
                         // Create a new packet with microbit name, packet number, and packet data
-                        String packetMessage = microbitName + "," + packetNumber + "," + new String(packetBytes, StandardCharsets.UTF_8);
+                        String packetMessage ="."+microbitName+","+packetNumber+","+new String(packetBytes, StandardCharsets.UTF_8);
                         System.out.println(packetMessage);
 
                         // Send the full packet to the receiver microbit
@@ -441,7 +439,6 @@ public class SerialMonitor {
         }
     }
     
-
     public void stop(){
         try{
             microbit.closePort();

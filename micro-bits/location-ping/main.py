@@ -91,6 +91,7 @@ def findLocation():
 
 
 def decodeMessage(message):
+    # display.scroll(message)
     global nodeList
     hasLocation = False
 
@@ -156,15 +157,19 @@ def main():
             if "PANIC" in message_str and name in message_str:
                 panic()
 
-            #display.scroll(message_str)
             # Split the message into components
             components = message_str.split(',')
-            display.scroll(message_str)
+            # display.scroll(message_str)
+
+            # #update the list for the user's location
+            hasLocation = decodeMessage(message)
 
             # Ensure that there are enough components
-            if len(components) >= 3:
+            if(components[0] == "Recv"):
+                print("")
+            elif len(components) >= 3:
                 # Extract microbit name, packet number, and packet data
-                microbit_name = components[0]
+                microbit_name = components[0][1:]
                 packet_number = int(components[1])
                 packet_data = components[2]
 
@@ -179,13 +184,7 @@ def main():
                     radio.config(channel=21)  # Change to the appropriate channel
                     radio.send(acknowledgment)
                     radio.config(channel=22)  # Change back to the original channel
-            if(components[1] == "Recv"):
-                print("dropped recv packet")
-
-            # #update the list for the user's location
-            hasLocation = decodeMessage(message)
-
-            if hasLocation:
+            elif hasLocation:
                 updateCounts()
                 locationNodeName = findLocation()
 
