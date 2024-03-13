@@ -18,13 +18,38 @@ const RoomCanvas = () => {
     let trackedName="";
 
     //default doors
-    const doorA = new Door("Office Side", [400, 110]);
-    const doorB = new Door("Office Main", [285, 200]);
+    // const doorA = new Door("Office Side", [400, 110]);
+    // const doorB = new Door("Office Main", [285, 200]);
 
+    const corridorDoor = new Door("Corridor Door",[350,300]);
+    const gymDoor = new Door("Gym Door",[300,350]);
+    const room1Door = new Door("Room 1 Door",[250,100]);
+    const room2Door = new Door("Room 2 Door", [250,200]);
+    const room3Door = new Door("Room 3 Door", [250,300]);
+    const restaurantDoorA = new Door("Resturant Door A", [450,250]);
+    const restaurantDoorB = new Door("Resturant Door B", [550,250]);
+    const lobbyDoorA = new Door("Lobby Door A", [450,550]);
+    const lobbyDoorB = new Door("Lobby Door B",[550,550]);
+    const barDoorResturant = new Door("Bar Door Resturant", [650,100]);
+    const barDoorBall = new Door("Bar Door Ballroom", [750,250]);
+    const barDoorOut = new Door("Bar Door Out", [900,150]);
+    const ballroomDoor = new Door("Ballroom Door", [650,350]);
+    const ballroomDoorOut = new Door("Ballroom Door Out", [900,350]);
+    
     //default rooms
     let rooms = [
-        new Room("Office", [[30,20],[400,20],[400,200],[30,200]],[doorA, doorB]), 
-        new Room("Kitchen", [[500,20],[870,20],[870,200],[500,200]],null)
+        // new Room("Office", [[30,20],[400,20],[400,200],[30,200]],[doorA, doorB]), 
+        // new Room("Kitchen", [[500,20],[870,20],[870,200],[500,200]],null)
+        new Room("Room 1", [[50,50],[250,50],[250,150],[50,150]], [room1Door]),
+        new Room("Room 2", [[50,150],[250,150],[250,250],[50,250]], [room2Door]),
+        new Room("Room 3", [[50,250],[250,250],[250,350],[50,350]], [room3Door]),
+        new Room("Corridor", [[250,50],[350,50],[350,350],[250,350]], [corridorDoor]),
+        new Room("Restaurant", [[350,50],[650,50],[650,250],[350,250]], [restaurantDoorA, restaurantDoorB]),
+        new Room("Lobby", [[350,250],[650,250],[650,550],[350,550]], [lobbyDoorA, lobbyDoorB]),
+        new Room("Gym", [[50,350],[350,350],[350,550],[50,550]], [gymDoor]),
+        new Room("Swimming Pool Area", [[1000,100],[1250,100],[1250,500],[1000,500]], null),
+        new Room("Ballroom", [[650,250],[900,250],[900,550],[650,550]], [ballroomDoor, ballroomDoorOut]),
+        new Room("Bar", [[650,50],[900,50],[900,250],[650,250]], [barDoorBall,barDoorOut,barDoorResturant])
     ];
 
     //draw every room to the canvas
@@ -90,7 +115,12 @@ const RoomCanvas = () => {
                         tempRoomArr.push(room);
                     } 
                 }
-                rooms = tempRoomArr;
+
+                if(tempRoomArr != rooms){
+                    rooms = tempRoomArr;
+                }
+
+                
         }catch(e){
             //if you are unable to load rooms
             console.log("Unable to load rooms from database");
@@ -109,8 +139,8 @@ const RoomCanvas = () => {
     
         let currentUserLocation = undefined;
         trackedName=getCookie("trackedUser");
-        // TEST get the location of the current selected user
-        console.log(trackedName)
+        
+        // console.log(trackedName)
         if(trackedName != undefined){
             //get the current location of the user
             currentUserLocation = await fetchApi("listAll?user="+trackedName+"&RT=true");//list of locations the user has been in
@@ -157,51 +187,20 @@ const RoomCanvas = () => {
                 }
             }
 
-            //gets and sets the current door data???
+            //gets and sets the current door data
             if(rooms[i].doors != null){
                 for(let j=0; j<rooms[i].doors.length; j++){
                     //return is boolean
-                    //this.rooms[i].doors[j].doorLocked = fetchApi(doorname);
-                    console.log(rooms[i].doors[j].name+" locked = "+rooms[i].doors[j].doorLocked);
+                    if(rooms[i].doors != null){
+                        rooms[i].doors[j].doorLocked = await fetchApi(`isDoorLocked?doorName=${rooms[i].doors[j].doorName}`);
+                        console.log(rooms[i].doors[j].doorName+" locked = "+rooms[i].doors[j].doorLocked);
+                    }
+                    
                 }
             }
 
         }
 
-
-    }
-
-    const handleClick = (event) => {
-
-        //gets coordinates of where the client has clicked on the canvas
-        const userX = event.clientX - event.target.offsetLeft;
-        const userY = event.clientY - event.target.offsetTop;
-    
-        // let roomFound = undefined;
-        // refreshCanvas();
-
-        // //for a room with 4 sides
-        // for(let i=0; i<rooms.length; i++){
-        //     //check if the user has clicked within the bounds of one of the drawn rooms
-        //     roomFound = rooms[i].checkClick(userX, userY);
-        //     if(roomFound){
-        //         break;
-        //     }
-        // }
-        // //if a room has been clicked
-        // if(roomFound != undefined){
-        //     console.log("Clicked "+roomFound.name);
-        //     roomFound.user = true;
-            
-        //     try{
-        //         roomFound.doors[0].doorLocked = false;
-        //         roomFound.doors[1].doorLocked = false;
-        //     }catch(e){
-
-        //     }
-
-        //     refreshCanvas();         
-        // }
     }
 
     //Initialise the images to be used
@@ -239,16 +238,10 @@ const RoomCanvas = () => {
 
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
+            loadRooms();
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
-        
-        //Load room data
-        //If there is no room data/cannot connect: display, "cannot load rooms from database", load default?
-        //Load room data
-        //link rooms to the data coming in
-        //
-
 
         drawRooms();
         refreshCanvas();
@@ -261,7 +254,6 @@ const RoomCanvas = () => {
             width={CANVAS_WIDTH}
             height={CANVAS_HEIGHT}
             ref={canvasRef}
-            onClick={handleClick}
         >
         </canvas>
         </>

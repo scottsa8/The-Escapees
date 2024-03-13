@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Guard;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -106,6 +107,8 @@ public class ServerApplication {
 		 //e.printStackTrace();
 		 }
 	}
+
+
 	@GetMapping("/getDomains")
 	private String getDomains() {
 		StringBuilder output = new StringBuilder();
@@ -168,7 +171,6 @@ public class ServerApplication {
 				insertRoomStatement.setInt(3, points[2]); // bottom_right_x
 				insertRoomStatement.setInt(4, points[3]); // bottom_right_y
 				insertRoomStatement.setString(5, roomName);
-				System.out.println(insertRoomStatement);
 				// Execute the insert statement
 				rowsAffected = insertRoomStatement.executeUpdate();
 			}else{
@@ -185,7 +187,6 @@ public class ServerApplication {
 				insertRoomStatement.setInt(4, points[2]); // bottom_right_x
 				insertRoomStatement.setInt(5, points[3]); // bottom_right_y
 
-				System.out.println(insertRoomStatement);
 				// Execute the insert statement
 				rowsAffected = insertRoomStatement.executeUpdate();
 			}
@@ -217,19 +218,40 @@ public class ServerApplication {
 			if (roomResultSet.next()) {
 				// Retrieve the room_id
 				int roomId = roomResultSet.getInt("room_id");
-	
-				// Insert the new door into the database
-				PreparedStatement insertDoorStatement = connection.prepareStatement(
-						"INSERT INTO doors (room_id, door_name, x_coordinate, y_coordinate) " +
-								"VALUES (?, ?, ?, ?)"
+
+				PreparedStatement checkDoor = connection.prepareStatement(
+						"SELECT door_name FROM doors WHERE door_name = ?"
 				);
-				insertDoorStatement.setInt(1, roomId);
-				insertDoorStatement.setString(2, doorName);
-				insertDoorStatement.setInt(3, xCoordinate);
-				insertDoorStatement.setInt(4, yCoordinate);
-				insertDoorStatement.executeUpdate();
-	
-				return true;
+				checkDoor.setString(1, doorName);
+				checkDoor.executeQuery();
+				ResultSet doorResult = selectRoomIdStatement.executeQuery();
+
+				if(doorResult.next()){
+					PreparedStatement insertDoorStatement = connection.prepareStatement(
+							"UPDATE doors SET x_coordinate=?, y_coordinate=? " +
+									"WHERE door_name = ?"
+					);
+					insertDoorStatement.setInt(1, xCoordinate);
+					insertDoorStatement.setInt(2, yCoordinate);
+					insertDoorStatement.setString(3, doorName);
+					insertDoorStatement.executeUpdate();
+
+					return true;
+				}else {
+
+					// Insert the new door into the database
+					PreparedStatement insertDoorStatement = connection.prepareStatement(
+							"INSERT INTO doors (room_id, door_name, x_coordinate, y_coordinate) " +
+									"VALUES (?, ?, ?, ?)"
+					);
+					insertDoorStatement.setInt(1, roomId);
+					insertDoorStatement.setString(2, doorName);
+					insertDoorStatement.setInt(3, xCoordinate);
+					insertDoorStatement.setInt(4, yCoordinate);
+					insertDoorStatement.executeUpdate();
+
+					return true;
+				}
 			} else {
 				// Handle the case when the roomName is not found
 				return false;
@@ -288,7 +310,7 @@ public class ServerApplication {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT username,user_microbit FROM users");
 			while (rs.next()) {
-				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit:\": \""+rs.getString("user_microbit")+"\"}");
+				output.append("{\"username\": \"" + rs.getString("username") + "\", \"microbit\": \""+rs.getString("user_microbit")+"\"}");
 				if (!rs.isLast()) {
 					output.append(",");
 				}
@@ -417,19 +439,20 @@ public class ServerApplication {
 
 	@GetMapping("/getPeople")
 	private int getPeople(@RequestParam(value = "loc") String loc,
-			@RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
+						  @RequestParam(value = "type", required = false, defaultValue = "inmate") String type) {
 		int total = 0;
-
+	
 		try (PreparedStatement selectStatement = connection.prepareStatement(
-				"SELECT COUNT(*) AS total_people " +
+				"SELECT COUNT(DISTINCT ro.user_id) AS total_people " +
 						"FROM roomOccupants ro " +
+						"JOIN (SELECT user_id, MAX(entry_timestamp) AS max_timestamp " +
+						"      FROM roomOccupants " +
+						"      GROUP BY user_id) latest ON ro.user_id = latest.user_id " +
 						"JOIN rooms r ON ro.room_id = r.room_id " +
-						"JOIN users u ON ro.user_id = u.user_id " +
-						"WHERE r.room_name = ? AND u.user_type = ?")) {
-
+						"WHERE r.room_name = ? AND ro.entry_timestamp = latest.max_timestamp")) {
+	
 			selectStatement.setString(1, loc);
-			selectStatement.setString(2, type);
-
+	
 			try (ResultSet rs = selectStatement.executeQuery()) {
 				// Retrieve the total count
 				if (rs.next()) {
@@ -439,9 +462,11 @@ public class ServerApplication {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+	
 		return total;
 	}
+	
+	
 
 	@GetMapping("/getRooms")
 	private String getRooms() {
@@ -627,8 +652,10 @@ public class ServerApplication {
 				ResultSet rs = selectStatement.executeQuery();
 				if (rs.next()) {
 					storedName = rs.getString("room_microbit");
+				}else{
+					storedName="";
 				}
-				if (storedName.equals("") || overwrite) {
+				if (storedName==null|| overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
 							"UPDATE rooms SET room_microbit = ? WHERE room_name = ?");
 					insertStatement.setString(1, mbName);
@@ -645,8 +672,10 @@ public class ServerApplication {
 				ResultSet rs = selectStatement.executeQuery();
 				if (rs.next()) {
 					storedName = rs.getString("user_microbit");
+				}else{
+					storedName="";
 				}
-				if (storedName.equals("") || overwrite) {
+				if (storedName==null || overwrite) {
 					PreparedStatement insertStatement = connection.prepareStatement(
 							"UPDATE users SET user_microbit = ? WHERE username = ?");
 					insertStatement.setString(1, mbName);
@@ -734,10 +763,14 @@ public class ServerApplication {
 							
 			if (rs.next()) {
 				// Retrieve the status from the result set and return it
-				return rs.getBoolean("is_locked");
+				if(rs.getInt("is_locked")==1){
+					return true;
+				}else{
+					return false;
+				}
 			} else {
 				// Handle the case when the door name is not found
-				return false;
+				return true;
 			}
 
 		} catch (SQLException e) {

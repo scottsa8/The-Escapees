@@ -117,6 +117,12 @@ const Dashboard = () => {
     document.title = `${currentView.pageTitle} - Prison System`
   }
 
+  useEffect(() => {
+    if (notifications.length === 0) {
+      setShowNotifications(false);
+    }
+  }, [notifications.length]);
+  
   return (
     <>
       {/* <title>{currentView.pageTitle} - Prison System</title> */}
@@ -133,14 +139,20 @@ const Dashboard = () => {
           </div>
         <div className="flex items-center space-x-4">
           <div className="relative">
-            <button onClick={() => setShowNotifications(!showNotifications)} className="rounded-md shadow-md p-2 bg-red-600"><NotificationIcon/></button>
-            {showNotifications && (
-              <div className="notif-box absolute -ml-16 top-full mt-2 overflow-y-auto max-h-64 w-64">
+          <button onClick={() => notifications.length > 0 && setShowNotifications(!showNotifications)} className="relative inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <span className="sr-only">Notifications</span>
+            <NotificationIcon/>
+            <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900">
+              {notifications.length}
+            </div>
+          </button>
+          {showNotifications && (
+              <div className="notif-box absolute -ml-32 top-full mt-2 overflow-y-auto max-h-64 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4">
                 {notifications.map((notification, index) => (
-                  <div className={`notif-card ml-6 p-4 mb-2 relative ${deleting === index ? 'deleting' : ''}`} key={index}>  
-                        <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1">X</button>
-                    <h1>{notification.title}</h1>
-                    <p>{notification.options}</p>
+                  <div className={`notif-card p-4 mb-4 relative bg-gray-100 dark:bg-gray-700 rounded-lg ${deleting === index ? 'deleting' : ''}`} key={index}>  
+                    <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1 text-gray-800 hover:text-red-500 rounded-full">X</button>
+                    <h1 className="text-lg font-bold">{notification.title}</h1>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{notification.options}</p>
                   </div>
                 ))}
               </div>
@@ -157,7 +169,7 @@ const Dashboard = () => {
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.interactiveMap)}>Map <MapIcon/></button>
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.charts)}>Analytics <AnalyticsIcon/></button>
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.settings)}>Settings <SettingsIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit Manager<CPUIcon/></button>
+          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit's<CPUIcon/></button>
         </div>
 
         {/* Where the screen contents are shown */}
