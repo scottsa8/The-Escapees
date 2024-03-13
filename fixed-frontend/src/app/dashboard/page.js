@@ -113,14 +113,10 @@ const Dashboard = () => {
     }
   }
 
-<<<<<<< HEAD
-  console.log("Width of screen: ",window.screen.width)
-=======
   if (typeof document !== 'undefined') {
     document.title = `${currentView.pageTitle} - Prison System`
   }
 
->>>>>>> main
   return (
     <>
       {/* <title>{currentView.pageTitle} - Prison System</title> */}
@@ -155,39 +151,19 @@ const Dashboard = () => {
         </div>
 
         {/* Used to navigate pages */}
-<<<<<<< HEAD
         <div className='topbar lg:sidebar'>
-          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.homePage)}>Home <HomeIcon/></button>
-          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.individualLocations)}>Locations <LocPin/></button>
-          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.interactiveMap)}>Map <MapIcon/></button>
-          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.charts)}>Analytics <AnalyticsIcon/></button>
-          <button className="topbar-button lg:sidebar-button" onClick={() => setView(views.settings)}>Settings <SettingsIcon/></button>
-          <button className="topbar-button lg:sidebar-button" onClick={() => logNotifications()}>Notifications</button>
-=======
-        <div className='topbar md:sidebar'>
-          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.homePage)}>Home <HomeIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.individualLocations)}>Locations <LocPin/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.interactiveMap)}>Map <MapIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.charts)}>Analytics <AnalyticsIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.settings)}>Settings <SettingsIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit Manager<CPUIcon/></button>
->>>>>>> main
+          <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.homePage)}>Home <HomeIcon/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.individualLocations)}>Locations <LocPin/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.interactiveMap)}>Map <MapIcon/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.charts)}>Analytics <AnalyticsIcon/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.settings)}>Settings <SettingsIcon/></button>
+          <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit Manager<CPUIcon/></button>
         </div>
 
         {/* Where the screen contents are shown */}
         <div className="card-container p-4">
           {currentView.page}
           <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600"
-<<<<<<< HEAD
-            onClick={() => {
-              fetch(`https://${network.ip}:${network.port}/panic`,
-              {mode: 'cors',headers: {'Access-Control-Allow-Origin':'*'}})
-              .catch((error) => {
-                console.error('Error:', error);
-              });
-              sendNotification("Panic Button Pressed", "A panic button has been pressed in the prison system")
-            }}
-=======
           onClick={async () => {
             try {
               await fetchApi('panic');
@@ -196,7 +172,6 @@ const Dashboard = () => {
               console.error('Error:', error);
             }
           }}
->>>>>>> main
           >Panic</button>
           <NotificationComponent />
         </div>
