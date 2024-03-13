@@ -134,20 +134,18 @@ public class ServerApplication {
 	@GetMapping("/getTypes")
 	public ArrayList<String> getTypes(){
 		try{
-			PreparedStatement stmt = connection.prepareStatement("SELECT DISTINCT user_type FROM users");
+			PreparedStatement stmt = connection.prepareStatement("SELECT DISTINCT user_type FROM users WHERE user_type!='Admin'");
 			ResultSet rs = stmt.executeQuery();
-			if(rs.next()){
+
 				ArrayList<String> output = new ArrayList<>();
 				while (rs.next()){
 					output.add(rs.getString("user_type"));
 				}
 				return output;
-			}
 		}catch (Exception e){
 			e.printStackTrace();
 		return null;
 		}
-	return null;
 	}
 
 	@GetMapping("/setDomain")
