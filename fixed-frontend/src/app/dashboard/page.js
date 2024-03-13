@@ -13,51 +13,67 @@ import { useNotification } from "../components/notifications";
 import { fetchApi } from "../components/apiFetcher";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useQuery } from "react-query";
 
 // Lists the pages for the navigation bar on the dashboard
 
 
 const brandImages = {
-  prison : {
+  Prison : {
     light: <Image src="/prison-logo.png" height={50} width={70} />,
     dark: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
   },
+  Hotel : {
+    light:<Image src="/hotel-logo.png" height={50} width={70} />,
+    dark: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />
+  }
 }
 
 
 
 const themes = {
   prison: {
+    title: "Prison System",
     cssRules:{
     "--light-body-background": "#EAEAEB",
     "--light-banner-colour": "#B7B6B7",
     "--light-sidebar": "#D9D9D9",
     "--light-title-colour": "black",
+    "--light-card": "#BDBDBC",
 
     "--dark-body-background": "#22314f",
     "--dark-sidebar-background": "#1b2030",
     "--dark-sidebar-main": "#DBE9FE",
     "--dark-banner-gradient": "linear-gradient(to right, #1d2232, #1b2030)",
-    "--dark-title-colour": "#dbeafe"
+    "--dark-title-colour": "#dbeafe",
+    "--dark-card": "#374151",
     },
-    lightImage: <Image src="/prison-logo.png" height={50} width={70} />,
-    darkImage: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
+    lightBrand: <Image src="/prison-logo.png" height={50} width={70} />,
+    darkBrand: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />,
+    lightBg: <Image src="/Prison-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
+    darkBg: <Image src="/Prison-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
   },
   hotel: {
+    title: "SCC Luxury",
     cssRules:{
-      "--light-body-background": "#EAEAEB",
-      "--light-banner-colour": "#B7B6B7",
-      "--light-sidebar": "#D9D9D9",
+      "--light-body-background": "#fffde3",
+      "--light-banner-colour": "#ffee97",
+      "--light-sidebar": "#ffee97",
       "--light-title-colour": "black",
+      "--light-card": "#fffde3",
 
       "--dark-body-background": "#22314f",
       "--dark-sidebar-background": "#1b2030",
       "--dark-sidebar-main": "#DBE9FE",
-      "--dark-banner-gradient": "linear-gradient(to right, #1d2232, #1b2030)",
-      "--dark-title-colour": "#dbeafe"
+      "--dark-banner-gradient": "linear-gradient(to right, #5D2E0C, #5D2E0C)",
+      "--dark-title-colour": "#dbeafe",
+      "--dark-card": "#846656"
     },
-    lightImage: <Image src="/prison-logo.png" height={50} width={70} />,
-    darkImage: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
+    lightBrand:<Image src="/hotel-logo.png" height={50} width={70} />,
+    darkBrand: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />,
+    lightBg: <Image src="/Hotel-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>,
+    darkBg: <Image src="/Hotel-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
+
   }
 }
 
@@ -66,24 +82,51 @@ const themes = {
 //It's the constant border around the main page
 const Dashboard = () => {
 
-
+  const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'prison' });
   const [username, setUsername] = useState('');
   const { sendNotification, NotificationComponent } = useNotification();
   const [ showNotifications, setShowNotifications ] = useState(false); 
-  const [currentTheme,setTheme] = useState(themes.prison);
+  
   const [isLightTheme,setLightTheme] = useState(true)
   const [deleting, setDeleting] = useState(null);
+
+  const [currentDomain, setDomain] = useState(selectedDomain)
+  // const [currentTheme,setTheme] = useState(themes[currentDomain]);
+
+  const setVariables = () =>{ 
+    console.log(currentDomain)
+    const rootStyles = document.documentElement.style;
+    Object.entries(themes[currentDomain].cssRules).forEach(v => rootStyles.setProperty(v[0], v[1]));
+
+  }
+  
+  const changeDomainStyling = (domain) => {
+    if (typeof document !== 'undefined'){
+      setDomain(domain)
+      console.log("Entered Domain: ",domain);
+      
+      refetchSelectedDomain()
+      const root = document.querySelector(':root');
+      const setVariables = vars => Object.entries(vars).forEach(v => root.style.setProperty(v[0], v[1]));
+
+      setVariables(themes[domain].cssRules)
+    }
+  }
+
+  
 
   const views = {
     individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
     homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
     interactiveMap: {page: <MapPage/>, pageTitle: "Interactive Map"},
-    settings: {page: <Settings dashThemeHook={setLightTheme}/>, pageTitle: "Settings"},
+    settings: {page: <Settings dashThemeHook={setLightTheme}  dashDomainChange={changeDomainStyling}/>, pageTitle: "Settings"},
     charts: {page: <Chart/>, pageTitle: "Charts"},
     microManager: {page: <MicroManager/>, pageTitle: "Microbit Manager"}
   }
 
   const [currentView,setView] = useState(views.homePage);
+
+  
 
   var notifications = null;
   if (typeof window !== 'undefined') {
@@ -103,18 +146,19 @@ const Dashboard = () => {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
     setLightTheme(getCookie('theme') === 'light')
+    changeDomainStyling(selectedDomain);
     setUsername(getCookie("username"));
   }, []);
 
   const viewChangeHandler = (view) => {
     setView(view);
     if (typeof document !== 'undefined') {
-      document.title = `${currentView.pageTitle} - Prison System`
+      document.title = `${currentView.pageTitle} - ${themes[currentDomain].title}`
     }
   }
 
   if (typeof document !== 'undefined') {
-    document.title = `${currentView.pageTitle} - Prison System`
+    document.title = `${currentView.pageTitle} - ${themes[currentDomain].title}`
   }
 
   useEffect(() => {
@@ -127,12 +171,13 @@ const Dashboard = () => {
     <>
       {/* <title>{currentView.pageTitle} - Prison System</title> */}
       <body>
-        
-
+        <div className="h-full fixed w-full overflow-hidden -z-10">
+          {isLightTheme?themes[currentDomain].lightBg:themes[currentDomain].darkBg}
+        </div>
         <div className="banner">
           <div className="flex px-4">
             {/* <Image src="/prison-logo.png" height={50} width={70} /> */}
-            {isLightTheme?currentTheme.lightImage:currentTheme.darkImage}
+            {isLightTheme?themes[currentDomain].lightBrand:themes[currentDomain].darkBrand}
             <div className="divider"></div>
             {/* margin-right: 1rem;border-right: 1px solid white;margin-left: 1rem; */}
             <h1 className="title">{currentView.pageTitle}</h1> 
@@ -174,6 +219,7 @@ const Dashboard = () => {
 
         {/* Where the screen contents are shown */}
         <div className="card-container p-4">
+          
           {currentView.page}
           <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600"
           onClick={async () => {

@@ -72,7 +72,7 @@ export default function Login() {
 
   return (
     <>
-      <title>Login - Prison System</title>
+      <title>Login</title>
     
       <div className="flex items-center justify-center h-screen">
         <div className="p-10 flex flex-col w-5/6 sm:mx-auto sm:max-w-md bg-gradient-to-r from-indigo-800 to-purple-950 text-sky-200 rounded-lg">
