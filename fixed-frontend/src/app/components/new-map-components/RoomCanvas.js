@@ -2,7 +2,9 @@ import { useEffect, useRef, useState} from "react";
 import {fetchApi, getEnvData} from "../apiFetcher";
 import Room from "./Room";
 import Door from "./Door";
-import { getCookie } from "../cookies";
+
+import { useQuery } from "react-query";
+import { getCookie, setCookie } from "../cookies";
 
 const RoomCanvas = () => {
 
@@ -71,12 +73,13 @@ const RoomCanvas = () => {
     /**
      * Fetches the rooms from the database and creates corresponding objects ready to be drawn
      */
-    async function loadRooms(){
+    
 
+    async function loadRooms(){
+        let roomData = await fetchApi('getAllRoomData'); 
         let tempRoomArr = [];//tempoary array to store created rooms in.
 
         //FETCH ROOMS FROM DB
-        let roomData = await fetchApi("getAllRoomData");
         if(roomData!=undefined){
             roomData = roomData.rooms.data;
         }
@@ -238,7 +241,10 @@ const RoomCanvas = () => {
 
         //will fetch the data periodically from the server
         const dataFetch = setInterval(() => {
-            loadRooms();
+            if(getCookie("newMapData") == true){
+                loadRooms();
+                setCookie("newMapData", false);
+            }
             setAllRoomData();
             refreshCanvas();
         }, SECOND);
