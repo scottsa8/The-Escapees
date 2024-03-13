@@ -153,7 +153,9 @@ const Dashboard = () => {
   if (typeof window !== 'undefined') {
     notifications = JSON.parse(localStorage.getItem('notifications')) || [];
   }else{}
-
+  const deleteAll = () =>{
+      localStorage.removeItem('notifications');
+  }
   const deleteNotification = (index) => {
     const newNotifications = [...notifications];
     setDeleting(index);
@@ -215,12 +217,12 @@ const Dashboard = () => {
           </button>
           {showNotifications && (
               <div className="notif-box absolute -ml-32 top-full mt-2 overflow-y-auto max-h-64 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4">
+                <button onClick={()=>deleteAll()} className="absolute top-0 right-0 p-1">Clear All </button>
                 {notifications.map((notification, index) => (
-                  <div className={`notif-card p-4 mb-4 relative bg-gray-100 dark:bg-gray-700 rounded-lg ${deleting === index ? 'deleting' : ''}`} key={index}>  
+                  <div className={`notif-card p-4 mb-4 mt-2 relative bg-gray-100 dark:bg-gray-700 rounded-lg ${deleting === index ? 'deleting' : ''}`} key={index}>  
                     <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1 text-gray-800 hover:text-red-500 rounded-full">X</button>
                     <h1 className="text-lg font-bold">{notification.title}</h1>
-                    {console.log(notification.options)}
-                    <p className="mt-2 text-sm text-gray-300 dark:text-gray-600">{notification.options}</p>
+                    <p className="mt-7 text-sm text-gray-300 dark:text-gray-600">{notification.options}</p>
                   </div>
                 ))}
               </div>
@@ -248,7 +250,7 @@ const Dashboard = () => {
           onClick={async () => {
             try {
               await fetchApi('panic');
-              sendNotification("Panic Button Pressed", "A panic button has been pressed in the "+await fetchApi("getDomain")+ " system at "+new Date().toUTCString());
+              sendNotification("Panic Button Pressed", "A panic button has been pressed in the "+await fetchApi("getDomain")+ " system at "+(new Date().toUTCString));
             } catch (error) {
               console.error('Error:', error);
             }
