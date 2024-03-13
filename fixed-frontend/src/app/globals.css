@@ -235,7 +235,7 @@ body {
   height: 2px;
   background-color: rgb(60, 255, 0);
   width: 100%;
-  animation: reverse-loading 3s linear forwards;
+  animation: reverse-loading 2s linear forwards;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
   border-radius: 5px;
 }
