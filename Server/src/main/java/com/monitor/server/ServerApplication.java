@@ -282,8 +282,29 @@ public class ServerApplication {
 			return false;
 		}
 	}
-	
+	private static String roomName;
+	private static String ts;
+	private static boolean maxTemp;
+	private static boolean maxNL;
+	private static boolean maxLL;
 
+	public static void setNoti(String rn,String tis, boolean maxTemp2, boolean maxNL2, boolean maxLL2){
+		roomName=rn;
+		ts=tis;
+		maxTemp=maxTemp2;
+		maxNL=maxNL2;
+		maxLL=maxLL2;
+	}
+	@GetMapping("/getNoti")
+	private String getNoti(){
+		StringBuilder output = new StringBuilder();
+		output.append("{\"noti\":{" +
+				"\"data\":[");
+		output.append("{\"roomName\": \""+roomName+"\",\"timestamp\": \""+ts+"\", \"maxTemp\": \""+maxTemp+"\","+
+				"\"maxNL\": \""+maxNL+"\", \"maxLL\": \""+maxLL+"\"}");
+		output.append("]}}");
+		return output.toString();
+	}
 	@GetMapping("/getDoors")
 	private String getDoors(@RequestParam(value = "roomName") String roomName) {
 		StringBuilder output = new StringBuilder();
