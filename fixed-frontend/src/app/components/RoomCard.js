@@ -29,9 +29,11 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}>
         <h2 className="text-xl font-semibold text-gray-600 dark:text-blue-300">{`${roomName}`}</h2>
-        <p className="text-gray-500 mt-2 dark:text-blue-100">{`${types[0]}: ${counts[0]}`}</p>
-        <p className="text-gray-500 mt-2 dark:text-blue-100">{`${types[1]}: ${counts[1]}`}</p>
-        <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${counts[0]+counts[1]}`}</p>
+        {console.log(types, counts)}
+        {types.map((type, index) => (
+          <p key={index} className="text-gray-500 mt-2 dark:text-blue-100">{`${type}: ${counts[type]}`}</p>
+        ))}
+        <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${Object.values(counts).reduce((sum, count) => sum + count, 0)}`}</p>
       </motion.div>
     );
 }
