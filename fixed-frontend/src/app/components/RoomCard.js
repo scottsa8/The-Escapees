@@ -6,17 +6,14 @@ import {getCookie,setCookie} from "./cookies";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
     const { data: types, isError, isLoading } = useQuery('getTypes', () => fetchApi(`getTypes`)).filter(type => type !== 'admin');
-    const userCounts = useQueries(types.map(type => ({
-      queryKey: ['getPeople', roomName, type],
-      queryFn: () => fetchApi(`getPeople?loc=${roomName}&type=${type}`),
-    })));
-
     useEffect(() => {
-      if (!isLoading && !typesLoading) {
-        console.log(userCounts);
-        console.log(types);
+      if (!isLoading) {
+        const userCounts = useQueries(types.map(type => ({
+          queryKey: ['getPeople', roomName, type],
+          queryFn: () => fetchApi(`getPeople?loc=${roomName}&type=${type}`),
+        })));
       }
-    }, [isLoading, typesLoading, userCounts, types]);
+    }, [isLoading, userCounts, types]);
   
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
@@ -31,9 +28,9 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
         transition={{ type: "spring", stiffness: 400, damping: 17 }}>
         <h2 className="text-xl font-semibold text-gray-600 dark:text-blue-300">{`${roomName}`}</h2>
         {types.map((type, index) => (
-          <p key={index} className="text-gray-500 mt-2 dark:text-blue-100">{`${type.charAt(0).toUpperCase() + type.slice(1)}: ${counts[type]}`}</p>
+          <p key={index} className="text-gray-500 mt-2 dark:text-blue-100">{`${type.charAt(0).toUpperCase() + type.slice(1)}: ${userCounts[index]}`}</p>
         ))}
-        <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${Object.values(counts).reduce((sum, count) => sum + count, 0)}`}</p>
+        <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${Object.values(userCounts).reduce((sum, count) => sum + count, 0)}`}</p>
       </motion.div>
     );
 }
