@@ -186,13 +186,15 @@ const RoomCanvas = () => {
             if(rooms[i].doors != null){
                 for(let j=0; j<rooms[i].doors.length; j++){
                     //return is boolean
-                    rooms[i].doors[j].doorLocked = await fetchApi(`isDoorLocked?doorName=${rooms[i].doors[j].doorName}`);
-                    console.log(rooms[i].doors[j].doorName+" locked = "+rooms[i].doors[j].doorLocked);
+                    if(rooms[i].doors != null){
+                        rooms[i].doors[j].doorLocked = await fetchApi(`isDoorLocked?doorName=${rooms[i].doors[j].doorName}`);
+                        console.log(rooms[i].doors[j].doorName+" locked = "+rooms[i].doors[j].doorLocked);
+                    }
+                    
                 }
             }
 
         }
-
 
     }
 
