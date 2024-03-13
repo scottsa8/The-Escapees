@@ -129,6 +129,11 @@ public class SerialMonitor {
                     if(sensorData.length!=3){
                         return;
                     }
+                    for(int i=0;i<sensorData.length;i++){
+                        if(sensorData[i].contains("Recv")|| sensorData[i].contains("Rec")){
+                            return;
+                        }
+                    }
                     String deviceName = sensorData[1];
                     String roomMicrobit = sensorData[2];
 
