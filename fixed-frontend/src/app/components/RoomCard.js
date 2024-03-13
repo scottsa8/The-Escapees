@@ -18,7 +18,6 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
         console.log(types);
       }
     }, [isLoading, typesLoading, userCounts, types]);
-
   
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
