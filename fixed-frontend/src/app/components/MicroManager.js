@@ -105,7 +105,7 @@ export default function MicroManager() {
                             {roomData.rooms.data.map((item) => (
                                 <TableRow key={item.name}>
                                     <TableCell>{item.name}</TableCell>
-                                    <TableCell>{item.microbit}</TableCell>
+                                    <TableCell>{item.microbit != "null"?item.microbit : ""}</TableCell>
                                     <TableCell>{item.maxTemp}</TableCell>
                                     <TableCell>{item.maxNoise}</TableCell>
                                     <TableCell>{item.maxLight}</TableCell>
@@ -129,7 +129,7 @@ export default function MicroManager() {
                         {namesData.names.data.map((item, index) => (
                         <TableRow key={index}>
                             <TableCell>{item.username}</TableCell>
-                            <TableCell>{item.microbit}</TableCell>
+                            <TableCell>{item.microbit != "null"?item.microbit : ""}</TableCell>
                         </TableRow>
                         ))}
                     </TableBody>
