@@ -204,6 +204,10 @@ class Room {
             this.toShow.push(Room.noiseIcon)
         }
 
+        if(this.toShow.length > 0){
+            this.alarm();
+        }
+
     }
 
     /**
