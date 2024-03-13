@@ -6,9 +6,9 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
 
     const { data: types } = useQuery('getTypes', () => fetchApi(`getTypes`));
     const fetchCounts = async () => {
-      const counts = {};
+      let counts = {};
       for (const type of types) {
-      const { data } = await fetchApi(`getPeople?loc=${roomName}&type=${type}`);
+      let data = await fetchApi(`getPeople?loc=${roomName}&type=${type}`);
       counts[type] = data;
       
       }
