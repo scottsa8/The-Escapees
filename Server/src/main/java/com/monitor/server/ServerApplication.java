@@ -55,6 +55,7 @@ public class ServerApplication {
 		SpringApplication.run(ServerApplication.class, args);
 		ServerApplication serverApp = new ServerApplication();
 		serverApp.initialize();
+
 		serverApp.startSerialMonitor();
 	}
 
@@ -71,9 +72,11 @@ public class ServerApplication {
 				PreparedStatement createTableStmt = connection.prepareStatement(make);
 				createTableStmt.executeUpdate();
 			}
+
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		createAcc("Admin","password","Admin");
 	}
 
 
@@ -153,6 +156,7 @@ public class ServerApplication {
 		try {
 			domain = d;
 			initialize();
+			createAcc("Admin","password","Admin");
 			return true;
 		} catch (Exception e) {
 			domain = temp;
@@ -461,17 +465,17 @@ public class ServerApplication {
 		int total = 0;
 	
 		try (PreparedStatement selectStatement = connection.prepareStatement(
-//				"SELECT COUNT(DISTINCT ro.user_id) AS total_people " +
-//						"FROM roomOccupants ro " +
-//						"JOIN (SELECT user_id, MAX(entry_timestamp) AS max_timestamp " +
-//						"      FROM roomOccupants " +
-//						"      GROUP BY user_id) latest ON ro.user_id = latest.user_id " +
-//						"JOIN rooms r ON ro.room_id = r.room_id " +
-//						"JOIN users u ON ro.user_id = u.user_id " +
-//						"WHERE r.room_name = ? " +
-//						"AND ro.entry_timestamp = latest.max_timestamp " +
-//						"AND u.user_type = ?"))
-		"")	)			{
+				"SELECT COUNT(DISTINCT ro.user_id) AS total_people " +
+						"FROM roomOccupants ro " +
+						"JOIN (SELECT user_id, MAX(entry_timestamp) AS max_timestamp " +
+						"      FROM roomOccupants " +
+						"      GROUP BY user_id) latest ON ro.user_id = latest.user_id " +
+						"JOIN rooms r ON ro.room_id = r.room_id " +
+						"JOIN users u ON ro.user_id = u.user_id " +
+						"WHERE r.room_name = ? " +
+						"AND ro.entry_timestamp = latest.max_timestamp " +
+						"AND u.user_type = ?"))
+					{
 			selectStatement.setString(1, loc);
 			selectStatement.setString(2, type);
 	
@@ -575,18 +579,30 @@ public class ServerApplication {
 	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value = "pass") String pass,
 			@RequestParam(value = "type") String type) {
 		try {
-			PreparedStatement insertStatement = connection.prepareStatement(
-					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)");
-			insertStatement.setString(1, user);
-			insertStatement.setString(2, hashPassword(pass));
-			if (type == null) {
-				insertStatement.setString(3, "user"); // Assuming default user_type is "user"
-			} else {
+			if(user.equals("Admin")){
+				PreparedStatement checkAdmin = connection.prepareStatement(
+						"SELECT username FROM users WHERE username = 'Admin'");
+				ResultSet rs = checkAdmin.executeQuery();
+				if(rs.next()){
+					return true	;
+				}else{
+					PreparedStatement insertStatement = connection.prepareStatement(
+							"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)");
+					insertStatement.setString(1, user);
+					insertStatement.setString(2, hashPassword(pass));
+					insertStatement.setString(3,type);
+					insertStatement.executeUpdate();
+					return true;
+				}
+			}else{
+				PreparedStatement insertStatement = connection.prepareStatement(
+						"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)");
+				insertStatement.setString(1, user);
+				insertStatement.setString(2, hashPassword(pass));
 				insertStatement.setString(3, type);
+				insertStatement.executeUpdate();
+				return true; // Success
 			}
-
-			insertStatement.executeUpdate();
-			return true; // Success
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false; // Failed
