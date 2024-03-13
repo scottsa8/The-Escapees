@@ -769,7 +769,7 @@ public class ServerApplication {
 				}
 			} else {
 				// Handle the case when the door name is not found
-				return false;
+				return true;
 			}
 
 		} catch (SQLException e) {
