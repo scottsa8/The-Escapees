@@ -42,9 +42,9 @@ const RoomCard = ({roomName, onClick, isSelected}) => {
                 className="text-gray-500 mt-2 dark:text-blue-100"
               >{`${type.charAt(0).toUpperCase() + type.slice(1)}: ${userCounts[index]?.data || 0}`}</p>
             ))}
-            <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${Object.values(userCounts).reduce(
-              (sum, count) => sum + count,
-              0
+            <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${userCounts.reduce(
+                (sum, { data = 0 }) => sum + data,
+                0
             )}`}</p>
           </motion.div>
         ) : (
