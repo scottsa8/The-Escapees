@@ -15,26 +15,10 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useQuery } from "react-query";
 
-// Lists the pages for the navigation bar on the dashboard
 
 
-const brandImages = {
-  Prison : {
-    light: <Image src="/prison-logo.png" height={50} width={70} />,
-    dark: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />
-  },
-  Hotel : {
-    light:<Image src="/hotel-logo.png" height={50} width={70} />,
-    dark: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />
-  }
-}
-
-
-
-const themes = {
-  prison: {
-    title: "Prison System",
-    cssRules:{
+const colourSchemes = {
+  blue:{
     "--light-body-background": "#EAEAEB",
     "--light-banner-colour": "#B7B6B7",
     "--light-sidebar": "#D9D9D9",
@@ -48,14 +32,7 @@ const themes = {
     "--dark-title-colour": "#dbeafe",
     "--dark-card": "#374151",
     },
-    lightBrand: <Image src="/prison-logo.png" height={50} width={70} />,
-    darkBrand: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />,
-    lightBg: <Image src="/Prison-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
-    darkBg: <Image src="/Prison-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
-  },
-  hotel: {
-    title: "SCC Luxury",
-    cssRules:{
+    orange:{
       "--light-body-background": "#fffde3",
       "--light-banner-colour": "#ffee97",
       "--light-sidebar": "#ffee97",
@@ -65,10 +42,39 @@ const themes = {
       "--dark-body-background": "#22314f",
       "--dark-sidebar-background": "#1b2030",
       "--dark-sidebar-main": "#DBE9FE",
-      "--dark-banner-gradient": "linear-gradient(to right, #5D2E0C, #5D2E0C)",
+      "--dark-banner-gradient": "linear-gradient(to right, #5D2E0C, #a64e0f)",
       "--dark-title-colour": "#dbeafe",
       "--dark-card": "#846656"
     },
+    purple:{
+      "--light-body-background": "#eee3ff",
+      "--light-banner-colour": "#c297ff",
+      "--light-sidebar": "#c297ff",
+      "--light-title-colour": "black",
+      "--light-card": "#eee3ff",
+
+      "--dark-body-background": "#22314f",
+      "--dark-sidebar-background": "#1b2030",
+      "--dark-sidebar-main": "#DBE9FE",
+      "--dark-banner-gradient": "linear-gradient(to right, #390c5d, #6a13b0)",
+      "--dark-title-colour": "#dbeafe",
+      "--dark-card": "#755684"
+    },
+}
+
+//Metadata about each domain; branding, colour scheme and titles
+const themes = {
+  prison: {
+    title: "Prison System",
+    cssRules:colourSchemes.blue,
+    lightBrand: <Image src="/prison-logo.png" height={50} width={70} />,
+    darkBrand: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />,
+    lightBg: <Image src="/Prison-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
+    darkBg: <Image src="/Prison-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
+  },
+  hotel: {
+    title: "SCC Luxury",
+    cssRules:colourSchemes.orange,
     lightBrand:<Image src="/hotel-logo.png" height={50} width={70} />,
     darkBrand: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />,
     lightBg: <Image src="/Hotel-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
@@ -93,12 +99,12 @@ const Dashboard = () => {
   const [currentDomain, setDomain] = useState(selectedDomain)
   // const [currentTheme,setTheme] = useState(themes[currentDomain]);
 
-  const setVariables = () =>{ 
-    console.log(currentDomain)
-    const rootStyles = document.documentElement.style;
-    Object.entries(themes[currentDomain].cssRules).forEach(v => rootStyles.setProperty(v[0], v[1]));
+  // const setVariables = () =>{ 
+  //   console.log(currentDomain)
+  //   const rootStyles = document.documentElement.style;
+  //   Object.entries(themes[currentDomain].cssRules).forEach(v => rootStyles.setProperty(v[0], v[1]));
 
-  }
+  // }
   
   const changeDomainStyling = (domain) => {
     if (typeof document !== 'undefined'){
@@ -114,7 +120,7 @@ const Dashboard = () => {
   }
 
   
-
+// Lists the pages for the navigation bar on the dashboard
   const views = {
     individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
     homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
