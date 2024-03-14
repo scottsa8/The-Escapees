@@ -272,6 +272,7 @@ const Dashboard = () => {
                     <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1 text-gray-800 hover:text-red-500 rounded-full">X</button>
                     <h1 className="text-lg font-bold">{notification.title}</h1>
                     <p className="mt-7 text-sm text-gray-300 dark:text-gray-600">{notification.options}</p>
+                    <p className="mt-7 text-sm text-gray-300 dark:text-gray-400">{notification.timestamp}</p>
                   </div>
                 ))}
               </div>
