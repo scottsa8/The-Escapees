@@ -108,48 +108,7 @@ export default function Settings({dashThemeHook,dashDomainChange,colourSchemes,d
                         </button>
                     </div>
                 
-                {/* Notification Settings */}
-                <div className="settings-width flex-grow card shadow-md m-4 p-4">
-                    <h1 className="text-xl font-bold mb-4">Notification Settings</h1>
-                    {/* Temperature slider */}
-                    <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Temperature</label>
-                    <input
-                        type="range"
-                        id="temp-slider"
-                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
-                        min="0"
-                        max="100"
-                        value={temp}
-                        onChange={(e) => setTemp(e.target.value)}
-                    />
-                    <div className="text-right text-sm">{temp}</div>
-
-                    {/* Noise slider */}
-                    <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Noise</label>
-                    <input
-                        type="range"
-                        id="noise-slider"
-                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
-                        min="0"
-                        max="100"
-                        value={noise}
-                        onChange={(e) => setNoise(e.target.value)}
-                    />
-                    <div className="text-right text-sm">{noise}</div>
-
-                    {/* Light slider */}
-                    <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Light</label>
-                    <input
-                        type="range"
-                        id="light-slider"
-                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
-                        min="0"
-                        max="100"
-                        value={light}
-                        onChange={(e) => setLight(e.target.value)}
-                    />
-                    <div className="text-right text-sm">{light}</div>
-                </div>
+            
                 <div className="settings-width flex-grow card shadow-md m-4 p-4">
                 <h1 className="text-xl font-bold mb-4">Upload New Map</h1>
                     <MapLoader></MapLoader>

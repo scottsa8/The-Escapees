@@ -108,7 +108,20 @@ const Dashboard = () => {
   //   const rootStyles = document.documentElement.style;
   //   Object.entries(themes[currentDomain].cssRules).forEach(v => rootStyles.setProperty(v[0], v[1]));
 
-  // }
+  useEffect(() => {
+    if (notification) {
+      console.log(notification.noti.data[0].maxTemp)
+      if (notification.noti.data[0].maxTemp==="true") {
+        sendNotification(notification.noti.data[0].roomName + " has reached its max Temperature at " +notification.noti.data[0].timestamp);
+      }
+      if (notification.noti.data[0].maxNL==="true") {
+        sendNotification(notification.noti.data[0].roomName + " has reached its max Noise at "+notification.noti.data[0].timestamp);
+      }
+      if (notification.noti.data[0].maxLL==="true") {
+        sendNotification(notification.noti.data[0].roomName + " has reached its max Light at "+notification.noti.data[0].timestamp);
+      }
+    }
+  }, [notification]);
   
   const changeDomainStyling = (domain) => {
     if (typeof document !== 'undefined'){
@@ -171,7 +184,9 @@ const Dashboard = () => {
   if (typeof window !== 'undefined') {
     notifications = JSON.parse(localStorage.getItem('notifications')) || [];
   }else{}
-
+  const deleteAll = () =>{
+      localStorage.removeItem('notifications');
+  }
   const deleteNotification = (index) => {
     const newNotifications = [...notifications];
     setDeleting(index);
@@ -251,11 +266,12 @@ const Dashboard = () => {
           </button>
           {showNotifications && (
               <div className="notif-box absolute -ml-32 top-full mt-2 overflow-y-auto max-h-64 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4">
+                <button onClick={()=>deleteAll()} className="absolute top-0 right-0 p-1">Clear All </button>
                 {notifications.map((notification, index) => (
-                  <div className={`notif-card p-4 mb-4 relative bg-gray-100 dark:bg-gray-700 rounded-lg ${deleting === index ? 'deleting' : ''}`} key={index}>  
+                  <div className={`notif-card p-4 mb-4 mt-2 relative bg-gray-100 dark:bg-gray-700 rounded-lg ${deleting === index ? 'deleting' : ''}`} key={index}>  
                     <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1 text-gray-800 hover:text-red-500 rounded-full">X</button>
                     <h1 className="text-lg font-bold">{notification.title}</h1>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{notification.options}</p>
+                    <p className="mt-7 text-sm text-gray-300 dark:text-gray-600">{notification.options}</p>
                   </div>
                 ))}
               </div>
@@ -271,24 +287,27 @@ const Dashboard = () => {
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.individualLocations)}>Locations <LocPin/></button>
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.interactiveMap)}>Map <MapIcon/></button>
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.charts)}>Analytics <AnalyticsIcon/></button>
+          {getCookie("username") == "Admin" ?
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.settings)}>Settings <SettingsIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit's<CPUIcon/></button>
+          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit's<CPUIcon/></button>:null
+                }
         </div>
 
         {/* Where the screen contents are shown */}
         <div className="card-container p-4">
           
           {currentView.page}
+          {fetchApi("getDomain")=="prison"?
           <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600"
           onClick={async () => {
             try {
               await fetchApi('panic');
-              sendNotification("Panic Button Pressed", "A panic button has been pressed in the prison system");
+              sendNotification("Panic Button Pressed", "A panic button has been pressed in the "+await fetchApi("getDomain")+ " system at "+(new Date().toUTCString));
             } catch (error) {
               console.error('Error:', error);
             }
           }}
-          >Panic</button>
+          >Panic</button>:null}
           <NotificationComponent />
         </div>
       </body>

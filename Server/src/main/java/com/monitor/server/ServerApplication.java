@@ -92,7 +92,7 @@ public class ServerApplication {
 		} catch (Exception e) {
 			System.out.println("no Microbit detected");
 		}
-		// transmitMessage(1, "Hello testing sending a long message with a variety of different stuff in the message so that I know what is going on with the thing im working on");
+		// transmitMessage("Ethan", "Hello testing sending a long message with a variety of different stuff in the message so that I know what is going on with the thing im working on");
 		// transmitMessage(1, "Message");
 		// getPeople("Cell Block", "guard");
 	}
@@ -245,7 +245,7 @@ public class ServerApplication {
 				checkDoor.setString(1, doorName);
 				checkDoor.executeQuery();
 				ResultSet doorResult = selectRoomIdStatement.executeQuery();
-
+				System.out.println(doorResult.next());
 				if(doorResult.next()){
 					PreparedStatement insertDoorStatement = connection.prepareStatement(
 							"UPDATE doors SET x_coordinate=?, y_coordinate=? " +
@@ -255,9 +255,11 @@ public class ServerApplication {
 					insertDoorStatement.setInt(2, yCoordinate);
 					insertDoorStatement.setString(3, doorName);
 					insertDoorStatement.executeUpdate();
+					System.out.println("updating");
 
 					return true;
 				}else {
+					System.out.println("inserting");
 
 					// Insert the new door into the database
 					PreparedStatement insertDoorStatement = connection.prepareStatement(
@@ -274,6 +276,7 @@ public class ServerApplication {
 				}
 			} else {
 				// Handle the case when the roomName is not found
+				System.out.println("no room");
 				return false;
 			}
 		} catch (Exception e) {
@@ -282,8 +285,29 @@ public class ServerApplication {
 			return false;
 		}
 	}
-	
+	private static String roomName;
+	private static String ts;
+	private static boolean maxTemp;
+	private static boolean maxNL;
+	private static boolean maxLL;
 
+	public static void setNoti(String rn,String tis, boolean maxTemp2, boolean maxNL2, boolean maxLL2){
+		roomName=rn;
+		ts=tis;
+		maxTemp=maxTemp2;
+		maxNL=maxNL2;
+		maxLL=maxLL2;
+	}
+	@GetMapping("/getNoti")
+	private String getNoti(){
+		StringBuilder output = new StringBuilder();
+		output.append("{\"noti\":{" +
+				"\"data\":[");
+		output.append("{\"roomName\": \""+roomName+"\",\"timestamp\": \""+ts+"\", \"maxTemp\": \""+maxTemp+"\","+
+				"\"maxNL\": \""+maxNL+"\", \"maxLL\": \""+maxLL+"\"}");
+		output.append("]}}");
+		return output.toString();
+	}
 	@GetMapping("/getDoors")
 	private String getDoors(@RequestParam(value = "roomName") String roomName) {
 		StringBuilder output = new StringBuilder();
@@ -314,7 +338,7 @@ public class ServerApplication {
 	@GetMapping("/panic")
 	private String triggerPanic() {
 		if (monitor != null) {
-			monitor.panic();
+			monitor.panic("");
 			return "Panic function triggered successfully";
 		} else {
 			return "Microbit not available";

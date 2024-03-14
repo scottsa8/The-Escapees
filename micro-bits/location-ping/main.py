@@ -123,16 +123,6 @@ def decodeMessage(message):
         hasLocation = True
     return hasLocation
 
-def check_double_press(button_pin):
-    first_press = button_pin.is_pressed()
-    sleep(DOUBLE_PRESS_DELAY)
-    second_press = button_pin.is_pressed()
-    return first_press and second_press
-
-def panic():
-    music.play(['F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6'])
-    display.scroll("PANIC")
-
 def main():
     global name
     radio.on()
@@ -147,19 +137,27 @@ def main():
             #scroll name of microbit
             display.scroll(name)
 
-        if(button_b.is_pressed()):
-            panic()
-            radio.config(channel=21)
-            radio.send("PANIC")
+        if button_b.is_pressed():
+            while True:
+                music.play(['F#5:1'])
+                sleep(100)
+                if button_b.is_pressed():
+                    break
+                elif button_a.is_pressed():
+                    music.play(['F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6'])
+                    display.scroll("PANIC")
+                    radio.config(channel=21)
+                    radio.send("PANIC,"+name)
+                    break
 
         if message:
             message_str = message[0][3:].decode('utf-8')
-            if "PANIC" in message_str and name in message_str:
-                panic()
-
             # Split the message into components
             components = message_str.split(',')
             # display.scroll(message_str)
+            if "PANIC" in message_str and name in message_str:
+                music.play(['F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6', 'F#5:6', 'C5:6'])
+                display.scroll(components[1])
 
             # #update the list for the user's location
             hasLocation = decodeMessage(message)
@@ -168,22 +166,25 @@ def main():
             if(components[0] == "Recv"):
                 print("")
             elif len(components) >= 3:
-                # Extract microbit name, packet number, and packet data
-                microbit_name = components[0][1:]
-                packet_number = int(components[1])
-                packet_data = components[2]
+                try:
+                    # Extract microbit name, packet number, and packet data
+                    microbit_name = components[0][1:]
+                    packet_number = int(components[1])
+                    packet_data = components[2]
 
-                # Check if the microbit name matches the packet microbit name
-                if microbit_name == name:
-                    # Read the message part and construct acknowledgment
-                    display.scroll(packet_data)
-                    acknowledgment = "5,{},{}".format(microbit_name, packet_number)
-                    # display.scroll(acknowledgment)  # Display acknowledgment (for testing)
+                    # Check if the microbit name matches the packet microbit name
+                    if microbit_name == name:
+                        # Read the message part and construct acknowledgment
+                        display.scroll(packet_data)
+                        acknowledgment = "5,{},{}".format(microbit_name, packet_number)
+                        # display.scroll(acknowledgment)  # Display acknowledgment (for testing)
 
-                    # Send acknowledgment back to the server
-                    radio.config(channel=21)  # Change to the appropriate channel
-                    radio.send(acknowledgment)
-                    radio.config(channel=22)  # Change back to the original channel
+                        # Send acknowledgment back to the server
+                        radio.config(channel=21)  # Change to the appropriate channel
+                        radio.send(acknowledgment)
+                        radio.config(channel=22)  # Change back to the original channel
+                except:
+                    continue
             elif hasLocation:
                 updateCounts()
                 locationNodeName = findLocation()
