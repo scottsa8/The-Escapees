@@ -1,8 +1,8 @@
 import { setCookie } from "../cookies";
 import { fetchApi } from "../apiFetcher";
-
+import { useNotification } from "../notifications";
 const MapLoader = () => {
-
+    const { sendNotification, NotificationComponent } = useNotification();
     /**
      * Checks to see if the room data is valid
      * @param {*} rooms Room objects
@@ -178,6 +178,7 @@ const MapLoader = () => {
                 loadToDatabase(rooms, doors);
                 setCookie("newMapData",true);
             }else{
+                sendNotification("Invalid data","please check CSV format")
                 console.log("Invalid data, please check CSV format");
             }
 
@@ -185,9 +186,14 @@ const MapLoader = () => {
 
     }
     return ( 
+        <div>
     <form>
         <input type={"file"} onChange={handleFileChange} accept={".csv"}></input>
-    </form> );
+    </form> 
+    <NotificationComponent className="bottom-1" />
+    </div>
+    );
+
 }
  
 export default MapLoader;

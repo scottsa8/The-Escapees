@@ -1,5 +1,6 @@
 package com.monitor.server;
 
+import com.mysql.cj.protocol.Resultset;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -479,6 +480,24 @@ public class ServerApplication {
 			System.out.println("failed to generate report");
 		}
 		return null;
+	}
+	@GetMapping("/getMax")
+	private int getMax(@RequestParam(value="loc")String room,@RequestParam(value="type") String type){
+		try{
+			PreparedStatement selectStatement = connection.prepareStatement(
+					"SELECT ? FROM rooms WHERE room_name=?"
+			);
+			selectStatement.setString(1,type);
+			selectStatement.setString(2,room);
+			ResultSet rs = selectStatement.executeQuery();
+			int out = -1;
+			if(rs.next()){
+				out=rs.getInt(type);
+			}
+			return out;
+		}catch (Exception e){
+			return -1;
+		}
 	}
 
 	@GetMapping("/getPeople")

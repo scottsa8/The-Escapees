@@ -90,7 +90,9 @@ const Dashboard = () => {
   
     }
   }
-
+  const { data: notification, isError, isLoading } = useQuery('getNoti', () => fetchApi(getNoti), {
+    refetchInterval: 1000,
+  });
   const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'prison' });
   const [username, setUsername] = useState('');
   const { sendNotification, NotificationComponent } = useNotification();
@@ -249,7 +251,7 @@ const Dashboard = () => {
             {/* <Image src="/prison-logo.png" height={50} width={70} /> */}
             {
             
-            themes[currentDomain] == null ? isLightTheme?themes.prison.lightBrand:themes.prison.darkBrand : 
+            themes[currentDomain] == null ? null : 
           isLightTheme?themes[currentDomain].lightBrand:themes[currentDomain].darkBrand}
             <div className="divider"></div>
             {/* margin-right: 1rem;border-right: 1px solid white;margin-left: 1rem; */}
@@ -288,8 +290,11 @@ const Dashboard = () => {
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.interactiveMap)}>Map <MapIcon/></button>
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.charts)}>Analytics <AnalyticsIcon/></button>
           {getCookie("username") == "Admin" ?
+          <div> 
           <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.settings)}>Settings <SettingsIcon/></button>
-          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit's<CPUIcon/></button>:null
+          
+          <button className="topbar-button md:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit's<CPUIcon/></button>  </div>:null
+        
                 }
         </div>
 
@@ -297,7 +302,7 @@ const Dashboard = () => {
         <div className="card-container p-4">
           
           {currentView.page}
-          {fetchApi("getDomain")=="prison"?
+          {selectedDomain=="prison"?
           <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600"
           onClick={async () => {
             try {
