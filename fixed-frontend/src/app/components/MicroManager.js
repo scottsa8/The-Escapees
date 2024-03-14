@@ -13,6 +13,8 @@ export default function MicroManager() {
     const [roomName, setRoomName] = useState('');
     const [mbName, setMbName] = useState('');
     const [maxValues, setMaxValues] = useState('');
+    const [updateMaxValues, setUpdateMaxValues] = useState('');
+    const [updateRoomName, updatesetRoomName] = useState('');
     const [selectedOption, setSelectedOption] = useState('initial');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -61,8 +63,8 @@ export default function MicroManager() {
 
                 <div className="space-y-2">
                     <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Update Max Values</h2>
-                    <input className="block w-full p-2 border rounded" value={roomName} onChange={e => setRoomName(e.target.value)} placeholder="Room Name" />
-                    <input className="block w-full p-2 border rounded" value={maxValues} onChange={e => setMaxValues(e.target.value)} placeholder="Max Values" />
+                    <input className="block w-full p-2 border rounded" value={updateRoomName} onChange={e => updatesetRoomName(e.target.value)} placeholder="Room Name" />
+                    <input className="block w-full p-2 border rounded" value={updateMaxValues} onChange={e => setUpdateMaxValues(e.target.value)} placeholder="Max Values" />
                     <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMax}>Update Max Values</button>
                 </div>
 
