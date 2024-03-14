@@ -308,7 +308,7 @@ const Dashboard = () => {
           onClick={async () => {
             try {
               await fetchApi('panic');
-              sendNotification("Panic Button Pressed", "A panic button has been pressed in the "+await fetchApi("getDomain")+ " system at "+(new Date().toUTCString));
+              sendNotification("Panic Button Pressed", "A panic button has been pressed in the "+await fetchApi("getDomain")+ " system at ");
             } catch (error) {
               console.error('Error:', error);
             }
