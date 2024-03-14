@@ -123,7 +123,7 @@ export default function Settings({dashThemeHook,dashDomainChange,colourSchemes,d
                         >
                         <h1 className="font-bold text-sky-500">{domain.charAt(0).toUpperCase() + domain.slice(1)}</h1><br/>
                         <div onClick={() => setDomainSettings(true)}>
-                            <SettingsIcon />
+                            {/* <SettingsIcon /> */}
                         </div>
                     </motion.div>
                 ))}
