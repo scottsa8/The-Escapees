@@ -82,7 +82,7 @@ export default function MicroManager() {
                     <input className="block w-full p-2 border rounded" type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username"/>
                     <input className="block w-full p-2 border rounded" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password"/>
                     <input className="block w-full p-2 border rounded" type="text" value={userType} onChange={e => setUserType(e.target.value)} placeholder="Type"/>
-                    <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" type="submit">Create Account</button>
+                    <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleCreateAccount}>Create Account</button>
                 </div>
 
 
