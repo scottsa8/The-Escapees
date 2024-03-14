@@ -3,7 +3,7 @@ import { useNotification } from "./notifications";
 import { getCookie } from "./cookies";
 
 const EnvironmentBox = ({size, dialClassName, measurement, value, max}) => {
-    const { sendNotification, NotificationComponent } = useNotification();
+        const { sendNotification, NotificationComponent } = useNotification();
     return ( 
     <div className="flex flex-col items-center p-4 bg-transparent">
         <Dial className={dialClassName} size={size} value={value} min={0} max={max}/>

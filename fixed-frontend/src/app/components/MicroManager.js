@@ -19,7 +19,7 @@ export default function MicroManager() {
     const [userType, setUserType] = useState('');
    
     const handleCreateAccount = async () => {
-        await fetchApi(`createAcc?user=${username}&pass=${password}&type=${type}`);
+        await fetchApi(`createAcc?user=${username}&pass=${password}&type=${userType}`);
         refetchNames();
       };
       
