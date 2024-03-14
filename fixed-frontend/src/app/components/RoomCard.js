@@ -1,38 +1,56 @@
-import { useQuery } from "react-query";
+import { useQuery, useQueries } from "react-query";
 import { fetchApi } from "./apiFetcher";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import {getCookie,setCookie} from "./cookies";
 
 const RoomCard = ({roomName, onClick, isSelected}) => {
-
-    const { data: types } = useQuery('getTypes', () => fetchApi(`getTypes`));
-    const fetchCounts = async () => {
-      const counts = {};
-      for (const type of types) {
-      const { data } = await fetchApi(`getPeople?loc=${roomName}&type=${type}`);
-      counts[type] = data.length;
+    const { data: types, isError, isLoading } = useQuery('getTypes', () => fetchApi(`getTypes`));
+    const [typeQueries, setTypeQueries] = useState([]);
+    
+    useEffect(() => {
+      if (types) {
+        setTypeQueries(types.map(type => ({
+          queryKey: ['getPeople', roomName, type],
+          queryFn: () => fetchApi(`getPeople?loc=${roomName}&type=${type}`),
+        })));
       }
-      return counts;
-    };
-    const { data: counts = {}, isLoading: isLoadingCounts } = useQuery(['counts', roomName], fetchCounts);
-
-    if (isLoadingCounts) return 'Loading...';
-
+    }, [types, roomName]);
+    
+    const userCounts = useQueries(typeQueries);
+  
       const cardStyle = isSelected 
       ? "bg-blue-300 dark:bg-sky-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
-      : (counts[0] <= counts[1] * 0.25 && counts[1] !== 0 && fetchApi('getDomain') === 'Prison')
+      : (userCounts[0] <= userCounts[1] * 0.25 && userCounts[1] !== 0 && fetchApi('getDomain') === 'Prison')
           ? "bg-red-500 dark:bg-red-700 text-white shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer" 
           : "bg-white dark:bg-gray-700 text-gray-600 dark:text-blue-100 shadow-md rounded-lg p-4 m-4 max-w-sm w-60 cursor-pointer";
 
     return (
-      <motion.div onClick={onClick} className={cardStyle}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 400, damping: 17 }}>
-        <h2 className="text-xl font-semibold text-gray-600 dark:text-blue-300">{`${roomName}`}</h2>
-        <p className="text-gray-500 mt-2 dark:text-blue-100">{`${types[0]}: ${counts[0]}`}</p>
-        <p className="text-gray-500 mt-2 dark:text-blue-100">{`${types[1]}: ${counts[1]}`}</p>
-        <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${counts[0]+counts[1]}`}</p>
-      </motion.div>
+      <>
+        {!isLoading ? (
+          <motion.div
+            onClick={onClick}
+            className={cardStyle}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
+            <h2 className="text-xl font-semibold text-gray-600 dark:text-blue-300">{`${roomName}`}</h2>
+            {types.map((type, index) => (
+              <p
+                key={index}
+                className="text-gray-500 mt-2 dark:text-blue-100"
+              >{`${type.charAt(0).toUpperCase() + type.slice(1)}: ${userCounts[index]?.data || 0}`}</p>
+            ))}
+            <p className="text-gray-500 mt-2 dark:text-blue-100">{`Total: ${userCounts.reduce(
+                (sum, { data = 0 }) => sum + data,
+                0
+            )}`}</p>
+          </motion.div>
+        ) : (
+          <div>Loading...</div>
+        )}
+      </>
     );
 }
  

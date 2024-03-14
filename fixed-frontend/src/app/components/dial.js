@@ -28,27 +28,22 @@ function Dial({className, value, min, max, onMaxValue, size = 170 }) {
     
     const offset = circumference - (value - min) / (max - min) * circumference;
 
-    useEffect(() => {
-        if (value >= max) {
-            onMaxValue();
-        }
-    }, [value]);
     
 
     return (
         <div className={className}>
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block">
                 {/* circle */}
-                <circle
+                <circle className="innerCircle"
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
-                    fill="#374151"
+                    fill="currentColor"
                     stroke="#e6e6e6"
                     strokeWidth={strokeWidth}
                 />
                 {/* border circle */}
-                <circle
+                <circle 
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}

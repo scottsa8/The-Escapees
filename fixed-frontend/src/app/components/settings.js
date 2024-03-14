@@ -8,7 +8,7 @@ import {motion} from 'framer-motion';
 import MapLoader from './new-map-components/MapLoader';
 
 //Hook to set if the light theme is active or not
-export default function Settings({dashThemeHook,dashDomainChange}) {
+export default function Settings({dashThemeHook,dashDomainChange,colourSchemes,domainThemeUpdate}) {
     const [temp, setTemp] = useState(30);
     const [noise, setNoise] = useState(30);
     const [light, setLight] = useState(30);
@@ -20,6 +20,7 @@ export default function Settings({dashThemeHook,dashDomainChange}) {
     const [formValues, setFormValues] = useState({ name: '', microbit: '', maxTemp: '', maxNoise: '', maxLight: '' });
     const { data: domains, refetch: refetchDomains } = useQuery('domains', () => fetchApi("getDomains"), { initialData: ['Hotel', 'Prison'] });
     const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'Prison' });
+    const [selectedScheme,selectScheme] = useState(colourSchemes[0]) 
 
 
 
@@ -51,6 +52,10 @@ export default function Settings({dashThemeHook,dashDomainChange}) {
         setUpdateDelay(newValue);
         setCookie('updateDelay', newValue);
     };
+
+    const handleSchemeChange = e => {
+        selectScheme(e.target.value)
+    }
 
     useEffect(() => {
         const savedTheme = getCookie('theme') || 'light';
@@ -103,48 +108,7 @@ export default function Settings({dashThemeHook,dashDomainChange}) {
                         </button>
                     </div>
                 
-                {/* Notification Settings */}
-                <div className="settings-width flex-grow card shadow-md m-4 p-4">
-                    <h1 className="text-xl font-bold mb-4">Notification Settings</h1>
-                    {/* Temperature slider */}
-                    <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Temperature</label>
-                    <input
-                        type="range"
-                        id="temp-slider"
-                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
-                        min="0"
-                        max="100"
-                        value={temp}
-                        onChange={(e) => setTemp(e.target.value)}
-                    />
-                    <div className="text-right text-sm">{temp}</div>
-
-                    {/* Noise slider */}
-                    <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Noise</label>
-                    <input
-                        type="range"
-                        id="noise-slider"
-                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
-                        min="0"
-                        max="100"
-                        value={noise}
-                        onChange={(e) => setNoise(e.target.value)}
-                    />
-                    <div className="text-right text-sm">{noise}</div>
-
-                    {/* Light slider */}
-                    <label className="block text-sm font-medium text-gray-700 dark:text-blue-100">Light</label>
-                    <input
-                        type="range"
-                        id="light-slider"
-                        className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
-                        min="0"
-                        max="100"
-                        value={light}
-                        onChange={(e) => setLight(e.target.value)}
-                    />
-                    <div className="text-right text-sm">{light}</div>
-                </div>
+            
                 <div className="settings-width flex-grow card shadow-md m-4 p-4">
                 <h1 className="text-xl font-bold mb-4">Upload New Map</h1>
                     <MapLoader></MapLoader>
@@ -174,10 +138,19 @@ export default function Settings({dashThemeHook,dashDomainChange}) {
                             <h2 className="text-lg font-bold mb-2">Domain Setup</h2>
                             <button className="rounded-full" onClick={() => setShowAddDomain(false)}><CloseIcon/></button>
                         </div>
-                        <form onSubmit={(e) => { e.preventDefault(); setShowAddDomain(false); addDomain(domainName); }}>
+                        <form onSubmit={(e) => { e.preventDefault(); setShowAddDomain(false); addDomain(domainName); domainThemeUpdate(domainName,selectedScheme)}}>
                             <label className="block mb-2">
                             Domain Name
                             <input onChange={e => setDomainName(e.target.value)} type="text" className="mt-1 block dark:bg-sky-800 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                            </label>
+                            <label className="block mb-2">
+                                Colour Scheme:
+                                <select value={selectedScheme} onChange={handleSchemeChange} className="mt-1 block dark:bg-sky-800 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    {colourSchemes.map((val) =>(
+                                        <option className='h-4' value={val}>{val}</option>
+                                    ))}
+                                    
+                                </select>
                             </label>
                             <button type="submit" className="mt-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             Submit

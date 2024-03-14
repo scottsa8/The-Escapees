@@ -17,6 +17,7 @@ export default function LocationCountBox({onRoomClick}){
     if (isLoading) {
       return <div>Loading...</div>;
     }
+   
 
     return(
       <div className="w-full pl-4 min-w-0 flex flex-wrap justify-start space-between">

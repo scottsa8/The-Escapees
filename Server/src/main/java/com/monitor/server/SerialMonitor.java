@@ -94,12 +94,32 @@ public class SerialMonitor {
                 String data = new String(delimitedMessage);
                 data = data.strip();
                 System.out.println("INPUT:" + data);
-                 if(data == "PANIC"){
-                    System.out.println("Panicking");
-                    panic();
-                }
                 String[] sensorData = data.split(",");
                 int packetType;
+                if(sensorData[0].equals("PANIC")){
+                    System.out.println("Panicking");
+                    PreparedStatement getRoom;
+                    try {
+                        getRoom = connection.prepareStatement(
+                            "SELECT r.room_name " +
+                            "FROM users u " +
+                            "JOIN roomOccupants ro ON u.user_id = ro.user_id " +
+                            "JOIN rooms r ON ro.room_id = r.room_id " +
+                            "WHERE u.user_microbit=?"
+                        );
+
+                        getRoom.setString(1, sensorData[1]);
+                        ResultSet rs = getRoom.executeQuery();
+                        String roomName = "";
+                        if(rs.next()){
+                            roomName=rs.getString("room_name");
+                            System.out.println(roomName);
+                            panic(roomName);
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
                 try{
                     packetType= Integer.parseInt(sensorData[0]);
                 }catch (Exception e){
@@ -108,6 +128,11 @@ public class SerialMonitor {
                 if (packetType == 1) { //moving device
                     if(sensorData.length!=3){
                         return;
+                    }
+                    for(int i=0;i<sensorData.length;i++){
+                        if(sensorData[i].contains("Recv")|| sensorData[i].contains("Rec")){
+                            return;
+                        }
                     }
                     String deviceName = sensorData[1];
                     String roomMicrobit = sensorData[2];
@@ -220,7 +245,7 @@ public class SerialMonitor {
                             insertStatement.setInt(5, scaledLightLevel);
                             insertStatement.executeUpdate();
                             PreparedStatement getRoom = connection.prepareStatement(
-                                    "SELECT room_name FROM rooms WHERE microbit_name=?"
+                                    "SELECT room_name FROM rooms WHERE room_microbit=?"
                             );
                             getRoom.setString(1, microbitName);
                             ResultSet rs = getRoom.executeQuery();
@@ -338,6 +363,7 @@ public class SerialMonitor {
         int maxTemp=0;int maxNL=0;int maxLL=0;
         int currTemp=0;int currNL=0;int currLL=0;
         boolean overTemp=false; boolean overNL=false; boolean overLL=false;
+        Timestamp timestamp = null;
         try {
             PreparedStatement selectData = connection.prepareStatement(
                     "SELECT max_temperature, max_noise_level, max_light_level FROM rooms WHERE room_name=?"
@@ -351,14 +377,15 @@ public class SerialMonitor {
             }
 
             PreparedStatement getMostRecent = connection.prepareStatement(
-                    "SELECT temperature,noise_level,light_level FROM roomsenvironment WHERE room_id=? ORDER BY timestamp DESC"
+                    "SELECT temperature,noise_level,light_level,timestamp FROM roomenvironment WHERE room_id=? ORDER BY timestamp DESC"
             );
-            selectData.setInt(1,roomID);
+            getMostRecent.setInt(1,roomID);
             ResultSet mostRecent = getMostRecent.executeQuery();
             if(mostRecent.next()){
                 currTemp=mostRecent.getInt("temperature");
                 currNL=mostRecent.getInt("noise_level");
                 currLL=mostRecent.getInt("light_level");
+                timestamp=mostRecent.getTimestamp("timestamp");
             }
             if(currTemp>maxTemp){
                 overTemp=true;
@@ -369,13 +396,13 @@ public class SerialMonitor {
             if(currLL>maxLL){
                 overLL=true;
             }
-
+            ServerApplication.setNoti(roomName, String.valueOf(timestamp).substring(0,String.valueOf(timestamp).length()-5),overTemp,overNL,overLL);
 
         }catch (Exception e){
-
+            e.printStackTrace();
         }
     }
-    public void panic() {
+    public void panic(String fromRoom) {
         try {
             // Retrieve all users with type "guard"
             PreparedStatement selectGuardsStatement = connection.prepareStatement(
@@ -391,7 +418,7 @@ public class SerialMonitor {
 
             // Send "PANIC" message to all guard microbits
             for (String guardMicrobit : guardMicrobits) {
-                sendMessage(guardMicrobit, "PANIC");
+                sendMessage(guardMicrobit, "PANIC:"+fromRoom);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -418,6 +445,8 @@ public class SerialMonitor {
             
                 String initMessage = "Recv";
                 microbit.writeBytes(initMessage.getBytes("UTF-8"), initMessage.length());
+
+                Thread.sleep(500);
     
                 // Send the full packet to the receiver microbit
                 microbit.writeBytes(packetMessage.getBytes("UTF-8"), packetMessage.length());

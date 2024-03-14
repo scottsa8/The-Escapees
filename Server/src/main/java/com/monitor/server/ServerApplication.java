@@ -55,6 +55,7 @@ public class ServerApplication {
 		SpringApplication.run(ServerApplication.class, args);
 		ServerApplication serverApp = new ServerApplication();
 		serverApp.initialize();
+
 		serverApp.startSerialMonitor();
 	}
 
@@ -71,9 +72,11 @@ public class ServerApplication {
 				PreparedStatement createTableStmt = connection.prepareStatement(make);
 				createTableStmt.executeUpdate();
 			}
+
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		createAcc("Admin","password","Admin");
 	}
 
 
@@ -89,8 +92,9 @@ public class ServerApplication {
 		} catch (Exception e) {
 			System.out.println("no Microbit detected");
 		}
-		// transmitMessage(1, "Hello testing sending a long message with a variety of different stuff in the message so that I know what is going on with the thing im working on");
+		// transmitMessage("Ethan", "Hello testing sending a long message with a variety of different stuff in the message so that I know what is going on with the thing im working on");
 		// transmitMessage(1, "Message");
+		// getPeople("Cell Block", "guard");
 	}
 
 	@Scheduled(cron = "0 */2 * ? * *")
@@ -130,20 +134,18 @@ public class ServerApplication {
 	@GetMapping("/getTypes")
 	public ArrayList<String> getTypes(){
 		try{
-			PreparedStatement stmt = connection.prepareStatement("SELECT DISTINCT user_type FROM users");
+			PreparedStatement stmt = connection.prepareStatement("SELECT DISTINCT user_type FROM users WHERE user_type!='Admin'");
 			ResultSet rs = stmt.executeQuery();
-			if(rs.next()){
+
 				ArrayList<String> output = new ArrayList<>();
 				while (rs.next()){
 					output.add(rs.getString("user_type"));
 				}
 				return output;
-			}
 		}catch (Exception e){
 			e.printStackTrace();
 		return null;
 		}
-	return null;
 	}
 
 	@GetMapping("/setDomain")
@@ -152,6 +154,7 @@ public class ServerApplication {
 		try {
 			domain = d;
 			initialize();
+			createAcc("Admin","password","Admin");
 			return true;
 		} catch (Exception e) {
 			domain = temp;
@@ -242,7 +245,7 @@ public class ServerApplication {
 				checkDoor.setString(1, doorName);
 				checkDoor.executeQuery();
 				ResultSet doorResult = selectRoomIdStatement.executeQuery();
-
+				System.out.println(doorResult.next());
 				if(doorResult.next()){
 					PreparedStatement insertDoorStatement = connection.prepareStatement(
 							"UPDATE doors SET x_coordinate=?, y_coordinate=? " +
@@ -252,9 +255,11 @@ public class ServerApplication {
 					insertDoorStatement.setInt(2, yCoordinate);
 					insertDoorStatement.setString(3, doorName);
 					insertDoorStatement.executeUpdate();
+					System.out.println("updating");
 
 					return true;
 				}else {
+					System.out.println("inserting");
 
 					// Insert the new door into the database
 					PreparedStatement insertDoorStatement = connection.prepareStatement(
@@ -271,6 +276,7 @@ public class ServerApplication {
 				}
 			} else {
 				// Handle the case when the roomName is not found
+				System.out.println("no room");
 				return false;
 			}
 		} catch (Exception e) {
@@ -279,8 +285,29 @@ public class ServerApplication {
 			return false;
 		}
 	}
-	
+	private static String roomName;
+	private static String ts;
+	private static boolean maxTemp;
+	private static boolean maxNL;
+	private static boolean maxLL;
 
+	public static void setNoti(String rn,String tis, boolean maxTemp2, boolean maxNL2, boolean maxLL2){
+		roomName=rn;
+		ts=tis;
+		maxTemp=maxTemp2;
+		maxNL=maxNL2;
+		maxLL=maxLL2;
+	}
+	@GetMapping("/getNoti")
+	private String getNoti(){
+		StringBuilder output = new StringBuilder();
+		output.append("{\"noti\":{" +
+				"\"data\":[");
+		output.append("{\"roomName\": \""+roomName+"\",\"timestamp\": \""+ts+"\", \"maxTemp\": \""+maxTemp+"\","+
+				"\"maxNL\": \""+maxNL+"\", \"maxLL\": \""+maxLL+"\"}");
+		output.append("]}}");
+		return output.toString();
+	}
 	@GetMapping("/getDoors")
 	private String getDoors(@RequestParam(value = "roomName") String roomName) {
 		StringBuilder output = new StringBuilder();
@@ -311,7 +338,7 @@ public class ServerApplication {
 	@GetMapping("/panic")
 	private String triggerPanic() {
 		if (monitor != null) {
-			monitor.panic();
+			monitor.panic("");
 			return "Panic function triggered successfully";
 		} else {
 			return "Microbit not available";
@@ -469,7 +496,8 @@ public class ServerApplication {
 						"JOIN users u ON ro.user_id = u.user_id " +
 						"WHERE r.room_name = ? " +
 						"AND ro.entry_timestamp = latest.max_timestamp " +
-						"AND u.user_type = ?")) {
+						"AND u.user_type = ?"))
+					{
 			selectStatement.setString(1, loc);
 			selectStatement.setString(2, type);
 	
@@ -573,18 +601,30 @@ public class ServerApplication {
 	private boolean createAcc(@RequestParam(value = "user") String user, @RequestParam(value = "pass") String pass,
 			@RequestParam(value = "type") String type) {
 		try {
-			PreparedStatement insertStatement = connection.prepareStatement(
-					"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)");
-			insertStatement.setString(1, user);
-			insertStatement.setString(2, hashPassword(pass));
-			if (type == null) {
-				insertStatement.setString(3, "user"); // Assuming default user_type is "user"
-			} else {
+			if(user.equals("Admin")){
+				PreparedStatement checkAdmin = connection.prepareStatement(
+						"SELECT username FROM users WHERE username = 'Admin'");
+				ResultSet rs = checkAdmin.executeQuery();
+				if(rs.next()){
+					return true	;
+				}else{
+					PreparedStatement insertStatement = connection.prepareStatement(
+							"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)");
+					insertStatement.setString(1, user);
+					insertStatement.setString(2, hashPassword(pass));
+					insertStatement.setString(3,type);
+					insertStatement.executeUpdate();
+					return true;
+				}
+			}else{
+				PreparedStatement insertStatement = connection.prepareStatement(
+						"INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)");
+				insertStatement.setString(1, user);
+				insertStatement.setString(2, hashPassword(pass));
 				insertStatement.setString(3, type);
+				insertStatement.executeUpdate();
+				return true; // Success
 			}
-
-			insertStatement.executeUpdate();
-			return true; // Success
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false; // Failed
