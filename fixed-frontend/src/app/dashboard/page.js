@@ -90,7 +90,9 @@ const Dashboard = () => {
   
     }
   }
-
+  const { data: notification, isError, isLoading } = useQuery('getNoti', () => fetchApi(getNoti), {
+    refetchInterval: 1000,
+  });
   const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'prison' });
   const [username, setUsername] = useState('');
   const { sendNotification, NotificationComponent } = useNotification();
@@ -249,7 +251,7 @@ const Dashboard = () => {
             {/* <Image src="/prison-logo.png" height={50} width={70} /> */}
             {
             
-            themes[currentDomain] == null ? isLightTheme?themes.prison.lightBrand:themes.prison.darkBrand : 
+            themes[currentDomain] == null ? null : 
           isLightTheme?themes[currentDomain].lightBrand:themes[currentDomain].darkBrand}
             <div className="divider"></div>
             {/* margin-right: 1rem;border-right: 1px solid white;margin-left: 1rem; */}
@@ -272,6 +274,7 @@ const Dashboard = () => {
                     <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1 text-gray-800 hover:text-red-500 rounded-full">X</button>
                     <h1 className="text-lg font-bold">{notification.title}</h1>
                     <p className="mt-7 text-sm text-gray-300 dark:text-gray-600">{notification.options}</p>
+                    <p className="mt-7 text-sm text-gray-300 dark:text-gray-400">{notification.timestamp}</p>
                   </div>
                 ))}
               </div>
@@ -288,9 +291,11 @@ const Dashboard = () => {
           <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.interactiveMap)}>Map <MapIcon/></button>
           <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.charts)}>Analytics <AnalyticsIcon/></button>
           {getCookie("username") == "Admin" ?
-          <div>
+          <div> 
           <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.settings)}>Settings <SettingsIcon/></button>
-          <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit Manager<CPUIcon/></button></div>:null
+          
+          <button className="topbar-button lg:sidebar-button" onClick={() => viewChangeHandler(views.microManager)}>Microbit Manager<CPUIcon/></button>  </div>:null
+        
                 }
         </div>
 
@@ -298,12 +303,12 @@ const Dashboard = () => {
         <div className="card-container p-4">
           
           {currentView.page}
-          {fetchApi("getDomain")=="prison"?
+          {selectedDomain=="prison"?
           <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600"
           onClick={async () => {
             try {
               await fetchApi('panic');
-              sendNotification("Panic Button Pressed", "A panic button has been pressed in the "+await fetchApi("getDomain")+ " system at "+(new Date().toUTCString));
+              sendNotification("Panic Button Pressed", "A panic button has been pressed in the "+await fetchApi("getDomain")+ " system at ");
             } catch (error) {
               console.error('Error:', error);
             }
