@@ -79,9 +79,9 @@ export default function EnviromentContainer(){
         <div>
             <div className="flex flex-col items-center p-2 bg-transparent">
                 <div className="w-full flex flex-row flex-wrap justify-center bg-transparent dark:text-blue-100">
-                    <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Temp" value={values["temp"]} max={fetchApi(`getMax?loc=${selectedLocation}&type=${max_temperature}`)}/>
-                    <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Light" value={values["light"]} max={fetchApi(`getMax?loc=${selectedLocation}&type=${max_light_level}`)}/>
-                    <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Noise" value={values["noise"]} max={fetchApi(`getMax?loc=${selectedLocation}&type=${max_noise_level}`)}/>
+                    <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Temp" value={values["temp"]} max={fetchApi(`getMax?loc=${selectedLocation}&type=max_temperature`)}/>
+                    <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Light" value={values["light"]} max={fetchApi(`getMax?loc=${selectedLocation}&type=max_light_level`)}/>
+                    <EnvironmentBox dialClassName={dialClassName} size={dialSize} measurement="Noise" value={values["noise"]} max={fetchApi(`getMax?loc=${selectedLocation}&type=max_noise_level`)}/>
                 </div>
             <LocationCountBox onRoomClick={handleRoomClick} />
             </div>
