@@ -248,6 +248,7 @@ const Dashboard = () => {
         <div className="card-container p-4">
           
           {currentView.page}
+          {fetchApi("getDomain")=="prison"?
           <button className="fixed right-0 rounded-md m-4 shadow-md bottom-0 flex justify-end p-2 bg-red-600"
           onClick={async () => {
             try {
@@ -257,7 +258,7 @@ const Dashboard = () => {
               console.error('Error:', error);
             }
           }}
-          >Panic</button>
+          >Panic</button>:null}
           <NotificationComponent />
         </div>
       </body>
