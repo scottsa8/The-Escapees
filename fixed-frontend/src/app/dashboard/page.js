@@ -130,7 +130,7 @@ const Dashboard = () => {
       const root = document.querySelector(':root');
       const setVariables = vars => Object.entries(vars).forEach(v => root.style.setProperty(v[0], v[1]));
 
-      setVariables(themes[domain].cssRules)
+      setVariables(themes[domain]?.cssRules || themes["prison"].cssRules)
     }
   }
 
@@ -177,12 +177,12 @@ const Dashboard = () => {
   const viewChangeHandler = (view) => {
     setView(view);
     if (typeof document !== 'undefined') {
-      document.title = `${currentView.pageTitle} - ${themes[currentDomain].title}`
+      document.title = `${currentView.pageTitle} - ${themes[currentDomain]?.title || currentDomain}`
     }
   }
 
   if (typeof document !== 'undefined') {
-    document.title = `${currentView.pageTitle} - ${themes[currentDomain].title}`
+    document.title = `${currentView.pageTitle} - ${themes[currentDomain]?.title || currentDomain}`
   }
 
   useEffect(() => {
