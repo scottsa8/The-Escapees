@@ -268,7 +268,7 @@ const Dashboard = () => {
           </button>
           {showNotifications && (
               <div className="notif-box absolute -ml-32 top-full mt-2 overflow-y-auto max-h-64 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4">
-                <button onClick={()=>deleteAll()} className="absolute top-0 right-0 p-1 sticky">Clear All </button>
+                <button onClick={()=>deleteAll()} className="absolute top-0 right-0 p-1">Clear All </button>
                 {notifications.map((notification, index) => (
                   <div className={`notif-card p-4 mb-4 mt-2 relative bg-gray-100 dark:bg-gray-700 rounded-lg ${deleting === index ? 'deleting' : ''}`} key={index}>  
                     <button onClick={() => deleteNotification(index)} className="absolute top-0 right-0 p-1 text-gray-800 hover:text-red-500 rounded-full">X</button>
