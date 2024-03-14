@@ -20,6 +20,7 @@ export default function MicroManager() {
    
     const handleCreateAccount = async () => {
         await fetchApi(`createAcc?user=${username}&pass=${password}&type=${type}`);
+        refetchNames();
       };
       
     const handleAddRoom = async () => {
@@ -125,7 +126,6 @@ export default function MicroManager() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {console.log(namesData.names.data)}
                         {namesData.names.data.map((item, index) => (
                         <TableRow key={index}>
                             <TableCell>{item.username}</TableCell>
