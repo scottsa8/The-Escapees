@@ -54,7 +54,7 @@ export default function MicroManager() {
             <div className="microbit-container flex justify-between flex-no-wrap">
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Add Room</h2>
+                    <h2 className="text-lg font-bold text-blue-300 dark:text-blue-100">Add Room</h2>
                     <input className="block w-full p-2 border rounded" value={roomName} onChange={e => setRoomName(e.target.value)} placeholder="Room Name" />
                     <input className="block w-full p-2 border rounded" value={mbName} onChange={e => setMbName(e.target.value)} placeholder="Microbit Name" />
                     <input className="block w-full p-2 border rounded" value={maxValues} onChange={e => setMaxValues(e.target.value)} placeholder="Max Values" />
@@ -62,7 +62,7 @@ export default function MicroManager() {
                 </div>
 
                 <div className="space-y-2">
-                    <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Update Max Values</h2>
+                    <h2 className="text-lg font-bold text-blue-300 dark:text-blue-100">Update Max Values</h2>
                     <input className="block w-full p-2 border rounded" value={updateRoomName} onChange={e => updatesetRoomName(e.target.value)} placeholder="Room Name" />
                     <input className="block w-full p-2 border rounded" value={updateMaxValues} onChange={e => setUpdateMaxValues(e.target.value)} placeholder="Max Values" />
                     <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMax}>Update Max Values</button>
@@ -70,7 +70,7 @@ export default function MicroManager() {
 
                 <div className="space-y-2">
                     
-                    <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Update Microbit</h2>
+                    <h2 className="text-lg font-bold text-blue-300 dark:text-blue-100">Update Microbit</h2>
                     <select class="flex mb-5 card-container border rounded"  value={selectedOption} onChange={e => setSelectedOption(e.target.value)}>
                     <option value={"initial"}disabled={true}>Select a Type</option>
                     <option value="user">User</option>
@@ -81,7 +81,7 @@ export default function MicroManager() {
                     <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600" onClick={handleUpdateMB}>Update Microbit</button>
                 </div>
                 <div className="space-y-2">
-                <h2 className="text-lg font-bold text-blue-700 dark:text-blue-100">Create account</h2>
+                <h2 className="text-lg font-bold text-blue-300 dark:text-blue-100">Create account</h2>
                     <input className="block w-full p-2 border rounded" type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username"/>
                     <input className="block w-full p-2 border rounded" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password"/>
                     <input className="block w-full p-2 border rounded" type="text" value={userType} onChange={e => setUserType(e.target.value)} placeholder="Type"/>
