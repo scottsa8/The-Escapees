@@ -7,93 +7,95 @@ import MapPage from "../components/new-map-components/MapPage"
 import Settings from "../components/settings"
 import Chart from "../components/charts"
 import MicroManager from "../components/MicroManager"
-import { getCookie } from "../components/cookies"
+import { getCookie, setCookie } from "../components/cookies"
 import { HomeIcon,LocPin,MapIcon,SettingsIcon,AnalyticsIcon,NotificationIcon,CPUIcon } from "../components/heroIcons"
 import { useNotification } from "../components/notifications";
 import { fetchApi } from "../components/apiFetcher";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useQuery } from "react-query";
+// const util = require('util');
 
 
 
-const colourSchemes = {
-  blue:{
-    "--light-body-background": "#EAEAEB",
-    "--light-banner-colour": "#B7B6B7",
-    "--light-sidebar": "#D9D9D9",
-    "--light-title-colour": "black",
-    "--light-card": "#BDBDBC",
 
-    "--dark-body-background": "#22314f",
-    "--dark-sidebar-background": "#1b2030",
-    "--dark-sidebar-main": "#DBE9FE",
-    "--dark-banner-gradient": "linear-gradient(to right, #1d2232, #1b2030)",
-    "--dark-title-colour": "#dbeafe",
-    "--dark-card": "#374151",
-    },
-    orange:{
-      "--light-body-background": "#fffde3",
-      "--light-banner-colour": "#ffee97",
-      "--light-sidebar": "#ffee97",
-      "--light-title-colour": "black",
-      "--light-card": "#fffde3",
-
-      "--dark-body-background": "#22314f",
-      "--dark-sidebar-background": "#1b2030",
-      "--dark-sidebar-main": "#DBE9FE",
-      "--dark-banner-gradient": "linear-gradient(to right, #5D2E0C, #a64e0f)",
-      "--dark-title-colour": "#dbeafe",
-      "--dark-card": "#846656"
-    },
-    purple:{
-      "--light-body-background": "#eee3ff",
-      "--light-banner-colour": "#c297ff",
-      "--light-sidebar": "#c297ff",
-      "--light-title-colour": "black",
-      "--light-card": "#eee3ff",
-
-      "--dark-body-background": "#22314f",
-      "--dark-sidebar-background": "#1b2030",
-      "--dark-sidebar-main": "#DBE9FE",
-      "--dark-banner-gradient": "linear-gradient(to right, #390c5d, #6a13b0)",
-      "--dark-title-colour": "#dbeafe",
-      "--dark-card": "#755684"
-    },
-}
-
-//Metadata about each domain; branding, colour scheme and titles
-const themes = {
-  prison: {
-    title: "Prison System",
-    cssRules:colourSchemes.blue,
-    lightBrand: <Image src="/prison-logo.png" height={50} width={70} />,
-    darkBrand: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />,
-    lightBg: <Image src="/Prison-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
-    darkBg: <Image src="/Prison-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
-  },
-  hotel: {
-    title: "SCC Luxury",
-    cssRules:colourSchemes.orange,
-    lightBrand:<Image src="/hotel-logo.png" height={50} width={70} />,
-    darkBrand: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />,
-    lightBg: <Image src="/Hotel-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
-    darkBg: <Image src="/Hotel-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
-
-  }
-}
 
 
 //Used by the user to navigate through pages
 //It's the constant border around the main page
 const Dashboard = () => {
-  const { data: notification, isError, isLoading } = useQuery('getNoti', () => fetchApi(`getNoti`), {
-    refetchInterval: 1000,
-  });
+
+  const colourSchemes = {
+    blue:{
+      "--light-body-background": "#EAEAEB",
+      "--light-banner-colour": "#B7B6B7",
+      "--light-sidebar": "#D9D9D9",
+      "--light-title-colour": "black",
+      "--light-card": "#BDBDBC",
+  
+      "--dark-body-background": "#22314f",
+      "--dark-sidebar-background": "#1b2030",
+      "--dark-sidebar-main": "#DBE9FE",
+      "--dark-banner-gradient": "linear-gradient(to right, #1d2232, #1b2030)",
+      "--dark-title-colour": "#dbeafe",
+      "--dark-card": "#374151",
+      },
+      orange:{
+        "--light-body-background": "#fffde3",
+        "--light-banner-colour": "#ffee97",
+        "--light-sidebar": "#ffee97",
+        "--light-title-colour": "black",
+        "--light-card": "#fffde3",
+  
+        "--dark-body-background": "#22314f",
+        "--dark-sidebar-background": "#1b2030",
+        "--dark-sidebar-main": "#DBE9FE",
+        "--dark-banner-gradient": "linear-gradient(to right, #5D2E0C, #a64e0f)",
+        "--dark-title-colour": "#dbeafe",
+        "--dark-card": "#846656"
+      },
+      purple:{
+        "--light-body-background": "#e9e1f9",
+        "--light-banner-colour": "#c297ff",
+        "--light-sidebar": "#c297ff",
+        "--light-title-colour": "black",
+        "--light-card": "#eee3ff",
+  
+        "--dark-body-background": "#3a224f",
+        "--dark-sidebar-background": "#1b2030",
+        "--dark-sidebar-main": "#DBE9FE",
+        "--dark-banner-gradient": "linear-gradient(to right, #390c5d, #6a13b0)",
+        "--dark-title-colour": "#dbeafe",
+        "--dark-card": "#755684"
+      },
+  }
+  
+  //Metadata about each domain; branding, colour scheme and titles
+  const themes = {
+    prison: {
+      title: "Prison System",
+      cssRules:colourSchemes.blue,
+      lightBrand: <Image src="/prison-logo.png" height={50} width={70} />,
+      darkBrand: <Image src="/prison-logo-dark-mode.png" height={50} width={70} />,
+      lightBg: <Image src="/Prison-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
+      darkBg: <Image src="/Prison-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
+    },
+    hotel: {
+      title: "SCC Luxury",
+      cssRules:colourSchemes.orange,
+      lightBrand:<Image src="/hotel-logo.png" height={50} width={70} />,
+      darkBrand: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />,
+      lightBg: <Image src="/Hotel-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
+      darkBg: <Image src="/Hotel-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
+  
+    }
+  }
+
   const { data: selectedDomain, refetch: refetchSelectedDomain } = useQuery('selectedDomain', () => fetchApi("getDomain"), { initialData:'prison' });
   const [username, setUsername] = useState('');
   const { sendNotification, NotificationComponent } = useNotification();
   const [ showNotifications, setShowNotifications ] = useState(false); 
+  // const [themes,setThemes] = useState(defaultThemes)
   
   const [isLightTheme,setLightTheme] = useState(true)
   const [deleting, setDeleting] = useState(null);
@@ -124,23 +126,52 @@ const Dashboard = () => {
   const changeDomainStyling = (domain) => {
     if (typeof document !== 'undefined'){
       setDomain(domain)
-      console.log("Entered Domain: ",domain);
+      setCookie("currentDomain",domain)
+      // console.log(getCookie("domainThemes"));
+      // themes = JSON.parse(getCookie("domainThemes"))
+      var domainCSS = JSON.parse(getCookie(domain+"CSS"))
       
       refetchSelectedDomain()
       const root = document.querySelector(':root');
       const setVariables = vars => Object.entries(vars).forEach(v => root.style.setProperty(v[0], v[1]));
-
-      setVariables(themes[domain]?.cssRules || themes["prison"].cssRules)
+      
+      setVariables(domainCSS)
     }
   }
 
+  const handleDomainTheme = (domainName,colourScheme) => {
+    
+    themes[domainName] = {
+      title:domainName,
+      cssRules:colourSchemes[colourScheme],
+      lightBrand:<Image src="/hotel-logo.png" height={50} width={70} />,
+      darkBrand: <Image src="/hotel-logo-dark-mode.png" height={50} width={70} />,
+      lightBg: <Image src="/Hotel-Light-Background.png" layout="fill" objectFit="cover" quality={100}/>,
+      darkBg: <Image src="/Hotel-Dark-Background.png" layout="fill" objectFit="cover" quality={100}/>
+    }
+    
+
+    setCookie(domainName+"title",domainName);
+    setCookie(domainName+"CSS",JSON.stringify(colourSchemes[colourScheme]))
+    // var updatedThemes = {...themes,...newTheme}
+    // setCookie("domainThemes",JSON.stringify(updatedThemes),(k,v) =>{
+    //   if(colourSchemes[k]){
+    //     return colourSchemes[k]
+    //   }
+    // })
+    // setThemes(updatedThemes)
+    // themes = {...themes,...newTheme}
+
+    
+  }
   
 // Lists the pages for the navigation bar on the dashboard
   const views = {
     individualLocations: { page: <LocationTable/>, pageTitle: "Individual Locations"},
     homePage: { page: <HomePage/>, pageTitle: "Dashboard"},
     interactiveMap: {page: <MapPage/>, pageTitle: "Interactive Map"},
-    settings: {page: <Settings dashThemeHook={setLightTheme}  dashDomainChange={changeDomainStyling}/>, pageTitle: "Settings"},
+    settings: {page: <Settings dashThemeHook={setLightTheme}  dashDomainChange={changeDomainStyling} 
+    colourSchemes={Object.keys(colourSchemes)} domainThemeUpdate={handleDomainTheme}/>, pageTitle: "Settings"},
     charts: {page: <Chart/>, pageTitle: "Charts"},
     microManager: {page: <MicroManager/>, pageTitle: "Microbit Manager"}
   }
@@ -169,20 +200,33 @@ const Dashboard = () => {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', (getCookie('theme') || 'light') === 'dark');
     console.log(getCookie("theme")===null)
+    
+    for (let key in themes){
+      if(getCookie(key+"CSS") === null){
+        setCookie(key+"CSS",JSON.stringify(themes[key].cssRules))
+      }
+      if(getCookie(key+"title") === null){
+        setCookie(key+"title",JSON.stringify(themes[key].title))
+      }
+    }
+
     setLightTheme(getCookie('theme') === null?true:getCookie('theme') === 'light')
     changeDomainStyling(selectedDomain);
+    setDomain(getCookie("currentDomain"))
     setUsername(getCookie("username"));
   }, []);
 
   const viewChangeHandler = (view) => {
     setView(view);
     if (typeof document !== 'undefined') {
-      document.title = `${currentView.pageTitle} - ${themes[currentDomain]?.title || currentDomain}`
+      
+      document.title = `${currentView.pageTitle} - ${getCookie(currentDomain+"title")}`
     }
   }
 
   if (typeof document !== 'undefined') {
-    document.title = `${currentView.pageTitle} - ${themes[currentDomain]?.title || currentDomain}`
+    console.log("Themes in Body", themes)
+    document.title = `${currentView.pageTitle} - ${getCookie(currentDomain+"title")}`
   }
 
   useEffect(() => {
@@ -196,12 +240,17 @@ const Dashboard = () => {
       {/* <title>{currentView.pageTitle} - Prison System</title> */}
       <body>
         <div className="h-full fixed w-full overflow-hidden -z-10">
-          {isLightTheme?themes[currentDomain].lightBg:themes[currentDomain].darkBg}
+          {
+          themes[currentDomain] == null ? <div/> : 
+          isLightTheme?themes[currentDomain].lightBg:themes[currentDomain].darkBg}
         </div>
         <div className="banner">
           <div className="flex px-4">
             {/* <Image src="/prison-logo.png" height={50} width={70} /> */}
-            {isLightTheme?themes[currentDomain].lightBrand:themes[currentDomain].darkBrand}
+            {
+            
+            themes[currentDomain] == null ? isLightTheme?themes.prison.lightBrand:themes.prison.darkBrand : 
+          isLightTheme?themes[currentDomain].lightBrand:themes[currentDomain].darkBrand}
             <div className="divider"></div>
             {/* margin-right: 1rem;border-right: 1px solid white;margin-left: 1rem; */}
             <h1 className="title">{currentView.pageTitle}</h1> 
